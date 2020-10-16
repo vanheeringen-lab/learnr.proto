@@ -1,0 +1,21 @@
+Package: learnr.proto
+Type: Package
+Title: A set of LearnR Tutorials.
+Version: 0.1.0
+Authors@R: 
+    person(given = "Siebren",
+           family = "Frölich",
+           role = c("aut", "cre"),
+           email = "siebrenf@science.ru.nl",
+           comment = c(ORCID = "0000-0001-6925-8446"))
+Maintainer: Siebren Frölich <siebrenf@science.ru.nl>
+Description: Tools to setup and launch Learnr tutorials
+    from the MBScourse server.
+License: MIT
+Encoding: UTF-8
+LazyData: true
+Imports:
+  learnr (>= 0.10.1),
+  tidyverse,
+  ggplot2
+  
