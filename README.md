@@ -1,9 +1,8 @@
 # learnr.proto
 
-## Developing this tutorial
+## Developing tutorial
 
 ### Quick and dirty
-
 The following steps download the learnr tutorial and allows you to work on them without version control.
 
 1) optional: `cd` into a directory where you want to store these files.
@@ -48,6 +47,6 @@ library(learnr)
 
 - To add a new tutorial to the repo, add a folder to `inst/tutorials` containing a Rmarkdown file with the same name (example: `inst/tutorials/test/test.Rmd`).
 
-- If there is no boxes to input code, close the tutorial. Next, in the top bar, click `Session`, then `Restart R`.
+- If there are no boxes to input code, close the tutorial. Next, in the top bar, click `Session`, then `Restart R`.
 
-- If you pressed "Run document" and got an error methioning "file exists", run `rm("learnr.proto-master/ins/tutorials/test/test.html")` and try again.
+- If you pressed "Run document" and got an error mentioning "file exists", run `rm("learnr.proto-master/ins/tutorials/test/test.html")` and try again.
