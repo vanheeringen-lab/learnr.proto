@@ -1,0 +1,11 @@
+channels:
+  - r
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - r::rstudio
+  - r::r>=3.6.0  # any r must be specified to install rstudio
+  - r::r-devtools=2.0.2
+  - conda-forge::r-learnr=0.10.1  # this should install shiny and Rmarkdown
+  - r::r-tidyverse
