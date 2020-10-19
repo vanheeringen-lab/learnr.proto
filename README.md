@@ -46,6 +46,8 @@ library(learnr)
 ### Notes & Troubleshooting
 - The settings menu (gear wheel symbol) can be used to change the display method of the tutorial. 
 
+- To add a new tutorial to the repo, add a folder to `inst/tutorials` containing a Rmarkdown file with the same name (example: `inst/tutorials/test/test.Rmd).
+
 - If there is no boxes to input code, close the tutorial. Next, in the top bar, click `Session`, then `Restart R`.
 
 - If you pressed "Run document" and got an error methioning "file exists", run `rm("learnr.proto-master/ins/tutorials/test/test.html")` and try again.
