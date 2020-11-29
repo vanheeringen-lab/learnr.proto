@@ -152,18 +152,22 @@ The **sequencer** analyzes a set number of bases, eg 42, 50 or 100 bp, called a 
 4. Quality score for each nucleotide, also called **Phred score**. 
 
 <br> 
-The Phred scores represents the probability (p) that the reported call is incorrect:  
+The Phred scores represents the probability (p) that the reported call is incorrect. You do not need to learn this encoding by heart but they will come back in the Quality Control step of our analysis, therefore we discuss briefly how they are encoded:    
 
-Phred quality score | Probability of incorrect base call | Accuracy  
-:--:|:--:|:--:  
-10 | 1 in 10 | 90%   
-20 | 1 in 100 | 99%  
-30 | 1 in 1000 | 99.9%   
-40 | 1 in 10000 | 99.99%   
-50 | 1 in 100000 | 99.999%   
+Phred quality score | Probability of incorrect base call | Accuracy | Characterer     
+:--:|:--:|:--:|:--:|:--      
+0 | 1 in 1 | 0% | !  
+10 | 1 in 10 | 90% | +  
+20 | 1 in 100 | 99% | 5  
+30 | 1 in 1000 | 99.9% | ?  
+40 | 1 in 10000 | 99.99% | J  
 
-Single letters and symbols are used to represent each quality score, eg:  
+Here's another visualization of how Phred scores are encoded :   
 ![](images/wk1_2_phred_quality_scores_TorstenSeemannpresentation.png){width=80%}   
+
+> *Background*: Here's the full ASCII Character encoding of quality scores 0-40:  
+![](images/wk1_1_phred_ascii.png){width=80%}   
+
 
 <br>
 Before we can start our data analysis and identify for example regions marked by activating and repressing histone marks, we need to process the raw data. This includes cleaning up, mapping, visualizing the sequenced reads and identifying genomic regions where reads tend to pile up (in other words "peaks"). Which is what we will discuss next.   
@@ -176,22 +180,26 @@ A general pipeline for ChIP sequencing data involves the following steps:
 #### 1. Run a quality check on the raw data  
 We run the raw fastq files through [FASTQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) software to get a quick impression of whether our data has any technical problems of which we should be aware before doing any further analysis. This tools outputs a HTML report with  graphs and tables summarizing, among others the base call accuracy, library base composition, duplication levels and the presence of overrepresented sequences.    
 
- he **Per base sequence quality** plot is one of the most important plots generated. It summarizes the base call accuracy (Y-axis) for each cycle (X-axis) across the library. See this example:  
+The **Per base sequence quality** plot is one of the most important plots generated. It summarizes the base call accuracy (Y-axis) for each cycle (X-axis) across the library. See this example:  
  <br>
 ![](images/wk1_3_fastqc_per_base_quality_vb1.png){width=80%}  
-For most runs, quality should be good for most reads through the whole run. If quality deteriorates we can use the other plots to understand why this is.  
+
+This exmaple shows ....
+
+
+For most runs, quality should be good for most reads through the whole run. If quality deteriorates, we can use the other plots and tables to try to understand why this is.  
 
 - Good (Illumina) quality is generally Phred > 28 - 30    
 - Concerning (Illumina) quality is Phred < 20  
 
 > **Exercise 1**  
-> Use the following two FASTQC reports to anser the following questions.  
+> Use the following two FASTQC reports to answer the following questions.  
 > 
 - [FASTQC report 1](https://ctoen.github.io/FunctGen/example1_sequence_short_fastqc.html)  
 - [FASTQC report 2](https://ctoen.github.io/FunctGen/example2_sequence_short_fastqc.html)
 
-```{r quiz_fastqc, exercise = T, echo =  F}
-quiz(caption = "Use the following two FASTQC reports to anser the following questions?",
+```{r quiz_fastqc, echo =  F}
+quiz(
     question("What is the sequence length?",
              answer("45"),
              answer("40", correct = T),   
