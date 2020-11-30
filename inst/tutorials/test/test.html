@@ -292,25 +292,6 @@ tutorial_options(
   exercise.timelimit = 10,  # max code execution time
   #exercise.checker = checker
   )
-
-# session$onSessionEnded(function() {
-#   learnr:::session_stop_event(session)
-# })
-</script>
- 
-<script type="application/shiny-prerendered" data-context="server">
-#, include=FALSE}
-# if (session$isClosed()){
-#   stopApp()
-# }
-
-
-# works with start_app(), but not start_tutorial(?)
-
-# what to do when the browser window is closed
-session$onSessionEnded(function() {
-  stopApp()
-})
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
@@ -325,6 +306,52 @@ learnr:::clear_exercise_setup_chunks()
 session$onSessionEnded(function() {
         learnr:::event_trigger(session, "session_stop")
       })
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::store_exercise_setup_chunk("__setup__", c("# for Shiny Server", "learnr.dashboard::set_lib_paths(\"/home/siebrenf/miniconda3/envs/learnr/lib/R/library\")", 
+"", "# packages", "library(learnr)  # 0.10.1 -> conda-forge / 0.9.2.1 -> r", 
+"library(tidyverse)  # 1.2.1 -> r / 1.3.0 -> conda-forge", "library(ggplot2)  # 3.1.1 -> r", 
+"# library(genomicranges)  # 1.40.0 -> bioconda", "# library(pheatmap)  # 1.0.12 -> r", 
+"# library(checkr)", "# library(grader)", "", "", "# configuration", 
+"knitr::opts_chunk$set(echo = FALSE)", "gradethis::gradethis_setup()", 
+"", "# functions", "# checker <- function(label, user_code, check_code, envir_result, evaluate_result, ...) {", 
+"#  list(message = check_code, correct = TRUE, location = \"append\")", 
+"# }", "tutorial_options(", "  exercise.timelimit = 10,  # max code execution time", 
+"  #exercise.checker = checker", "  )"), overwrite = FALSE)
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::store_exercise_setup_chunk("__setup__", c("# for Shiny Server", "learnr.dashboard::set_lib_paths(\"/home/siebrenf/miniconda3/envs/learnr/lib/R/library\")", 
+"", "# packages", "library(learnr)  # 0.10.1 -> conda-forge / 0.9.2.1 -> r", 
+"library(tidyverse)  # 1.2.1 -> r / 1.3.0 -> conda-forge", "library(ggplot2)  # 3.1.1 -> r", 
+"# library(genomicranges)  # 1.40.0 -> bioconda", "# library(pheatmap)  # 1.0.12 -> r", 
+"# library(checkr)", "# library(grader)", "", "", "# configuration", 
+"knitr::opts_chunk$set(echo = FALSE)", "gradethis::gradethis_setup()", 
+"", "# functions", "# checker <- function(label, user_code, check_code, envir_result, evaluate_result, ...) {", 
+"#  list(message = check_code, correct = TRUE, location = \"append\")", 
+"# }", "tutorial_options(", "  exercise.timelimit = 10,  # max code execution time", 
+"  #exercise.checker = checker", "  )"), overwrite = FALSE)
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::store_exercise_setup_chunk("__setup__", c("# for Shiny Server", "learnr.dashboard::set_lib_paths(\"/home/siebrenf/miniconda3/envs/learnr/lib/R/library\")", 
+"", "# packages", "library(learnr)  # 0.10.1 -> conda-forge / 0.9.2.1 -> r", 
+"library(tidyverse)  # 1.2.1 -> r / 1.3.0 -> conda-forge", "library(ggplot2)  # 3.1.1 -> r", 
+"# library(genomicranges)  # 1.40.0 -> bioconda", "# library(pheatmap)  # 1.0.12 -> r", 
+"# library(checkr)", "# library(grader)", "", "", "# configuration", 
+"knitr::opts_chunk$set(echo = FALSE)", "gradethis::gradethis_setup()", 
+"", "# functions", "# checker <- function(label, user_code, check_code, envir_result, evaluate_result, ...) {", 
+"#  list(message = check_code, correct = TRUE, location = \"append\")", 
+"# }", "tutorial_options(", "  exercise.timelimit = 10,  # max code execution time", 
+"  #exercise.checker = checker", "  )"), overwrite = FALSE)
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+# stop the tutorial when the browser window is closed
+session$onSessionEnded(function() {
+  stopApp()
+})
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
@@ -353,12 +380,12 @@ learnr:::store_exercise_cache("name", list(setup = NULL, chunks = list(list(labe
         external = TRUE, sanitize = FALSE, interval = 1, aniopts = "controls,loop", 
         warning = TRUE, error = FALSE, message = TRUE, render = NULL, 
         ref.label = NULL, child = NULL, engine = "r", split = FALSE, 
-        include = TRUE, purl = TRUE, tutorial = TRUE, exercise.timelimit = 10, 
-        exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, ...) \n{\n    (utils::getFromNamespace(\"grade_learnr_\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, ...)\n}", 
-        exercise.error.check.code = "grade_code()", max.print = 1000, 
-        label = "name", exercise = TRUE, code = "", out.width.px = 624, 
-        out.height.px = 384, params.src = "name, exercise=TRUE", 
-        fig.num = 0L, exercise.df_print = "paged"), engine = "r"))
+        include = TRUE, purl = TRUE, max.print = 1000, tutorial = TRUE, 
+        exercise.timelimit = 10, exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, ...) \n{\n    (utils::getFromNamespace(\"grade_learnr_\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, ...)\n}", 
+        exercise.error.check.code = "grade_code()", label = "name", 
+        exercise = TRUE, code = "", out.width.px = 624, out.height.px = 384, 
+        params.src = "name, exercise=TRUE", fig.num = 0L, exercise.df_print = "paged"), 
+    engine = "r"))
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
@@ -388,11 +415,12 @@ learnr:::store_exercise_cache("name2", list(setup = NULL, chunks = list(list(lab
         aniopts = "controls,loop", warning = TRUE, error = FALSE, 
         message = TRUE, render = NULL, ref.label = NULL, child = NULL, 
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
-        tutorial = TRUE, exercise.timelimit = 10, exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, ...) \n{\n    (utils::getFromNamespace(\"grade_learnr_\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, ...)\n}", 
-        exercise.error.check.code = "grade_code()", max.print = 1000, 
-        label = "name2", exercise = TRUE, exercise.lines = 5, 
-        exercise.eval = TRUE, code = "head(mtcars)", out.width.px = 624, 
-        out.height.px = 384, params.src = "name2, exercise=TRUE, exercise.lines = 5, exercise.eval=TRUE", 
+        max.print = 1000, tutorial = TRUE, exercise.timelimit = 10, 
+        exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, ...) \n{\n    (utils::getFromNamespace(\"grade_learnr_\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, ...)\n}", 
+        exercise.error.check.code = "grade_code()", label = "name2", 
+        exercise = TRUE, exercise.lines = 5, exercise.eval = TRUE, 
+        code = "head(mtcars)", out.width.px = 624, out.height.px = 384, 
+        params.src = "name2, exercise=TRUE, exercise.lines = 5, exercise.eval=TRUE", 
         fig.num = 0, exercise.df_print = "paged"), engine = "r"))
 </script>
  
@@ -423,11 +451,11 @@ learnr:::store_exercise_cache("print-limit", list(setup = NULL, chunks = list(li
         aniopts = "controls,loop", warning = TRUE, error = FALSE, 
         message = TRUE, render = NULL, ref.label = NULL, child = NULL, 
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
-        tutorial = TRUE, exercise.timelimit = 10, exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, ...) \n{\n    (utils::getFromNamespace(\"grade_learnr_\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, ...)\n}", 
-        exercise.error.check.code = "grade_code()", max.print = 1000, 
-        label = "print-limit", exercise = TRUE, exercise.eval = TRUE, 
-        code = "mtcars", out.width.px = 624, out.height.px = 384, 
-        params.src = "print-limit, exercise=TRUE, exercise.eval=TRUE", 
+        max.print = 1000, tutorial = TRUE, exercise.timelimit = 10, 
+        exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, ...) \n{\n    (utils::getFromNamespace(\"grade_learnr_\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, ...)\n}", 
+        exercise.error.check.code = "grade_code()", label = "print-limit", 
+        exercise = TRUE, exercise.eval = TRUE, code = "mtcars", 
+        out.width.px = 624, out.height.px = 384, params.src = "print-limit, exercise=TRUE, exercise.eval=TRUE", 
         fig.num = 0, exercise.df_print = "paged"), engine = "r"))
 </script>
  
@@ -457,12 +485,12 @@ learnr:::store_exercise_cache("add", list(setup = NULL, chunks = list(list(label
         external = TRUE, sanitize = FALSE, interval = 1, aniopts = "controls,loop", 
         warning = TRUE, error = FALSE, message = TRUE, render = NULL, 
         ref.label = NULL, child = NULL, engine = "r", split = FALSE, 
-        include = TRUE, purl = TRUE, tutorial = TRUE, exercise.timelimit = 10, 
-        exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, ...) \n{\n    (utils::getFromNamespace(\"grade_learnr_\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, ...)\n}", 
-        exercise.error.check.code = "grade_code()", max.print = 1000, 
-        label = "add", exercise = TRUE, code = "1+1", out.width.px = 624, 
-        out.height.px = 384, params.src = "add, exercise=TRUE", 
-        fig.num = 0, exercise.df_print = "paged"), engine = "r"))
+        include = TRUE, purl = TRUE, max.print = 1000, tutorial = TRUE, 
+        exercise.timelimit = 10, exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, ...) \n{\n    (utils::getFromNamespace(\"grade_learnr_\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, ...)\n}", 
+        exercise.error.check.code = "grade_code()", label = "add", 
+        exercise = TRUE, code = "1+1", out.width.px = 624, out.height.px = 384, 
+        params.src = "add, exercise=TRUE", fig.num = 0, exercise.df_print = "paged"), 
+    engine = "r"))
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
@@ -491,12 +519,12 @@ learnr:::store_exercise_cache("letter", list(setup = NULL, chunks = list(list(la
         external = TRUE, sanitize = FALSE, interval = 1, aniopts = "controls,loop", 
         warning = TRUE, error = FALSE, message = TRUE, render = NULL, 
         ref.label = NULL, child = NULL, engine = "r", split = FALSE, 
-        include = TRUE, purl = TRUE, tutorial = TRUE, exercise.timelimit = 10, 
-        exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, ...) \n{\n    (utils::getFromNamespace(\"grade_learnr_\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, ...)\n}", 
-        exercise.error.check.code = "grade_code()", max.print = 1000, 
-        label = "letter", exercise = TRUE, code = "", out.width.px = 624, 
-        out.height.px = 384, params.src = "letter, exercise=TRUE", 
-        fig.num = 0L, exercise.df_print = "paged"), engine = "r"))
+        include = TRUE, purl = TRUE, max.print = 1000, tutorial = TRUE, 
+        exercise.timelimit = 10, exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, ...) \n{\n    (utils::getFromNamespace(\"grade_learnr_\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, ...)\n}", 
+        exercise.error.check.code = "grade_code()", label = "letter", 
+        exercise = TRUE, code = "", out.width.px = 624, out.height.px = 384, 
+        params.src = "letter, exercise=TRUE", fig.num = 0L, exercise.df_print = "paged"), 
+    engine = "r"))
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
@@ -526,12 +554,12 @@ learnr:::store_exercise_cache("exercise1", list(setup = NULL, chunks = list(list
     external = TRUE, sanitize = FALSE, interval = 1, aniopts = "controls,loop", 
     warning = TRUE, error = FALSE, message = TRUE, render = NULL, 
     ref.label = NULL, child = NULL, engine = "r", split = FALSE, 
-    include = TRUE, purl = TRUE, tutorial = TRUE, exercise.timelimit = 10, 
-    exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, ...) \n{\n    (utils::getFromNamespace(\"grade_learnr_\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, ...)\n}", 
-    exercise.error.check.code = "grade_code()", max.print = 1000, 
-    label = "exercise1", exercise = TRUE, code = "1+1", out.width.px = 624, 
-    out.height.px = 384, params.src = "exercise1, exercise = TRUE", 
-    fig.num = 0, exercise.df_print = "paged"), engine = "r"))
+    include = TRUE, purl = TRUE, max.print = 1000, tutorial = TRUE, 
+    exercise.timelimit = 10, exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, ...) \n{\n    (utils::getFromNamespace(\"grade_learnr_\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, ...)\n}", 
+    exercise.error.check.code = "grade_code()", label = "exercise1", 
+    exercise = TRUE, code = "1+1", out.width.px = 624, out.height.px = 384, 
+    params.src = "exercise1, exercise = TRUE", fig.num = 0, exercise.df_print = "paged"), 
+    engine = "r"))
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
@@ -562,26 +590,26 @@ learnr:::store_exercise_cache("filter", list(setup = NULL, chunks = list(list(la
         external = TRUE, sanitize = FALSE, interval = 1, aniopts = "controls,loop", 
         warning = TRUE, error = FALSE, message = TRUE, render = NULL, 
         ref.label = NULL, child = NULL, engine = "r", split = FALSE, 
-        include = TRUE, purl = TRUE, tutorial = TRUE, exercise.timelimit = 10, 
-        exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, ...) \n{\n    (utils::getFromNamespace(\"grade_learnr_\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, ...)\n}", 
-        exercise.error.check.code = "grade_code()", max.print = 1000, 
-        label = "filter", exercise = TRUE, code = "", out.width.px = 624, 
-        out.height.px = 384, params.src = "filter, exercise=TRUE", 
-        fig.num = 0L, exercise.df_print = "paged"), engine = "r"))
+        include = TRUE, purl = TRUE, max.print = 1000, tutorial = TRUE, 
+        exercise.timelimit = 10, exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, ...) \n{\n    (utils::getFromNamespace(\"grade_learnr_\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, ...)\n}", 
+        exercise.error.check.code = "grade_code()", label = "filter", 
+        exercise = TRUE, code = "", out.width.px = 624, out.height.px = 384, 
+        params.src = "filter, exercise=TRUE", fig.num = 0L, exercise.df_print = "paged"), 
+    engine = "r"))
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "quiz-1", question = structure("Which package contains functions for installing other R packages?", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_9c789f2", 
+"character")), answers = list(structure(list(id = "lnr_ans_f4ee2d", 
     option = "base", value = "base", label = structure("base", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = NULL), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_e705337", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_a67b19b", 
     option = "tools", value = "tools", label = structure("tools", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = NULL), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_227135b", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_a569268", 
     option = "utils", value = "utils", label = structure("utils", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = NULL), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_f4a9a58", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_fe16539", 
     option = "codetools", value = "codetools", label = structure("codetools", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = NULL), class = c("tutorial_question_answer", 
 "tutorial_quiz_answer"))), button_labels = list(submit = structure("Submit Answer", html = TRUE, class = c("html", 
@@ -592,22 +620,22 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 "character")), message = NULL, post_message = NULL), ids = list(
     answer = "quiz-1-answer", question = "quiz-1"), loading = structure("<strong>Loading:<\u002fstrong> \nWhich package contains functions for installing other R packages?\n<br/><br/><br/>", html = TRUE, class = c("html", 
 "character")), random_answer_order = FALSE, allow_retry = FALSE, 
-    seed = 52598110.4755071, options = list()), class = c("learnr_radio", 
+    seed = 969228575.548668, options = list()), class = c("learnr_radio", 
 "tutorial_question")))
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_checkbox", label = "quiz-2", question = structure("Which of the R packages listed below are used to create plots?", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_51ae506", 
+"character")), answers = list(structure(list(id = "lnr_ans_3f63c1a", 
     option = "lattice", value = "lattice", label = structure("lattice", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = NULL), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_98f8b2e", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_393aa24", 
     option = "tools", value = "tools", label = structure("tools", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = NULL), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_16425d7", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_d319862", 
     option = "stats", value = "stats", label = structure("stats", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = NULL), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_196dcc5", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_65a4121", 
     option = "grid", value = "grid", label = structure("grid", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = NULL), class = c("tutorial_question_answer", 
 "tutorial_quiz_answer"))), button_labels = list(submit = structure("Submit Answer", html = TRUE, class = c("html", 
@@ -618,20 +646,20 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_checkbox", lab
 "character")), message = NULL, post_message = NULL), ids = list(
     answer = "quiz-2-answer", question = "quiz-2"), loading = structure("<strong>Loading:<\u002fstrong> \nWhich of the R packages listed below are used to create plots?\n<br/><br/><br/>", html = TRUE, class = c("html", 
 "character")), random_answer_order = FALSE, allow_retry = FALSE, 
-    seed = 228931359.893396, options = list()), class = c("learnr_checkbox", 
+    seed = 2100806209.02174, options = list()), class = c("learnr_checkbox", 
 "tutorial_question")))
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "var-types", question = structure("Which of the following is a numerical variable?", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_a278de9", 
+"character")), answers = list(structure(list(id = "lnr_ans_152fb47", 
     option = "zip code", value = "zip code", label = structure("zip code", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("Zip code is recoded using numbers, but it&#39;s not a numerical variable.", html = TRUE, class = c("html", 
     "character"))), class = c("tutorial_question_answer", "tutorial_quiz_answer"
-)), structure(list(id = "lnr_ans_b3e9973", option = "height", 
+)), structure(list(id = "lnr_ans_5e52d60", option = "height", 
     value = "height", label = structure("height", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = NULL), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_f9653e9", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_6e8d93c", 
     option = "handedness", value = "handedness", label = structure("handedness", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = NULL), class = c("tutorial_question_answer", 
 "tutorial_quiz_answer"))), button_labels = list(submit = structure("Submit Answer", html = TRUE, class = c("html", 
@@ -642,7 +670,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 "character")), message = NULL, post_message = NULL), ids = list(
     answer = "var-types-answer", question = "var-types"), loading = structure("<strong>Loading:<\u002fstrong> \nWhich of the following is a numerical variable?\n<br/><br/><br/>", html = TRUE, class = c("html", 
 "character")), random_answer_order = FALSE, allow_retry = TRUE, 
-    seed = 128403617.940207, options = list()), class = c("learnr_radio", 
+    seed = 395979460.315608, options = list()), class = c("learnr_radio", 
 "tutorial_question")))
 </script>
  
@@ -664,7 +692,7 @@ output$hist <- renderPlot({
 <!--/html_preserve-->
 <!--html_preserve-->
 <script type="application/shiny-prerendered" data-context="execution_dependencies">
-{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85]}},"value":[{"type":"character","attributes":{},"value":["assertthat","backports","base","blob","broom","cellranger","checkmate","cli","colorspace","compiler","crayon","curl","datasets","DBI","dbplyr","digest","dplyr","ellipsis","evaluate","fansi","fastmap","forcats","fs","generics","ggplot2","glue","gradethis","graphics","grDevices","grid","gtable","haven","hms","htmltools","htmlwidgets","httpuv","httr","jsonlite","knitr","later","learnr","learnr.dashboard","lifecycle","lubridate","magrittr","markdown","methods","mime","modelr","munsell","pillar","pkgconfig","promises","purrr","R6","rappdirs","Rcpp","readr","readxl","renv","reprex","rlang","rmarkdown","rprojroot","rsconnect","rstudioapi","rvest","scales","shiny","stats","stringi","stringr","tibble","tidyr","tidyselect","tidyverse","tinytex","tools","utils","vctrs","withr","xfun","xml2","xtable","yaml"]},{"type":"character","attributes":{},"value":["0.2.1","1.1.10","3.6.3","1.2.1","0.7.1","1.1.0","2.0.0","2.1.0","1.4-1","3.6.3","1.3.4","4.3","3.6.3","1.1.0","1.4.4","0.6.25","1.0.2","0.3.1","0.14","0.4.1","1.0.1","0.5.0","1.5.0","0.0.2","3.3.2","1.4.2","0.1.0.9004","3.6.3","3.6.3","3.6.3","0.3.0","2.3.1","0.5.3","0.5.0.9001","1.5.2","1.5.4","1.4.2","1.7.1","1.30","1.1.0.1","0.10.1.9006","0.1.0","0.2.0","1.7.9","1.5","1.1","3.6.3","0.9","0.1.8","0.5.0","1.4.6","2.0.3","1.1.1","0.3.4","2.4.1","0.3.1","1.0.5","1.3.1","1.3.1","0.12.0","0.3.0","0.4.8","2.4","1.3-2","0.8.16","0.11","0.3.6","1.1.1","1.5.0","3.6.3","1.5.3","1.4.0","3.0.4","1.1.2","1.1.0","1.3.0","0.26","3.6.3","3.6.3","0.3.4","2.3.0","0.18","1.3.2","1.8-4","2.2.1"]}]}]}
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81]}},"value":[{"type":"character","attributes":{},"value":["assertthat","backports","base","blob","broom","cellranger","checkmate","cli","colorspace","compiler","crayon","curl","datasets","DBI","dbplyr","digest","dplyr","ellipsis","evaluate","fansi","fastmap","forcats","fs","generics","ggplot2","glue","gradethis","graphics","grDevices","grid","gtable","haven","hms","htmltools","htmlwidgets","httpuv","httr","jsonlite","knitr","later","learnr","learnr.dashboard","lifecycle","lubridate","magrittr","markdown","methods","mime","modelr","munsell","pillar","pkgconfig","promises","purrr","R6","Rcpp","readr","readxl","reprex","rlang","rmarkdown","rprojroot","rstudioapi","rvest","scales","shiny","stats","stringi","stringr","tibble","tidyr","tidyselect","tidyverse","tools","utils","vctrs","withr","xfun","xml2","xtable","yaml"]},{"type":"character","attributes":{},"value":["0.2.1","1.1.10","3.6.3","1.2.1","0.7.1","1.1.0","2.0.0","2.1.0","1.4-1","3.6.3","1.3.4","4.3","3.6.3","1.1.0","1.4.4","0.6.25","1.0.2","0.3.1","0.14","0.4.1","1.0.1","0.5.0","1.5.0","0.0.2","3.3.2","1.4.2","0.1.0.9004","3.6.3","3.6.3","3.6.3","0.3.0","2.3.1","0.5.3","0.5.0.9001","1.5.2","1.5.4","1.4.2","1.7.1","1.30","1.1.0.1","0.10.1.9006","0.1.0","0.2.0","1.7.9","1.5","1.1","3.6.3","0.9","0.1.8","0.5.0","1.4.6","2.0.3","1.1.1","0.3.4","2.4.1","1.0.5","1.3.1","1.3.1","0.3.0","0.4.8","2.4","1.3-2","0.11","0.3.6","1.1.1","1.5.0","3.6.3","1.5.3","1.4.0","3.0.4","1.1.2","1.1.0","1.3.0","3.6.3","3.6.3","0.3.4","2.3.0","0.18","1.3.2","1.8-4","2.2.1"]}]}]}
 </script>
 <!--/html_preserve-->
 </div>
