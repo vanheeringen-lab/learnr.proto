@@ -1,0 +1,28 @@
+# based on environment_v3_withversions.yaml
+# and /Users/christatoenhake/GitHub/learnr_adding_packages_to_learnr_v3_withversions.txt
+
+channels:
+  - r
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - r::rstudio
+  - r::r>=3.6.0  # any r must be specified to install rstudio
+  - r::r-devtools=2.0.2
+  - conda-forge::r-learnr=0.10.1  # this should install shiny and Rmarkdown
+  - conda-forge::r-upsetr # for combinatorial bar plots with dottable below
+  - conda-forge::r-pheatmap # for nice heatmaps
+  - bioconda::bioconductor-iranges # for working with interval data
+  - bioconda::bioconductor-rtracklayer # for importing bed files
+  - bioconda::bioconductor-genomicfeatures # for manipulating txdb objects
+  - bioconda::bioconductor-genomicranges # for working with genomic interval data
+  - bioconda::bioconductor-txdb.hsapiens.ucsc.hg38.knowngene # annotatations
+  - bioconda::bioconductor-chipseeker # tools for analysis of chipseq data
+  - bioconda::bioconductor-chippeakanno # another set of tools for chipseq data
+  - r::r-tidyverse=1.2.1
+  - conda-forge::r-dplyr=0.8.5 # had to update to this version for chipseeker
+  - conda-forge::r-tidyr=1.1.2 # had to update to this version for chipseeker
+  - bioconda::bioconductor-org.hs.eg.db
+  - bioconda::bioconductor-genomation
+  - bioconda::bioconductor-plyranges=1.6.0
