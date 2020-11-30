@@ -17,6 +17,9 @@ description: >
 
 
 ```{r setup, include=FALSE}
+# for Shiny Server
+learnr.dashboard::set_lib_paths("/home/siebrenf/miniconda3/envs/learnr/lib/R/library")
+
 # packages
 library(learnr)  # 0.10.1 -> conda-forge / 0.9.2.1 -> r
 library(tidyverse)  # 1.2.1 -> r / 1.3.0 -> conda-forge
@@ -39,14 +42,13 @@ tutorial_options(
   exercise.timelimit = 10,  # max code execution time
   #exercise.checker = checker
   )
+```
 
-# # what to do when the browser window is closed
-# session$onSessionEnded(function() {
-# 
-#   # TODO save progress
-# 
-#   stopApp()
-#   })
+```{r, context="server"} 
+# stop the tutorial when the browser window is closed
+session$onSessionEnded(function() {
+  stopApp()
+})
 ```
 
 
