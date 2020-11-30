@@ -79,6 +79,24 @@ Global learning objectives #5-6.
 Global learning objectives #12.  
 <br>  
 
+#### Tutorial specs  
+
+- For each week you will run a different tutorial.  
+- Answers will be saved for each of your sessions.  
+
+> Refreshers, background information, tips and hints are often formatted in gray boxes and are not obligatory. 
+
+- Background information can also be collapsed and recognized by black arrowheads:    
+
+<details><summary>Click on this sentence to see an example drop-down box.</summary>
+<br>
+**Well done! Applause for you!**   
+<br>
+<iframe src="https://giphy.com/embed/srg19CG0cKMuI" width="480" height="270" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/applause-clapping-oscars-srg19CG0cKMuI">via GIPHY</a></p>
+<br>
+**Collapse the box by clicking the sentence again.**  
+</details>  
+
 #### Need help?  
 Use the virtual classroom space in Brightspace/Zoom meeting when you need advice. A lecturer will be present there during practical hours.  
 
@@ -107,7 +125,10 @@ Briefly review ChIP-seq, library preperation for next-generation sequencing and 
 ![](https://www.youtube.com/watch?v=nkWGmaYRues&ab_channel=StatQuestwithJoshStarmer)  
 <br>  
 
-> *Background*: There are several manufacturers of sequencing machines and reagents. **Illumina** is a common one. The Illumina technology is summarized in the following videos (optional):  
+>#### **Refresher**: Illumina technology   
+><br>
+<details><summary>Click here for a Illumina sequencing technology refresher.</summary>
+There are several manufacturers of sequencing machines and reagents. **Illumina** is a common one. The Illumina technology is summarized in the following videos (optional):  
 > 
 - [Introduction to Illumina Sequencing, Rob Edwards, duration 2:45](https://www.youtube.com/watch?v=mLZqS0RYqCk&ab_channel=RobEdwards)  
 - [Illumina Sequencing Technology, Illumina, duration 5:03](https://www.youtube.com/watch?reload=9&v=womKfikWlxM&ab_channel=Illumina) 
@@ -136,6 +157,7 @@ Briefly review ChIP-seq, library preperation for next-generation sequencing and 
 <a href = "https://hbctraining.github.io/Intro-to-ChIPseq/lessons/02_QC_FASTQC.html">
 ![Intro-to-ChIPseq, hbctraining](images/wk1_1_illuminasequencing.png){width=80%}    
 </a>
+</details>
 
 <br>
 <!--Currently Illumina also has the nextSeq 500 series (besides MiSeq and HiSeq mentioned in the video). One of the main difference being that the MiSeq and HiSeq use four fluorescent colors (G = blue ,C = green, A = yellow and T = red) while the nextSeq series use 2-color chemistry (green and red). The effect being that with each cycle for the NextSeq, only two images need to be taken, As ar read as clusters appearing in both images and Gs are read as clusters that are not present in either of the two.-->    
@@ -165,11 +187,12 @@ Phred quality score | Probability of incorrect base call | Accuracy | Charactere
 Here's another visualization of how Phred scores are encoded :   
 ![](images/wk1_2_phred_quality_scores_TorstenSeemannpresentation.png){width=80%}   
 
-
-> *Background*: Here's the full ASCII Character encoding of quality scores 0-40:  
+<details><summary>Here's the complete encoding of Phred scrores 0-40.</summary>
+> *Background*:  
 ![](images/wk1_1_phred_ascii.png){width=80%}   
-
 <!--ref: Amixon TRAINING, Bioinformatics for beginners - File formats Part 2. - Short reads, written on 01/07/2013, visited on 29/11/2020, through: https://www.omixon.com/bioinformatics-for-beginners-file-formats-part-2-short-reads/-->
+
+</details>
 
 <br>
 Before we can start our data analysis and identify for example regions marked by activating and repressing histone marks, we need to process the raw data. This includes cleaning up, mapping, visualizing the sequenced reads and identifying genomic regions where reads tend to pile up (in other words "peaks"). Which is what we will discuss next.   
@@ -181,10 +204,10 @@ The sequencer determines the sequence of the DNA molecules in your sample and pr
 <br>
 ![](images/wk1_3_intro_whatbioinformaticiancsdo.png){width=60%}\    
 <br>
-A general pipeline for ChIP sequencing data involves several following steps. In theory, all of them can be performed in R but the first steps are commonly performed by other tools. The resulting peakfiles, files with read depth and or read counts are then imported in R.  
+A general pipeline for ChIP sequencing data involves several following steps. In theory, all of them can be performed in R but the first steps are commonly performed by tools outside R (often on Linux server). The resulting peakfiles, files with read depth and/or read counts are then imported in R.  
 
 <br>
-Here we will discuss the immportant steps that are necessary before we can start our analyses in R:  
+Here we will discuss the steps that are necessary to turn the raw  before we can start our analyses in R:  
 <br> 
 
 #### 1. Run a quality check on the raw data  
@@ -196,7 +219,7 @@ The **Per base sequence quality** plot is one of the most important plots genera
 
 This exmaple shows the average Phred quality for a library sequenced to 72 bp. The majority of bases have a good quality, the quality drops for the last two bases and we should (in this case) remove these from the end of the read. 
 
-For most runs, quality should be good for most reads through the whole run. If quality is low, we can use the other plots and tables to try to understand why this is.  
+For most runs, quality should be good for most reads through the whole run. If quality is low, we can use the other plots and tables to try to understand why this is.
 
 - Good (Illumina) quality is generally Phred > 28 - 30    
 - Concerning (Illumina) quality is Phred < 20  
@@ -238,30 +261,27 @@ In this cleaning step we predominantly:
 <br>
 
 #### 3. Align reads to the genome  
-NGS sequence alignment means that we identify the likely location in the reference genome where the original DNA molecule came from. This process is called **aligning** and is performed by **alignment tools**, also called **read mappers**. Well known examples include STAR, BWA and bowtie2. In essence, these tools perform the same tasks but with different algorithms/strategies.  
+Next Generation Sequence (NGS) alignment means that we identify the likely location in the reference genome where the original DNA molecule came from. This process is called **aligning** and is performed by **alignment tools**, also called **read mappers**. Well known examples include STAR, BWA and bowtie2. In essence, these tools perform the same tasks but with different algorithms/strategies.  
 <br>
-Since the first publication of the human genome, successive versions have been released (also called **assemblies** or **builds**). The improvements in quality are thanks to technological advancements as well as improvements in the representativeness of the genome with respect to the genetic diversity found in the human population, including historically underrepresentated populations. We will work with the (one of the) latests relaese referred to as **GRCh38** or **hg38** (Genome Reference Consortium Human Build 38).  
+Since the publication of the human genome, successive versions have been released (also called **assemblies** or **builds**). The improvements in quality are thanks to technological advancements as well as improvements in the representativeness of the genome with respect to the genetic diversity found in the human population. We will work with (one of) the latests relaese referred to as **GRCh38** or **hg38** (Genome Reference Consortium Human Build 38).  
 <br>
 The aligner thus requires as input the quality-filtered and trimmed fastq files together with the reference genome.  
 <br>
-The outputted alignment is stored in (*huge!*) TAB-delimited text Sequence Alignment Map files, **SAM files**. The compressed version of SAM files are called **BAM files** (Binary Alginment Map).  
+The outputted alignment is stored in (*huge!* ) TAB-delimited text Sequence Alignment Map files, **SAM files**. The compressed version of SAM files are called **BAM files** (Binary Alginment Map).  
 <br>
-The SAM/BAM files contains a header with information about the mapping procedure. This is followed by the read alignments with 1 line per read. The latter contains information about the read sequence, how much of it was mapped to the reference genome (eg. the whole read or only part of it), how well it alinged, and lots of other information, dependent on the aligner.  
+
+<details><summary>Click here for additional information about SAM/BAM file format.</summary>
+> *Background*: The SAM/BAM files contains a header with information about the mapping procedure. This is followed by the read alignments with 1 line per read. The latter contains information about the read sequence, how much of it was mapped to the reference genome (eg. the whole read or only part of it), how well it alinged, and lots of other information, dependent on the aligner.  
 <br>
 To give you a feel for how SAM files looks like, here's an example of the header and one record:  
-<!--![](images/wk1_2_bam_example.png){width=80%}-->      
-<!-- ref: https://genome.sph.umich.edu/w/images/thumb/2/2f/BamRecNew.png/650px-BamRecNew.png --> 
-![](images/wk1_2_bam_header_example.png){width=100%}     
+![](images/wk1_3_bam_header_example_sandrews_tutorial201911.png){width=100%}     
 <!-- ref: Simon Andrews, Babraham Bioinformatics, Quality control for Sequencing Experiments pdf, v2019-11 --> 
-![](images/wk1_2_bam_record_example.png){width=100%}     
+![](images/wk1_3_bam_record_example_sandrews_tutorial201911.png){width=100%}     
 <!-- ref: Simon Andrews, Babraham Bioinformatics, Quality control for Sequencing Experiments pdf, v2019-11 --> 
-
 This example tells you among others that the library was mapped with [hisat2](http://daehwankimlab.github.io/hisat2/manual/) to the mouse reference genome GRCm38 with certain additional settings. The single displayed read is mapping to chr18, starting at position 57944851.    
-
-> *Background*: The BAM file, outputted by the aligner and post-alignment analytical and filtering tools, contains two sections: a header section at the top followed by records of read alignments.  
 <br>
-The header lines tell you how the alignment was performed, incl. which reference genome was used and the program (or *aligner*) used to align reads to the reference. The read alignments contain 1 line per read. So if we count all the lines minus the header section, we get the number of reads in the file.  
-<br>
+In summary:  
+![](images/wk1_3_BAM_fields_broadinstitute.png){width=100%}   
 Each record holds at least 11 columns (exact number depends on the aligner and post-alignment analytics performed on the file):  
 >
 ColumnNR | Description | Example  
@@ -278,6 +298,8 @@ ColumnNR | Description | Example
 10. | Called bases | AAAAGATCTCTTGAT...   
 11. | Phred quality score of the read | GGGGGGGGGGGGGGG...    
 
+</details>
+
 <br>
 
 #### 4. Filter artefacts and reads aligning to multiple regions  
@@ -289,9 +311,10 @@ Files are created that count how many reads align to each nucleotide in the refe
 <br>
 These files can be uploaded to the UCSC Genome Browser which we will look at in more detail today as well. Various file types can store this kind of data. We wil use bigwig files (.bw file extension), these are fast and relatively small but we can't view them.    
 <br>
-Here's a fictional example of alignment and a read depth graph:  
-![](images/wk1_2_read_depth.png){width=80%}  
+<details><summary>A fictional example of alignment and a read depth graph</summary>  
+![](images/wk1_3_read_depth_Pavlopoulos2018.png){width=80%}  
 <!-- ref: Pavlopoulos et al (2013) BioData Mining 6, Article number: 13 (2013), figure 6 -->
+</details> 
 <br>
 
 #### 6. Call peaks  
@@ -309,85 +332,78 @@ Sample clustering can be included here as additional QC. It should identify whic
 <br>
 Here's an example of such a clustering, showing how different each sample is. Samples 15754-56 should be moslty similar and different from 15757-59, and vice versa:  
 `r colorize("Siebren: what's the color legend representing?", "red")`  
-![](images/wk1_2_sample_clustering_siebrenspptx.svg){width=70%}    
+![](images/wk1_3_sample_clustering_siebrenspptx.svg){width=60%}    
 
 > #### 8. Optionally: DNaseI footprinting, variant calling, novel gene identification and more     
 Depending on your experimental set up additional steps are performed outside R. For DNaseI-seq, we can identify small depleted regions within peaks that correspond to the nucleotides that interact with the TF. This interaction protects these nucleotides from DNaseI attacks. These so-called footprints can be used to identify TF motifs and predict the likely TF bound. Although this sounds simple, and for a stable binding factor like CTCF it may be the case, it is not always that simple in reality.    
 
 <br>
 
-> **Exercise 2**  
-Choose the right order of steps that is used for ChIP-seq data analysis from the following list of options:  
-
-```{r q2_order_analysis, eval = F, echo = F}
-question("..",
-  answer("chr7, short arm"),
-  answer("chr7, long arm"),
-  answer("chr17, short arm"),
-  answer("chr17, long arm"),
-  allow_retry = TRUE)
-```
-
-
-
-![](images/wk1_3_Furay_2012_naturereviews_fig2_chipseqanalysis.png){width=80%}\   
-[Furay, 2012, Nat Rev](https://pubmed.ncbi.nlm.nih.gov/23090257/)  
-
 ### 1.3.2 Common causes of noise and artefacts  
-Artefact and noise in your data can arise from various causes. Here's a list of important **causes**.   
+Artefact and noise in your data can arise from various causes. Here's a list of common **causes**:    
 
-1. Synthetic DNA sequence  
-2. Base call accuracy  
+1. Synthetic DNA sequences  
+2. Poor base call accuracy  
 3. Amplification bias during library preparation   
+4. Genomic repeats and Low complexity regions  
 
-> **Exercise 3**: 
+> **Exercise 2**: 
 Below is a list of descriptions and methods to handle these arefacts. Read these carefully and combine what you think is the most likely description and method to handle the above mentioned artefacts.  
 
 **Descriptions**:  
 
 A.  The amount of nucleic acids you generally obtain from your cells is often too low to be directly analyzed and one or more steps of PCR are needed (unless you use special, amplification-free protocols and sequencing methods). Not all DNA or RNA molecules behave the same in this reaction. Some are amplified more than others.  
 B.  These include adapters ligated to the DNA molecules to allow their amplification with uniform primers during library prep and in the sequencer. These adapter sequences come with the kit or are designed by the researcher self.  
-C.  The chemical reaction and quality of the optical measurement that occur in the sequencer are not perfect and depend among others on the nucleotide composition of all samples, the length of the DNA molecules and the concentration of the samples. Each nt is therefore given a quality score that reflects the accuracy of the measurement.   
+C.  Short tandem repeats and interspersed repeats make up roughly 50% of the human genome. Reads produced by sequencers are generally shorter than these sequences, thus mapping them becomes ambiguous. 
+D.  The chemical reaction and quality of the optical measurement that occur in the sequencer are not perfect and depend among others on the nucleotide composition of all samples, the length of the DNA molecules and the concentration of the samples. Each nt is therefore given a quality score that reflects the accuracy of the measurement.   
+
 
 **Methods**:  
 
 a. We can control for this by using the input sample as the control during peak calling, paired-end sequencing and remove all fragments with exactly the same coordinates for read 1 and read 2, and/or the use of a unique molecular identifier (UMI) appended to our adapters that labels each unique DNA fragment.  
-b. Remove low-quality nt's from reads or remove reads altoghether if all their nt's are of low quality.  
+b. There are usually 3 choices: (1) Discard them; (2) Take the best alignment, if there are multiple best hits take one randomly; (3) Report all alignments or report up to a certain number. The strategy you choose depends on the sample, the technology, your research question and the reference species you work with.  
 c. Filter these out of our dataset right after we get our data from the sequencer.  
+d. Remove low-quality nt's from reads or remove reads altoghether if all their nt's are of low quality. 
+
+
 
 ```{r quiz_artefacts, echo =  F}
 quiz(caption = "Which answers summarize the appropriate combinations of artefact - description - method?",
     question("For (1) *Synthetic DNA sequences*",
-             answer("1 - B - c", correct = T),
-             answer("1 - C - b"), 
-             answer("1 - A - c"),
-             answer("1 - C - a"), 
+             answer("Description B; Method c", correct = T),
+             answer("Description D; Method d"), 
+             answer("Description A; Method b"),
+             answer("Description C; Method a"), 
              allow_retry = TRUE,
              random_answer_order = TRUE),
     question("For (2) *Base call accuracy*",
-             answer("2 - B - b"), 
-             answer("2 - B - c"),
-             answer("2 - C - b", correct = T),
-             answer("2 - A - b"), 
+             answer("Description B; Method a"), 
+             answer("Description C; Method b"),
+             answer("Description D; Method d", correct = T),
+             answer("Description A; Method c"), 
              allow_retry = TRUE,
              random_answer_order = TRUE),
     question("For (3) *Amplification bias during library preparation*",
-             answer("3 - B - b"),
-             answer("3 - C - b"),
-             answer("3 - B - c"),
-             answer("3 - A - a", correct = T),
+             answer("Description D; Method b"),
+             answer("Description C; Method d"),
+             answer("Description B; Method c"),
+             answer("Description A; Method a", correct = T),
              allow_retry = TRUE,
-             random_answer_order = TRUE)
-)
+             random_answer_order = TRUE),
+    question("For (4) *Genomic repeats and Low complexity regions*",
+             answer("Description D; Method a"),
+             answer("Description C; Method b", correct = T),
+             answer("Description B; Method c"),
+             answer("Description A; Method d"),
+             allow_retry = TRUE,
+             random_answer_order = TRUE)   )
 ```
 <br>
 
-Lastly, when trying to pinpoint the location in the reference genome where the DNA molecule most likely was derived off, we are confronted with:  
-  
-  * **Genomic repeats.** The origin of reads coming from these reigons is difficult to pinpoint. But also, the reference genome might contain more or less number of repeats than the original sample.  
-  * **Low complexity regions**. These are regions that contain a lot of sequence similarity, eg telomeres. Because of this the quality of the reference genome is generally low in these regions.  
-  
-All these aspects need to be taken into account while processing the raw reads to usefull data.   
+`r colorize("Exercise 2: Choose the right order of steps that is used for ChIP-seq data analysis from the following list of options", "red")`    
+
+![](images/wk1_3_Furay_2012_naturereviews_fig2_chipseqanalysis.png){width=80%}\   
+[Furay, 2012, Nat Rev](https://pubmed.ncbi.nlm.nih.gov/23090257/)  
 
 <!--
 - **Amplification bias during the library preparation:** The amount of nucleic acids you generally obtain from your cells is often too low to be directly analyzed and one or more steps of PCR are needed (unless you use special, amplification-free protocols and sequencing methods). Not all DNA or RNA molecules behave the same in this reaction. Some are amplified more than others and this can generate a bias. We can control for amplification bias with:  
@@ -406,75 +422,70 @@ All these aspects need to be taken into account while processing the raw reads t
  
 <br> 
 
-### 1.3.4 Alternatively: use FAIR data   
-Add section discussion FAIR data and referring to several platforms where it can be found? Several reserach consortia provide easy access and clear description of their data through data portals. These files can be downloaded or immediately uploaded to the UCSC Genome browser using the URL.  
+### 1.3.3 Alternatively: use FAIR data   
+In 2014 a core set of principles were drafted in order to optimize the reusability of research data, the resulting  **FAIR principles** were [published](https://www.nature.com/articles/sdata201618) in 2016. They represent a set of guidelines and best practices to ensure that data or any digital object are **Findable**, **Accessible**, **Interoperable** and **Re-usable** with special emphasis on enhancing the ability of machines to automatically find and use data.  
 
-Table with databases to get data from:  
+![](images/wk1_3_fairdata_fosteropenscience.png){width=80%}    
+ <!--The Open Science Training Handbook, via https://book.fosteropenscience.eu/en/,-->  
 
-<br>  
+- **Findable**: The first thing to be in place to make data reusable is the possibility to find them. It should be easy to find the data and the metadata for both humans and computers. Automatic and reliable discovery of datasets and services depends on machine-readable persistent identifiers and metadata.
 
- 
-<br> 
+- **Accessible**: The (meta)data should be retrievable by their identifier using a standardized and open communications protocol, possibly including authentication and authorisation. Also, metadata should be available even when the data are no longer available.
 
+- **Interoperable**: The data should be able to be combined with and used with other data or tools. The format of the data should therefore be open and interpretable for various tools, including other data records. The concept of interoperability applies both at the data and metadata level. For instance, the (meta)data should use vocabularies that follow FAIR principles.
 
+- **Re-usable**: Ultimately, FAIR aims at optimizing the reuse of data. To achieve this, metadata and data should be well-described so that they can be replicated and/or combined in different settings. Also, the reuse of the (meta)data should be stated with (a) clear and accessible license(s).
 
+An extensive list of databases for genomics research can be found [here](https://sites.google.com/site/anshulkundaje/idataset).  
 
- 
 <br>  
 
 ## 1.4 UCSC Genome Browser     
-
-> UCSC GB sessions for making these exercises (tip: use right-mouse click to not loose this tutorial page):  
->  
-- Default should look like (if it doesn't, I need to adjust the text): http://genome-euro.ucsc.edu/s/ctoenhake/hg38_default    
-- Genes and ruler only: http://genome-euro.ucsc.edu/s/ctoenhake/hg38_genesonly   
-- Monocyte wiggle data (blueprint in colors, encode in black): http://genome-euro.ucsc.edu/s/ctoenhake/hg38_monos_blueprint_and_encode    
-- Monocyte wiggle + peak data, blueprint only: http://genome-euro.ucsc.edu/s/ctoenhake/hg38_monos_blueprint_wiglle_and_peaks   
-
 ### 1.4.1 UCSC Genome browser intro   
-Genome browsers are great tools to display genomics data. You can walk, or *browse*, through all chromosomes, look at the location of genes, extract DNA sequences, examine pre-loaded data or upload your own data. The latter comes in quite handy when you want to, for example, have a visual (personal) confirmation of data quality, evaluate the effect of different settings for processing the raw reads, and/or confirm as computationally detected associations.  
+Genome browsers are great tools to display genomics data. You can walk, or **browse**, through all chromosomes, look at the location of genes, extract DNA sequences, examine pre-loaded data or upload your own data. The latter comes in quite handy when you want to, for example, have a visual (personal) confirmation of data quality, evaluate the effect of different settings for processing the raw reads, and/or confirm as computationally detected associations.  
 <br>
 
 Watch the following youtube video's to get familiar with the UCSC Genome Browser:  
 
-1. UCSC Genome Browser Basics (duration (mm.ss): 08.40): ![](https://www.youtube.com/watch?v=DNXI-M9oQl8)    
-2. UCSC Genome Browser Tracks (duration: 09:14): ![](https://www.youtube.com/watch?v=1Kpy5G_MSG8)   
+1. UCSC Genome Browser Basics (duration: 08.40): ![](https://www.youtube.com/watch?v=DNXI-M9oQl8)    
+2. UCSC Genome Browser Tracks (duration: 09.14): ![](https://www.youtube.com/watch?v=1Kpy5G_MSG8)   
 
 <br>
 
-After watching video 1 you should be able to:  
+**Checklist**:  
 
-- How to access your genome+assembly of interest in the UCSC Genome Browser.  
-- Find the chromosomal coordinates of the region currently in view or of a region you just selected (with click+drag).   
-- Go to a gene or region of interest.  
-- Zoom in and out.  
-- Recognize UTRs, exons, introns, and the direction of transcription.  
-- Find the length of a region or gene.  
-
-<br>
-After watching video 2 you should be able to:  
-  
-- Define what we mean with a *track*.  
-- Adjust the display of tracks: eg. *full*, *pack*, *hide* etc.  
-- Display tracks from the list of preloaded tracks below the browser (important: hit `refresh`).  
+* Watching video 1 you should be able to:  
+    + Access your genome & assembly of interest in the UCSC Genome Browser.  
+    + Find the chromosomal coordinates of the region currently in view or of a region you just selected (with click+drag).   
+    + Go to a gene or region of interest.  
+    + Zoom in and out.  
+    + Recognize UTRs, exons, introns, and the direction of transcription.  
+    + Find the length of a region or gene.  
+* After watching video 2 you should be able to:  
+    + Define what we mean with a track.  
+    + Adjust the display of tracks: eg. full, pack, hide etc.  
+    + Display tracks from the list of preloaded tracks below the browser (important: hit `refresh`).  
 
 <br>
-Additional actions and terms that were not explicitly discussed in the videos but that are important:  
+Additional important actions and terms that were not explicitly discussed in the videos:  
   
 - **Selecting a region in the genome browser**: hold shift-key and click/drag with your left mouse key over the region. A pop-up appears to 'Zoom in', 'Add highlight' or 'Cancel' (cancel = do nothing).  
-- **Upstream** and **downstream** refer to a position relative to the coding strand of a gene. Upstream means to the 5' end and beyond. Downstream means to the 3' end and beyond. Thus, depending on the orientation of the gene, upstream can mean that you move in the direction of the start of the chromosome or to the end of the chromosome.  
+  ![](images/wk1_4_gb_drag_and_select.png){width=60%}  
 
-> *Optional videos*, finding the coordinates of a sequence using blat, handy for eg. primers, and using the Table Browser to, among others, obtain DNA, RNA or protein sequences:  
->  
+- **Upstream** and **downstream** refer to a position relative to the coding strand of a gene. Upstream means to the 5' end and beyond. Downstream means to the 3' end and beyond. Thus, depending on the orientation of the gene, upstream can mean that you move in the direction of the start of the chromosome or to the end of the chromosome.  
+    ![](images/wk1_4_upstream_downstream_munca.jpg){width=80%}  
+<!--https://www.mun.ca/biology/scarr/iGen3_05-03.html--> 
+
+<!-- *Optional videos*: finding the coordinates of a sequence using blat, handy for eg. primers, and using the Table Browser to, among others, obtain DNA, RNA or protein sequences:  
 1. [UCSC Genome Browser Blat, 9m39s](https://www.youtube.com/watch?v=E6DDNGDXH8A)   
-2. [UCSC Genome Browser Table Browser, 7m19s](https://www.youtube.com/watch?v=Ueqt5Wgre9c&ab)  
+2. [UCSC Genome Browser Table Browser, 7m19s](https://www.youtube.com/watch?v=Ueqt5Wgre9c&ab) -->  
 
 <br> 
 
 ### 1.4.2 Go to the UCSC Genome browser  
 **Let's go to the UCSC genome browser....**  
 
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">ACTION: Go to the [UCSC Genome Browser](https://genome.ucsc.edu/index.html) (blue text is a link, use right-mouse click to open in new window).</span>   
+<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Go to the [UCSC Genome Browser](https://genome.ucsc.edu/index.html) (blue text is a link, use right-mouse click to open in new window).</span>   
 <br> 
 The starting page has been updated since the video was made but still holds the same blue bar at the top with **Genomes**, **Tools**, etc.:  
 ![](images/wk1_4b_ucsc_genome_browser_topmenubar.png){width=80%}\     
@@ -483,39 +494,42 @@ The starting page has been updated since the video was made but still holds the 
 
 > *Tip*: In case you have been here before, it is wise to reset user settings such that you don't continue with settings from a previous project. For this, hover over "Genome Browser" and select "Reser All User Settings".  
 
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">ACTION: To access the human genome, select the "Genomes" tab.</span>     
+> *Tip*: A pop-up may appear now or one stap later, redirected you to the official European mirror site if those servers are geographically closer, that's ok.  
+
 <br>
-
-> *Background*: A pop-up may appear now or one stap later, redirected you to the official European mirror site if those servers are geographically closer, that's ok.  
-
-
+<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: To access the human genome, select the "Genomes" tab.</span>     
 <br>
 On the left you can browse and select the genome you are interested in (not a drop-down menu anymore as in the video). By default, the human genome is selected.   
 <br>
 We can go to a position of our choice by entering the gene or chromosomal coordinates under **Position/Search Term** or immediatly go to the 'Current position' by clicking on `GO` on the right-hand side or **Genome Browser** in the menu bar on top.  
 <br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">ACTION: Ensure that "Human" is selected in the **REPRESENTED SPECIES** tree and "Dec. 2013 (GRCh38/hg38)" is selected under **Human Assembly**.</span>     
+<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Ensure that "Human" is selected in the REPRESENTED SPECIES tree and "Dec. 2013 (GRCh38/hg38)" is selected under Human Assembly (red arrows in image below).</span>     
 <br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">ACTION: Go to *ACTB* gene (gene coding for non-muscular actin part of cytoskeleton).</span>    
+<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Go to *ACTB* gene (gene coding for non-muscular actin part of cytoskeleton).</span>    
 <br>
-Genomes page, ready to go to *ACTB* gene in Human genome GRCh38:  
-![](images/wk1_4b_ucsc_gb_actb_question_startpage.png){width=80%}\    
+*Genomes page, ready to go to ACTB gene in Human genome GRCh38*:  
+![](images/wk1_4b_ucsc_gb_actb_question_startpage.png){width=90%}\    
 
 <br>
+<details><summary>To change the Image width of the browser (to fit your screen): </summary>
+> *Tip*: You can adjust the width of the browser to fit your (laptop) screen under "Genome Browser" > "Configure". And adjust the "image width:" .. pixels. Hit `submit` to apply the changed settings and return to the browser:  
+> ![](images/wk1_4_gb_configure.png)   
+> ![](images/wk1_4_gb_configureImage.png){width=80%}  
+</details>
 
-> *Hint* your browser should be showing chr7:5,527,148-5,530,601.     
+<br>
+<details><summary>Your browser should be showing chromosomal region: </summary>  
+> *Hint*: chr7:5,527,148-5,530,601.     
+</details>
 
+<br>
 As discussed in the video, in the top of the window we have navigation and zoom bottons. Right below we can read the chromosomal coordinates and length of the regions we are currently viewing (in this case the complete *ACTB* gene). Below that we see a miniature chromosome with the characteristic gray/black pattern from karyotyping. A red `r colorize("|", "red")`-sign gives us an idea of our current positioning in the chromosome.   
 <br>
-
-> `r colorize("UCSC GB session for the following exercises (tip: use right-mouse click to not loose this tutorial page): Default should look like (if it doesn't, I need to adjust the text): http://genome-euro.ucsc.edu/s/ctoenhake/hg38_default", "red")`    
-
-<br>
-Figure for Question 1:   
+*Figure for Question 1*:   
 ![](images/wk1_4b_ucsc_gb_actb_locationinchromosome.png){width=80%}\     
 <br>
 ```{r q1_actin_location, eval = T, echo = F}
-question("Question 1: What chromosome is ACTB located on? And is it located on the short or long arm of this chromosome?",
+question("What chromosome is ACTB located on? And is it located on the short or long arm of this chromosome?",
   answer("chr7, short arm", correct = TRUE, message = "The *ACTB* gene is indeed located on the short arm of chromosome 7. In the coordinates bar and in the 'ruler' track we can see that we are looking at chromosome 7. By looking at the red |-sign in the chroosomal idiogram, we see that this gene is located to the left of the centromere (red diabolo within the idiogram) and thus ont the short arm."),
   answer("chr7, long arm", message = "Where do you see the red |-sign in the miniature chromosome on top?"),
   answer("chr17, short arm", message = "Review the UCSC Genome Browser Basics video, or find *chr#* in the browser window"),
@@ -525,38 +539,36 @@ question("Question 1: What chromosome is ACTB located on? And is it located on t
 <br>
 The data window displays various *tracks* or *track sets*. Tracks runs the complete length of the chromosome. Data includes most often:   
 
-- **positional information**, of a gene, SNP or cir-regulatory element for example, often displayed as horizontal bars the thickness and color of which can hold additional information depending on the type of track.  
-- **signal information**, of gene expression, detection of histone marks or degree of conservation. Often displayed as histograms but can also be summarized in vertical bars with different levels of color intensity encoding the signal intensity.   
+- **Positional information**, of a gene, SNP or cir-regulatory element for example, often displayed as horizontal bars the thickness and color of which can hold additional information depending on the type of track.  
+- **Signal information**, of gene expression, detection of histone marks or degree of conservation. Often displayed as histograms but can also be summarized in vertical bars with different levels of color intensity encoding the signal intensity.   
 
-<br>
-`r colorize("Add a question like 'what is the name of the track with gene locations?' or a picutre with c/b/c/d/e/f etc. instead of track name and asking 'which one diplays the chromosomal coordinates and which one the gene locations?'", "red")`  
 <br>
 The method of display and whether individual tracks are displayed can be changed by:  
 
 1. Right-mouse click on the grey, vertical bar at the left-most area of the Genome Browser shows you options `hide`, `dense`, `squish`, `pack` and `full`. Additional adjustments to the track can be made by selecting `Configure [track name]` in this menu.  
+![](images/wk1_4_gb_configure_track_display.png){width=60%}  
 2. Scroll to the area below the data window, here you see a possibly overwhelming list of potential tracks, most are `hidden`. Using the pull down menu you can change display settings of multiple tracks at once. Always make sure to hit the `refresh` button below the browser window to ensure all changes are performed.  
 
 <br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">ACTION: hide all tracks and tracksets except for the ruler and GENCODE v32 tracks.</span>   
+<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: hide all tracks and tracksets except for the ruler and GENCODE v32 tracks.</span>   
 <br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">ACTION: for GENCODE v32, via `Configure GENCODE v32`, make sure the option "splice variants" is unchecked.</span>     
+<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: for GENCODE v32, via "Configure GENCODE v32", make sure the option "splice variants" is unchecked.</span>     
 <br>
-Configuration window for GECODE v32 gene track with splice variants unselected:  
-![](images/wk1_4b_ucsc_gb_unselectsplicevariants.png){width=80%}\       
+
+<details><summary>Configuration window for GECODE v32 gene track with splice variants unselected:</summary>  
+![](images/wk1_4b_ucsc_gb_unselectsplicevariants.png){width=90%}\    
+</details>
 <br>
-Your GB session should look like this: ![](images/wk1_4b_ucsc_gb_actb_genetracksonly.png){width=80%}\      
+<details><summary>Your GB session should look like this</summary>   ![](images/wk1_4b_ucsc_gb_actb_genetracksonly.png){width=90%}\  
+</details>
 <br>
 We see the complete *ACTB* gene with exons as horizontally stretched rectangles and introns as horintal lines with arrowheads in them  indicating the direction of transcription. The exons have different heights. The highest regions correspond to  *coding* exons, the other regions are the 5- and 3UTR.  
-<br>
-
-> `r colorize("UCSC GB session for the following exercises (tip: use right-mouse click to not loose this tutorial page): Genes and ruler only: http://genome-euro.ucsc.edu/s/ctoenhake/hg38_genesonly", "red")`   
-
 <br>
 More information about *ACTB* can be obtained by clicking on the gene in the browser. Doing that brings you to a gene page like:  
 ![](images/wk1_4b_ucsc_gb_actb_geneinformation.png){width=80%}\       
 <br>
 ```{r q2_ACTB_exons, echo = F}
-question("Question 2: How many exons does the *ACTB* gene have?",
+question("How many exons does the *ACTB* gene have?",
           answer("5", message = "exons are displayed as thicker lines in the gene, introns as lines with arrows in them."),
           answer("6", correct = TRUE),
           answer("7", message = "one exon can contain coding and non-coding (UTR) elements" ),
@@ -564,10 +576,10 @@ question("Question 2: How many exons does the *ACTB* gene have?",
            allow_retry = TRUE)
 ```
 
-Figure for Question 3:   
+*Figure for Question 3*:   
 ![](images/wk1_4b_ucsc_gb_actb_question_TSSquestion.png){width=80%}\   
 ```{r 13_ACTB_start, echo = F}
-question("Question 3: Which letter points to the TSS?",
+question("Which letter points to the TSS?",
               answer("A", message = "Pay attention to how directionality is visualized in the UCSC Genome Browser, discussed in video 1 at ??4:30"),
               answer("B", message = "Pay attention to how directionality is visualized in the UCSC Genome Browser, discussed in video 1 at ??4:30"),
               answer("C", message = "Pay attention to the visualization of UTRs, discussed in video 1 at ??5:10"),
@@ -589,7 +601,7 @@ question("Question 3: Which letter points to the TSS?",
 ```
 <br>
 
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">ACTION: Go to the gene *SPI1* </span>    
+<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Go to the gene *SPI1* </span>    
 <br>
 
 *SPTI1* encodes the myeloid and B-cell???specific transcription factor PU.1 [Pham 2012 Blood](https://doi.org/10.1182/blood-2012-01-402453).  
@@ -628,7 +640,7 @@ To upload the data we have already put them together in a so-called track hub, h
 ![My Hubs window](images/wk1_4c_ucsc_gb_encode_fig2_trackhub.png){width=100%}\    
 
 <br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">ACTION: Upload the required data using the following URL [...].</span>     
+<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Upload the required data using the following URL [...].</span>     
 <br>  
 Note that, after adding the trackhub, an additional section is added below the browser, specfic to the tracks in this trackhub.  
 <br>
@@ -656,7 +668,7 @@ We have the following datasets:
 > *Tip*: What we haven't discussed so far is the y-axis at the left side of the track with *signal* information such as the ones just uploaded. Using this y-axis we can evaluate signal intensities. The height is currently set to 30, 50 or 100. This corresponds to the number of reads mapping to that location per million sequenced reads. You can change the height of the y-axis by right-mouse click on the trakname, select the `Configure [trackname]` option and change under "Vertical viewing range", the min" and "max". Hit `APPLY` afterwards.  
 
 <br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">ACTION: Go back to the *ACTB* locus and zoom out 3x to see the surrounding region.</span>     
+<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Go back to the *ACTB* locus and zoom out 3x to see the surrounding region.</span>     
 
 > *Hint*: your browser should be showing chr7:5,523,694-5,534,055 approximately, a few bases more or less is not a problem.   
 
@@ -714,18 +726,18 @@ question("Question 8: Which histone marks, are detected at the ACTB promoter? (S
 <br>
 The peaks have been compiled in another trackhub: [URL].  
 <br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">ACTION: Upload the peak data.</span>     
+<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Upload the peak data.</span>     
 <br>
 *Called* peaks are represented as horizontal bars. 
 <br>
 
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">ACTION: From *ACTB* locus, zoom out 100x.</span>     
+<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: From *ACTB* locus, zoom out 100x.</span>     
 
 > *Hint*: your browser should be showing chr7:5,356,175-5,701,574 approximately, a few bases more or less is not a problem.   
 
 A prominant H3K27me3 peaks comes in the viewing window now. It covers the promoter of *FSCN1* gene. 
 
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">ACTION: Zoom into that gene *uncluding* the prominant H3K27me3 peak.</span>     
+<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Zoom into that gene *uncluding* the prominant H3K27me3 peak.</span>     
 
 > *Hint*: your browser should be showing chr7:5,587,501-5,611,400 approximately, a few bases more or less is not a problem.   
 
@@ -830,7 +842,7 @@ question("Question 16: What is the approximate size of the H3K9me3 silenced regi
 <br>
 Silencing does not necessarily have to be mediated by H3K9me3.  
 <br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">ACTION: Go to the ACTA1 gene, encoding muscular actin. Zoom out 10x.</span>  
+<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Go to the ACTA1 gene, encoding muscular actin. Zoom out 10x.</span>  
 
 > *Hint*: you should be at ??  chr1:229,418,420-229,446,919.  
 
@@ -872,7 +884,7 @@ Our collegue performed ChIPs for H3K9me3, H3K27me3, H3K4me3, H3K36me3, H3K4me1 a
 <br>
 We know which ChIPs were performed, but which track (labelled a-f) is most likely which ChIP?  
 <br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">ACTION: upload the following track hub [URL].</span>   
+<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: upload the following track hub [URL].</span>   
 <br>  
 Which column from the following table reflects the most likely decoding?     
 
@@ -970,3 +982,4 @@ Introducing next week...
 - seq2science
 - fastqc
 - [Quality control in sequencing experiments v2019-11, Simon Andrews, Babraham Bioinformatics](https://www.bioinformatics.babraham.ac.uk/training.html#sequenceqc)
+- [The Open Science Training Handbook](https://book.fosteropenscience.eu/en/)  
