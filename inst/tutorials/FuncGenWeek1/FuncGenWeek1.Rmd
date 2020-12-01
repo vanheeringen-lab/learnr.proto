@@ -159,7 +159,6 @@ There are several manufacturers of sequencing machines and reagents. **Illumina*
 </a>
 </details>
 
-<br>
 <!--Currently Illumina also has the nextSeq 500 series (besides MiSeq and HiSeq mentioned in the video). One of the main difference being that the MiSeq and HiSeq use four fluorescent colors (G = blue ,C = green, A = yellow and T = red) while the nextSeq series use 2-color chemistry (green and red). The effect being that with each cycle for the NextSeq, only two images need to be taken, As ar read as clusters appearing in both images and Gs are read as clusters that are not present in either of the two.-->    
 
 <br>
@@ -204,7 +203,13 @@ The sequencer determines the sequence of the DNA molecules in your sample and pr
 <br>
 ![](images/wk1_3_intro_whatbioinformaticiancsdo.png){width=60%}\    
 <br>
-A general pipeline for ChIP sequencing data involves several following steps. In theory, all of them can be performed in R but the first steps are commonly performed by tools outside R (often on Linux server). The resulting peakfiles, files with read depth and/or read counts are then imported in R.  
+A general analysis workflow for ChIP sequencing data involves the steps discussed below. In theory, all of them can be performed in R but the first steps are commonly performed by tools outside R (often on Linux server). The resulting peakfiles, files with read depth and/or read counts are then imported in R.  
+<br>
+Visually depicting the analysis:  
+![](images/wk1_3_chipseq_workflow_utsoutwesternedu_mcdermottlab.png)  
+<!--ref: http://www4.utsouthwestern.edu/mcdermottlab/NGS/analysis/analysis-chipseq.html -->  
+![](images/wk1_3_chipseq_workflow_nakato2020methods.jpg)  
+<!--ref: http://www4.utsouthwestern.edu/mcdermottlab/NGS/analysis/analysis-chipseq.html -->  
 
 <br>
 Here we will discuss the steps that are necessary to turn the raw  before we can start our analyses in R:  
@@ -360,11 +365,10 @@ D.  The chemical reaction and quality of the optical measurement that occur in t
 
 **Methods**:  
 
-a. We can control for this by using the input sample as the control during peak calling, paired-end sequencing and remove all fragments with exactly the same coordinates for read 1 and read 2, and/or the use of a unique molecular identifier (UMI) appended to our adapters that labels each unique DNA fragment.  
+a. We can control for this by using the input sample as the control during peak calling, paired-end sequencing and remove all fragments with exactly the same coordinates for read 1 and read 2, and/or the use of a unique molecular identifier (UMI) appended to our adapters that labels each DNA fragment uniquely.  
 b. There are usually 3 choices: (1) Discard them; (2) Take the best alignment, if there are multiple best hits take one randomly; (3) Report all alignments or report up to a certain number. The strategy you choose depends on the sample, the technology, your research question and the reference species you work with.  
 c. Filter these out of our dataset right after we get our data from the sequencer.  
 d. Remove low-quality nt's from reads or remove reads altoghether if all their nt's are of low quality. 
-
 
 
 ```{r quiz_artefacts, echo =  F}
@@ -422,7 +426,10 @@ quiz(caption = "Which answers summarize the appropriate combinations of artefact
  
 <br> 
 
-### 1.3.3 Alternatively: use FAIR data   
+### 1.3.3 Alternatively: use Publicy available data   
+Multiple public databases are available to download Genomics data from. Often various data types are available (e.g., fastq, bam, bigwig, and peak files). These ...
+
+
 In 2014 a core set of principles were drafted in order to optimize the reusability of research data, the resulting  **FAIR principles** were [published](https://www.nature.com/articles/sdata201618) in 2016. They represent a set of guidelines and best practices to ensure that data or any digital object are **Findable**, **Accessible**, **Interoperable** and **Re-usable** with special emphasis on enhancing the ability of machines to automatically find and use data.  
 
 ![](images/wk1_3_fairdata_fosteropenscience.png){width=80%}    
@@ -510,25 +517,24 @@ We can go to a position of our choice by entering the gene or chromosomal coordi
 *Genomes page, ready to go to ACTB gene in Human genome GRCh38*:  
 ![](images/wk1_4b_ucsc_gb_actb_question_startpage.png){width=90%}\    
 
-<br>
-<details><summary>To change the Image width of the browser (to fit your screen): </summary>
-> *Tip*: You can adjust the width of the browser to fit your (laptop) screen under "Genome Browser" > "Configure". And adjust the "image width:" .. pixels. Hit `submit` to apply the changed settings and return to the browser:  
+>#### **Tip**:    
+<details><summary>To change the width of the browser (to fit your screen): </summary>
+> Go to "Genome Browser" > "Configure". And adjust the "image width:" .. pixels. Hit `submit` to apply the changed settings and return to the browser:  
 > ![](images/wk1_4_gb_configure.png)   
 > ![](images/wk1_4_gb_configureImage.png){width=80%}  
 </details>
-
 <br>
-<details><summary>Your browser should be showing chromosomal region: </summary>  
-> *Hint*: chr7:5,527,148-5,530,601.     
+
+>#### **Optional check**:    
+<details><summary>Your browser should be showing genomic region:</summary>  
+<br>
+> chr7:5,527,148-5,530,601.     
 </details>
 
 <br>
 As discussed in the video, in the top of the window we have navigation and zoom bottons. Right below we can read the chromosomal coordinates and length of the regions we are currently viewing (in this case the complete *ACTB* gene). Below that we see a miniature chromosome with the characteristic gray/black pattern from karyotyping. A red `r colorize("|", "red")`-sign gives us an idea of our current positioning in the chromosome.   
 <br>
-*Figure for Question 1*:   
-![](images/wk1_4b_ucsc_gb_actb_locationinchromosome.png){width=80%}\     
-<br>
-```{r q1_actin_location, eval = T, echo = F}
+```{r q3_actin_location, echo = F}
 question("What chromosome is ACTB located on? And is it located on the short or long arm of this chromosome?",
   answer("chr7, short arm", correct = TRUE, message = "The *ACTB* gene is indeed located on the short arm of chromosome 7. In the coordinates bar and in the 'ruler' track we can see that we are looking at chromosome 7. By looking at the red |-sign in the chroosomal idiogram, we see that this gene is located to the left of the centromere (red diabolo within the idiogram) and thus ont the short arm."),
   answer("chr7, long arm", message = "Where do you see the red |-sign in the miniature chromosome on top?"),
@@ -537,17 +543,20 @@ question("What chromosome is ACTB located on? And is it located on the short or 
   allow_retry = TRUE)
 ```
 <br>
-The data window displays various *tracks* or *track sets*. Tracks runs the complete length of the chromosome. Data includes most often:   
+The data window displays various **tracks** or **track sets**. Tracks runs the complete length of the chromosome. Data includes most often:   
 
 - **Positional information**, of a gene, SNP or cir-regulatory element for example, often displayed as horizontal bars the thickness and color of which can hold additional information depending on the type of track.  
 - **Signal information**, of gene expression, detection of histone marks or degree of conservation. Often displayed as histograms but can also be summarized in vertical bars with different levels of color intensity encoding the signal intensity.   
 
 <br>
-The method of display and whether individual tracks are displayed can be changed by:  
 
-1. Right-mouse click on the grey, vertical bar at the left-most area of the Genome Browser shows you options `hide`, `dense`, `squish`, `pack` and `full`. Additional adjustments to the track can be made by selecting `Configure [track name]` in this menu.  
-![](images/wk1_4_gb_configure_track_display.png){width=60%}  
-2. Scroll to the area below the data window, here you see a possibly overwhelming list of potential tracks, most are `hidden`. Using the pull down menu you can change display settings of multiple tracks at once. Always make sure to hit the `refresh` button below the browser window to ensure all changes are performed.  
+>#### **Refresher**:     
+<details><summary>Adjusting the display of tracks by:   </summary>  
+>
+>1. Right-mouse click on the grey, vertical bar at the left-most area of the Genome Browser shows you options `hide`, `dense`, `squish`, `pack` and `full`. Additional adjustments to the track can be made by selecting `Configure [track name]` in this menu.  
+> ![](images/wk1_4_gb_configure_track_display.png){width=40%}  
+> 2. Scroll to the area below the data window, here you see a possibly overwhelming list of potential tracks, most are `hidden`. Using the pull down menu you can change display settings of multiple tracks at once. Always make sure to hit the `refresh` button below the browser window to ensure all changes are performed.  
+</details>
 
 <br>
 <span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: hide all tracks and tracksets except for the ruler and GENCODE v32 tracks.</span>   
@@ -555,19 +564,25 @@ The method of display and whether individual tracks are displayed can be changed
 <span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: for GENCODE v32, via "Configure GENCODE v32", make sure the option "splice variants" is unchecked.</span>     
 <br>
 
-<details><summary>Configuration window for GECODE v32 gene track with splice variants unselected:</summary>  
+>#### **Optional check**:   
+<details><summary>In case you want to check your settings, these screenshots could help you:</summary>  
+<br>
+Configuration window for GECODE v32 gene track with splice variants unselected:   
 ![](images/wk1_4b_ucsc_gb_unselectsplicevariants.png){width=90%}\    
 </details>
 <br>
-<details><summary>Your GB session should look like this</summary>   ![](images/wk1_4b_ucsc_gb_actb_genetracksonly.png){width=90%}\  
+<details><summary>Your GB session should look like this:</summary>   
+![](images/wk1_4b_ucsc_gb_actb_genetracksonly.png){width=90%}\  
 </details>
 <br>
-We see the complete *ACTB* gene with exons as horizontally stretched rectangles and introns as horintal lines with arrowheads in them  indicating the direction of transcription. The exons have different heights. The highest regions correspond to  *coding* exons, the other regions are the 5- and 3UTR.  
+
+We see the complete *ACTB* gene with exons as horizontally stretched rectangles and **introns** as horintal lines with arrowheads in them indicating the **direction of transcription**. The exons have different heights. The highest regions correspond to  **coding exons**, the other regions are the **5-** and **3UTR**.  
 <br>
 More information about *ACTB* can be obtained by clicking on the gene in the browser. Doing that brings you to a gene page like:  
 ![](images/wk1_4b_ucsc_gb_actb_geneinformation.png){width=80%}\       
 <br>
-```{r q2_ACTB_exons, echo = F}
+
+```{r q4_ACTB_exons, echo = F}
 question("How many exons does the *ACTB* gene have?",
           answer("5", message = "exons are displayed as thicker lines in the gene, introns as lines with arrows in them."),
           answer("6", correct = TRUE),
@@ -576,20 +591,20 @@ question("How many exons does the *ACTB* gene have?",
            allow_retry = TRUE)
 ```
 
-*Figure for Question 3*:   
-![](images/wk1_4b_ucsc_gb_actb_question_TSSquestion.png){width=80%}\   
-```{r 13_ACTB_start, echo = F}
+*Figure for the following two questions*:   
+![](images/wk1_4b_ucsc_gb_actb_question_TSSquestion.png){width=100%}\   
+```{r q5_ACTB_start, echo = F}
 question("Which letter points to the TSS?",
-              answer("A", message = "Pay attention to how directionality is visualized in the UCSC Genome Browser, discussed in video 1 at ??4:30"),
-              answer("B", message = "Pay attention to how directionality is visualized in the UCSC Genome Browser, discussed in video 1 at ??4:30"),
-              answer("C", message = "Pay attention to the visualization of UTRs, discussed in video 1 at ??5:10"),
-              answer("D", message = "Pay attention to the visualization of UTRs, discussed in video 1 at ??5:10"),
+              answer("A", message = "Pay attention to how directionality is visualized in the UCSC Genome Browser, discussed in video 1 at 4:30"),
+              answer("B", message = "Pay attention to how directionality is visualized in the UCSC Genome Browser, discussed in video 1 at 4:30"),
+              answer("C", message = "Pay attention to the visualization of UTRs, discussed in video 1 at 5:10"),
+              answer("D", message = "Pay attention to the visualization of UTRs, discussed in video 1 at 5:10"),
               answer("E", correct = T),
          allow_retry = TRUE)
 ```
 <br>
-```{r q4_ACTB_statements, echo = F}
-     question("Question 4: What statement about the *ACTB* gene is correct? (Select ALL that apply.) ",
+```{r q6_ACTB_statements, echo = F}
+     question("What statement about the *ACTB* gene is correct? (Select ALL that apply.) ",
               answer("ACTB gene is encoded on the minus-strand", correct = TRUE),
               answer("The TTS of ACTB gene has a higher coordinate than its TSS", message = "Look at the direction of arrows in the introns."),
               answer("The coding size of this gene is appr 2kb", correct = TRUE),
@@ -603,196 +618,247 @@ question("Which letter points to the TSS?",
 
 <span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Go to the gene *SPI1* </span>    
 <br>
+*SPTI1* encodes the myeloid and B-cell specific transcription factor PU.1 [Pham 2012 Blood](https://doi.org/10.1182/blood-2012-01-402453).  
 
-*SPTI1* encodes the myeloid and B-cell???specific transcription factor PU.1 [Pham 2012 Blood](https://doi.org/10.1182/blood-2012-01-402453).  
-
-* Copy this sentence and fill in the blanks with numbers in the code:  
-
-`r colorize("Are up- & downstream discussed?", "red")`    
-`r colorize("Klaas: no, I do not explicitly discuss up- and down-stream. Maybe explain this here very briefly. Maybe it is good practice in general to briefly explain key terms (e.g. TSS) in the practical as a reminder. This can be in the form of the ???background??? box you also used for explaining the CD markers/monocytes.", "red")`    
-
-SPI1 gene is located on chr [...]. It spans [...] bp and is encoded on the [plus/minus] strand. It has [...] exons and [...] introns. It is an [zinc finger domain TF/ETS-domain transcription factor]. The first downstream protein-gene is [MYBPC3/SLC39A13].
-
-```{r Q5_spti, exercise =T, eval = F, exercise.eval=FALSE, exercise = T}
-# Fill in the blanks with numbers in the code:  
-SPI1 gene is located on chr ...  . It spans ... bp and is encoded on the [plus/minus] strand. It has ... coding exons and ... introns. It is an [zinc finger domain TF/ETS-domain transcription factor]. The first downstream protein-gene is [MYBPC3/SLC39A13].  
-```
-
-
-**Wonderfull, you are now able to recognize genes, their location within the chromosome, and their coding elements as well as their orientation. These are important reference points used when we evaluate the quality of epigenomics data and to formulate hypothesis that we can test later on.**  
-
+>#### **Optional check**:   
+<details><summary>Your browser should be showing genomic region:</summary>   
+<br>
+> chr11:47,354,860-47,378,576       
+</details>
 <br>
 
- 
+Use the browser view and the gene page of *SPI1* to answer the following question.  
+
+```{r q7_spti, echo = F}
+question("What statement about the *SPI1* gene is correct? (Select ALL that apply.)",
+         answer("This gene spans 23717 bp", correct = T),
+         answer("This gene spans 23127 bp", message = "The coding region spans 23127bp but this excludes the UTRs. What genomic width is the browser covering after navigating to the *SPI1*?"),
+         answer("*SPI1* is encoded on the plus strand", message = "*SPI1* is not encoded on the plus strand, check the direction of the arrows."),
+         answer("*SPI1* has 5 exons and 7 introns", message = "*SPI1* doesn't have 7 introns, check the number of straight lines (=introns) in the GB view."),
+         answer("*SPI1* has 5 exons and 4 introns", correct = T),
+         answer("*SPI1* has 7 exons and 4 introns", message = "*SPI1* doesn't have 7 exons. One exon can contain coding parts and the UTR."),
+         answer("It encodes a an zinc finger domain transcription factor", message = "*SPI1* is not a zinc-finger TF, check it's gene page."),
+         answer("This gene encodes an ETS-domain transcription factor", correct =  T),
+         answer("The nearest downstream protein-coding gene is *MYBPC3*", correct = T),
+         answer("The nearest upstream protein-coding gene is *MYBPC3*", message = "*MYBPC3* is not the nearest upstream. Review the image on upstream and downstream in section 1.4.1"),
+         allow_retry = TRUE)
+
+```
+
+**Wonderfull, you are now able to navigate in the genome browser, recognize genes, their location within the chromosome, and their coding elements as well as their orientation. These are important reference points used when we visualize genomics data.**  
 
 <br>  
 
 ### 1.4.3 Viewing BLUEPRINT data   
-
-***Yes! Finally time for some real data! Using the UCSC Genome Browser, you will inspect characteristic histone PTM and DNaseI-seq combinations, what their location in relation to genes and - ultimately - what this may say about the gene's transcription state.  
+**Yes! Finally time for some real data! Using the UCSC Genome Browser, you will inspect characteristic histone PTM and DNaseI-seq combinations, what their location in relation to genes and - ultimately - what this may say about the gene's transcription state.**    
 
 <br>
-To upload the data we have already put them together in a so-called track hub, hosted by our own server. We can add this to our browser session by going to the tab "My Data" in the top menu and select "Track Hubs". In the "My hubs" tab you can paste a URL that directs to the data you want to upload.  
+To upload the data we have already put them together in a so-called track hub, hosted by our own server. We can add this to our browser session by going to the tab "My Data" in the top menu and select "Track Hubs". In the "My hubs" tab you can paste a URL that directs to the data you want to upload. These screenshots show you where to be:   
 <br>
+<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Upload the required data using the following URL</span> `http://mbdata.science.ru.nl/ctoenhake/edu/trackhub_monocytes/hub.txt`. <span style="color: goldenrod; font-family: Arial; font-size:16px;"> And return back to the Genome Browser.</span>     
+<br>  
 
+>#### **Optional check**: 
+<details><summary>Screenshots showing where to go to add the trackhub: </summary>  
+<br>
+Note the "My Hubs" tab in the second screenshot:
 ![Go to Track Hubs](images/wk1_4c_ucsc_gb_encode_fig1_gototrackhub.png){width=100%}\    
-
 ![My Hubs window](images/wk1_4c_ucsc_gb_encode_fig2_trackhub.png){width=100%}\    
 
+>#### **I get a warning**:
+<details><summary>What to do with `r colorize("ERROR: Couldn't open [URL]..", col = "red")`? </summary> 
+> If you see this error, you can first:  
+>
+> 1. Check the spelling of the URL. If no mistakes were made, hit 'Retry Hub'.  
+> 2. 'Disconnect' this hub and copy-paste the URL again.  
+> 3. If none of the above work, ask peers and/or assistants. </details>
+>
 <br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Upload the required data using the following URL [...].</span>     
-<br>  
+<details><summary>What to do when a track is replaced by a folder location? </summary> 
+>
+> 1. Reload the page.  
+> 2. Connect the hub again.  
+</details>
+<br>
+
 Note that, after adding the trackhub, an additional section is added below the browser, specfic to the tracks in this trackhub.  
-<br>
+
+```{r q8_trackhub, echo = F}
+question("What is the name of this trackhub",
+          answer("Trackhub", message = "Examine the section for this hub below the browser view."),
+          answer("BLUEPRINT monocytes", correct = TRUE, message = "You might notice the 'hidden' peak tracks, we will use them in part 1.4.4."),
+          answer("Functional Genomics", message = "Examine the section for this hub below the browser view." ),
+           allow_retry = TRUE)
+```
+
 This trackhub contains histone PTM ChIP-seq and DNaseI-seq data of monocytes, to be precise of **CD14+, CD16- classical monocytes**. 
 <br>
 
 > *Background*: CD14 and CD16 are cell surface markers of the **CD (Cluster of Differentiation) gene family** which we will come across more often during this practical. These cell surface molecules and their differential expression are used for immunophenotyping of cells. CD molecules can function as receptors, ligands and, for example, activate signalling cascades, mediate cell adhesion, cell migration, regulate gene expression etc. [HUGO, genegoups, CD](https://www.genenames.org/data/genegroup/#!/group/471)  
 
 <br> 
-We have the following datasets:  
+We have the following datasets:      
 
-- ChIP-seq data histone PTMs:  
-
-    * H3K9me3 ChIP-seq (gray)   
-    * H3K27me3 ChIP-seq (gray)  
-    * H3K4me3 ChIP-seq (red)   
-    * H3K4me1 ChIP-seq (yellow)   
-    * H3K27me1 ChIP-seq (peach)  
-    * H3K36me3 ChIP-seq (goldenrod)   
-    
-- DNaseI-seq data in a blue track.   
-- polyA-selected, stranded RNA-seq data, again in green  
-- Input ChIP-seq in black.  
-
-> *Tip*: What we haven't discussed so far is the y-axis at the left side of the track with *signal* information such as the ones just uploaded. Using this y-axis we can evaluate signal intensities. The height is currently set to 30, 50 or 100. This corresponds to the number of reads mapping to that location per million sequenced reads. You can change the height of the y-axis by right-mouse click on the trakname, select the `Configure [trackname]` option and change under "Vertical viewing range", the min" and "max". Hit `APPLY` afterwards.  
++ H3K9me3 ChIP-seq, grey   
++ H3K27me3 ChIP-seq, grey  
++ H3K4me3 ChIP-seq, red   
++ H3K4me1 ChIP-seq, yellow   
++ H3K27mac ChIP-seq, pink    
++ H3K36me3 ChIP-seq, green   
++ DNaseI-seq data, blue 
++ polyA-selected, stranded RNA-seq data (plus and minus seperate), again in green  
++ Input ChIP-seq, black
 
 <br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Go back to the *ACTB* locus and zoom out 3x to see the surrounding region.</span>     
-
-> *Hint*: your browser should be showing chr7:5,523,694-5,534,055 approximately, a few bases more or less is not a problem.   
-
+What we haven't discussed so far is the y-axis at the left side of the track with *signal* information such as the ones just uploaded. Using this y-axis we can evaluate signal intensities. The height is currently set to 30, 50 or 100. This corresponds to the number of reads mapping to that location per million sequenced reads. You can change the height of the y-axis by right-mouse click on the trakname, select the "Configure [trackname]" option and change under "Vertical viewing range", the min" and "max". Hit `APPLY` afterwards.  
 <br>
-
-> `r colorize("UCSC GB session for the following exercises  (tip: use right-mouse click to not loose this tutorial page):  Monocyte wiggle data (blueprint in colors, encode in black): http://genome-euro.ucsc.edu/s/ctoenhake/hg38_monos_blueprint_and_encode", "red")`    
-
-Use the RNA-seq data...   
-```{r Q6_ACTB_expression, echo = F}
-question("Question 6: would you conclude that the ACTB gene is active?",
+<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Go back to the *ACTB* locus </span>  
+ 
+```{r q9_ACTB_expression, echo = F}
+quiz(""
+  question("A.) Would you conclude that the ACTB gene is active?",
        answer("Yes", correct = TRUE),
-       answer("No", message = "Look at the signal in RNA-seq data"),
-         allow_retry = T
+       answer("No"),
+      allow_retry = T),
+  question("B.) If you would only have ChIP-seq data, which track do you need to answer (A.)?",
+         answer("monocyte_H3K9me3", message = "H3K9me3 is associated with silencing, not active genes."),
+         answer("monocyte_H3K27me3", message = "H3K27me3 is associated with silencing, not active genes."),
+         answer("monocyte_H3K4me3", message = "H3K4me3 is definitely number two, but another histone PTM is more directly associated with transcription."),
+         answer("monocyte_H3K4me1", message = "H3K4me1 is not the best mark from this list to recognize active genes."),
+         answer("monocyte_H3K27ac", message = "H3K27ac is not the best mark from this list to recognize active genes."),
+         answer("monocyte_H3K36me3", correct = TRUE),
+         allow_retry = TRUE)
 )
+  
 ```
 <br>
-`r colorize("Klaas remark: would it be possible to have the students indicate why they conclude this? Perhaps by having them indicate the track on which they based their conclusion?", "red")`  
+<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: From the *ACTB* locus, zoom out 3x to see the surrounding region.</span>     
+
+> #### **Optional check**:  
+<details><summary> Your browser should be showing:</summary>  
+<br>
+chr7:5,523,694-5,534,055 approximately, a few bases more or less is not a problem.   
+</details>
 <br>
 
-Within the Genomics tracks we can discriminate regions of high signal from the background. These are the peaks.  
+Within the ChIP- and DNaseI-seq tracks we can discriminate regions of high signal from the background. These are the peaks.  
 <br>
-```{r Q7_ACTB_DNaseIseq, echo = F}
-question("Question 7: Which of the following regions points to a DNaseI-seq peak?)",
-  answer("chr7:5530101-5530501", message = "Nice try but this region has a H3K27ac ChIP-seq peak."),
+```{r q10_ACTB_DNaseIseq, echo = F}
+question("Which of the following regions points to a DNaseI-seq peak?",
+  answer("chr7:5531001-5532001", message = "Nice try but this region has a H3K4me3 peak."),
   answer("chr7:5530501-5530800", correct = TRUE, message = "Yes. Note that this DNaseI-seq peak is located at the *ACTB* TSS/promoter"),
   answer("chr7:5532001-5532500", message = "Try again. If anything, you may be looking at the H3K4me1 signal." ),
-  answer("None of the these", message = "Try again. Please look again"),
+  answer("None of the these", message = "Look again, one of these regions covers a DNaseI-peak. You can hold shift+click and drag with your mouse to highlight the approximate areas."),
   allow_retry = TRUE
      )
 ```
 
-```{r Q8_ACTB_histone_marks_one, echo = F}
-question("Question 8: Which histone marks, are detected at the ACTB promoter? (Select ALL that apply)",
+```{r q11_ACTB_histone_marks_one, echo = F}
+question("We define the promoter as 3kb upstream of the TSS. Which histone marks are detected at the ACTB promoter? (Select ALL that apply)",
   answer("H3K9me3", message = "H3K9me3 is not detected here"),
   answer("H3K27me3", message = "H3K27me3 is not detected here"),
-  answer("H3K4me3", correct = TRUE, message = "correct"),
-  answer("H3K4me1", message = "H3K4me1 isn ot detected here"),
-  answer("H3K27ac", correct = TRUE, message = "correct"),
+  answer("H3K4me3", correct = TRUE, message = "H3K4me3 is indeed covering this promoter."),
+  answer("H3K4me1", correct = TRUE, message = "H3K4me1 is indeed covering this promoter."),
+  answer("H3K27ac", correct = TRUE, message = "H3K27ac is indeed covering this promoter."),
   answer("H3K36me3", message = "H3K36me3 is detected covering the gene body, not the promoter."),
   answer("none", message = "wrong"),
          allow_retry = T)
 ```
 <br>
-
-`r colorize("Or is the promoter spanning 3kb and including the H3K4me1 peak?", "red")`  
-`r colorize("Klaas remark: indeed H3K4me1 also seems to be detected at a distande of ~ 2kb from the TSS. Could be enhancer embedded in distal promoter, or could be proximal enhancer region. Maybe Simon can help distinguish this. Alternatively, we can define the promoter as a set number of bp from the TSS for this exercise", "red")`  
-
-<br>  
-
  
-<br> 
 
 ### 1.4.4 Peaks from peak calling software 
-***It would be cumbersume if we would have to identify all peaks manually, not to mention a highly biased procedure. Luckily we have peak calling software to help us with that. In the following section we will use those results along with the tracks. 
+**It would be cumbersume if we would have to identify all peaks manually, not to mention a highly biased procedure. Luckily we have peak calling software to help us with that. In the following section we will use those results along with the tracks.**   
 <br>
-The peaks have been compiled in another trackhub: [URL].  
+The peaks are already loaded, see the list of files in "BLUEPRINT monocytes" section below the browser.  
 <br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Upload the peak data.</span>     
+<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Turn the display of all peak tracks to "dense" using the drop down menu.</span>    
 <br>
-*Called* peaks are represented as horizontal bars. 
-<br>
-
 <span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: From *ACTB* locus, zoom out 100x.</span>     
-
-> *Hint*: your browser should be showing chr7:5,356,175-5,701,574 approximately, a few bases more or less is not a problem.   
-
-A prominant H3K27me3 peaks comes in the viewing window now. It covers the promoter of *FSCN1* gene. 
-
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Zoom into that gene *uncluding* the prominant H3K27me3 peak.</span>     
-
-> *Hint*: your browser should be showing chr7:5,587,501-5,611,400 approximately, a few bases more or less is not a problem.   
-
-> `r colorize("UCSC GB session for the following exercises (tip: use right-mouse click to not loose this tutorial page): Monocyte wiggle & peak data, blueprint only: http://genome-euro.ucsc.edu/s/ctoenhake/hg38_monos_blueprint_wiglle_and_peaks", "red")`    
-
 <br>
-```{r Q9_FSCN1_bivalent_promoter, echo = F}
-question("Question 9: What additional histone marks, mark this region? (Select ALL that apply.)",
+A prominant H3K27me3 peaks upstream of *ACTB* comes in view.  
+
+> #### **Optional check**:  
+<details><summary> Your browser should be showing:</summary>  
+<br>
+chr7:5,356,175-5,701,574 approximately, a few bases more or less is not a problem.   
+</details>
+<br>
+
+
+```{r q12_FSCN1_bivalent_promoter, echo = F}
+question("The promoter of which gene is covered by this mark?)",
+         answer("*ACTB*", message = "The *ACTB* promoter is not covered by H3K27me3."),
+         answer("*FSCN1*", correct = T),
+         answer("*FBXL18*", message = "The *FBXL18* promoter is not covered by H3K27me3 *and* is not located up- but downstream."),
+         answer("This peak is not covering a promoter.", message = "This peak covers the promoter of a gene."),
+         allow_retry = T,
+         random_answer_order = T
+         )
+```
+
+<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Zoom into that gene *including* the prominant H3K27me3 peak.</span>     
+
+> #### **Optional check**:  
+<details><summary> Your browser should be showing *at least*:</summary>  
+<br>
+chr7:5,589,700-5,607,000 or a few 100 bp wider.  
+</details>
+<br>   
+
+```{r q13_FSCN1_bivalent_promoter, echo = F}
+question("What additional histone marks, mark this region? (Select ALL that apply.)",
          answer("H3K9me3", message = "we don't see H3K9me3"),
          answer("H3K27me3", correct = T),
          answer("H3K4me3", correct = T),
          answer("H3K4me1", correct = T),
          answer("H3K27ac", message = "A very thin line, not a 'clear' peak"),
-         answer("H3K36me3", message = "we don't see H3K36me3 signal."),
-         answer("none", message = "We are referring to region chr7:5,373,445-5,684,304."),
+         answer("H3K36me3", message = "We don't see H3K36me3 signal."),
+         answer("none", message = "We are referring to peak region ??chr7:5,590,487-5,597,207."),
          allow_retry = T
          )
 ```
-<br>
-```{r Q10_FSCN1_expression, echo = F}
-question("Question 10: Is *FSCN1* transcribed?",
+
+```{r q14_FSCN1_expression, echo = F}
+question("Is *FSCN1* transcribed?",
          answer("Yes"),
-         answer("No", correct = T, message = "This is a candidate bivalent promoter. *FSCN1* encodes a member of the fascin family (3 genes in humans) of actin-binding proteins. Fascin proteins organize filamentous actin polymers into parallel bundles. This is required for the formation of actin-based cellular protrusions during cell migration, motility, adhesion and cellular interactions of neurons, glial cells and also dendritic cells [Bros, 2003, J Immunol](https://doi.org/10.4049/jimmunol.171.4.1825). The bivalent marking of this promoter in monocytes makes sense, knowing that a proportion of monocytes differentiates into dendritic cell(also called antigen-presenting cell in this [scheme](https://ctoen.github.io/FunctGen/#Hematopoiesis_scheme))."),
+         answer("No", correct = T, message = "This is a candidate bivalent promoter. *FSCN1* encodes a member of the fascin family (3 genes in humans) of actin-binding proteins. Fascin proteins organize filamentous actin polymers into parallel bundles. This is required for the formation of actin-based cellular protrusions during cell migration, motility, adhesion and cellular interactions of neurons, glial cells and also dendritic cells [Bros, 2003, J Immunol](https://doi.org/10.4049/jimmunol.171.4.1825). The bivalent marking of this promoter in monocytes makes sense, knowing that a proportion of monocytes differentiates into dendritic cell (also called antigen-presenting cell in this [scheme](https://www.blueprint-epigenome.eu/UserFiles/File/cell%20types%20images%20etc/Haematopoiesis_original.pdf))."),
          allow_retry = T)
 ```
 <br>
 The region inbetween *ACTB* and *FSCN1* is marked as well. What marks do you observe and what functional elements could they point to?  
 <br>
-```{r Q11_ACTB_enhacer_one, echo = F}
-question("Question 11: epigenetic marks inbetween *ACTB* and *FSCN1* (Select ALL that apply.)",
+```{r q15_ACTB_enhacer_one, echo = F}
+question("Epigenetic marks inbetween *ACTB* and *FSCN1* (Select ALL that apply.)",
   answer("H3K9me3", message = "H3K9me3 is not detected here"),
   answer("H3K27me3", message = "H3K27me3 is not detected here"),
   answer("H3K4me3", correct = TRUE),
   answer("H3K4me1", correct = TRUE),
   answer("H3K27ac", correct = TRUE),
   answer("H3K36me3", message = "H3K36me3 is detected covering the gene body, not the promoter."),
-  answer("DNaseI-seq", correct = TRUE))
+  answer("DNaseI-seq", correct = TRUE), 
+  allow_retry = TRUE
+  )
 ```
-<br>
-```{r Q12_ACTB_enhancer_two, echo = F}
-question("Question 12: What functional element do these marks most likely reflect?",
+
+```{r q16_ACTB_enhancer_two, echo = F}
+question("What functional element do these marks most likely reflect?",
   answer("terminator"),
   answer("promoter"),
   answer("TSS"),
   answer("enhancer", correct = TRUE, message = "At least the region spanning chr7:5560200-5564149 is reported a super-enhancer and controls among others the *ACTB* gene."),
   answer("centromere"),
   answer("telomere"),
-  answer("coding region")
+  answer("coding region"), 
+  allow_retry = TRUE
 )
 ```
 <br>
-Another highly expressed gene in this cell type is *CD14*, remember it's protein was used to select these cells on. Answer the following question about this gene using the UCSC Genome Browser:   
+Another highly expressed gene in this cell type is *CD14*, remember it's protein was used to select these cells on.  
+Answer the following question about this gene using the UCSC Genome Browser:   
 <br>
-```{r Q13_cd14_questions, echo = F}
-question("Question 13: What statement about *CD14* is correct? (Select ALL that apply) ",
+```{r q17_cd14_questions, echo = F}
+question("What statement about *CD14* is correct? (Select ALL that apply) ",
   answer("*CD14* gene is encoded on the minus-strand", correct = TRUE),
   answer("The TTS of *CD14* gene has a higher coordinate than its TSS"), 
   answer("*CD14* is encoded on the long arm of chr5", correct = TRUE),
@@ -802,12 +868,17 @@ question("Question 13: What statement about *CD14* is correct? (Select ALL that 
   allow_retry = TRUE)
 ```
 <br> 
-Approximately 20 kb downstream of *CD14* is another enhancer. What histone marks populate/mark this enhancer? (Downstream with respect to the *CD14* orientation.)   
+Approximately 20 kb downstream of *CD14* is another enhancer. What histone marks mark this enhancer? (Downstream with respect to the *CD14* orientation.)   
 
-> For testing purposes: the enhancer I'm pointing to is located at chr5:140611060-140612601  
+> #### **Optional check**:  
+<details><summary> We're referring to the region:</summary>  
+<br>
+??chr5:140611060-140612601  
+</details>
+<br>  
 
-```{r Q14_cd14_enhancer, echo = F}
-question("Question 14: Which marks mark the enhancer 20kb downstream of *CD14*?",
+```{r q18_cd14_enhancer, echo = F}
+question("Which marks mark the enhancer 20kb downstream of *CD14*?",
   answer("H3K9me3", message = "not H3K9me3"),
   answer("H3K27me3", message = "not H3K27me3"),
   answer("H3K4me3", message = "not H3K4me3"),
@@ -821,18 +892,23 @@ question("Question 14: Which marks mark the enhancer 20kb downstream of *CD14*?"
 So far we have seen active promoters, bivalent promoters and enhancers. A region silenced by H3K9me3 is loacted appr. 120kb upstream of **CD14**.  
 <br>
 
-> Tip: zoom out to chr5:140,147,501-141,605,000.  
+> #### **Optional check**:  
+<details><summary> We're referring to the region:</summary>  
+<br>
+??chr5:140,147,501-141,605,000   
+</details>
+<br>  
 
-```{r Q15_cd14_near_silencing, echo = F}
-question("Question 15: The expression of what gene family is controlled by this marking?",
+```{r q19_cd14_near_silencing, echo = F}
+question("The expression of what gene family is controlled by this marking?",
   answer("PCDHA gene family", correct = T, message = "PCDHA gene cluster encodes a family of cadherin-like cell surface proteins that are expressed in neurons and are present at synaptic junctions."),
 answer("A group of LINC RNAs"),
   answer("Family of KRAB-ZNF encoding genes", message = "not H3K27me3"),
   allow_retry = T)
 ```
 <br>
-```{r Q16_cd14_near_silencing_two, echo = F}
-question("Question 16: What is the approximate size of the H3K9me3 silenced region? (*Tip2: hold shift and click-and-drag in the brwoser to capture and thereby measure the width of the H3K9me3 domain)",
+```{r q20_cd14_near_silencing_two, echo = F}
+question("What is the approximate size of the H3K9me3 silenced region? (*Tip2: hold shift and click-and-drag in the brwoser to capture and thereby measure the width of the H3K9me3 domain)",
   answer("250kb"),
   answer("500kb"),
   answer("750kb", correct = TRUE),
@@ -844,11 +920,15 @@ Silencing does not necessarily have to be mediated by H3K9me3.
 <br>
 <span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Go to the ACTA1 gene, encoding muscular actin. Zoom out 10x.</span>  
 
-> *Hint*: you should be at ??  chr1:229,418,420-229,446,919.  
-
+> #### **Optional check**:  
+<details><summary> Your browser should display:</summary>  
 <br>
-```{r Q17_ACTA1_marking_one, echo = F}
-question("Question 17: Which histone mark most likely mediates repression of *ACTA1* in these cells?",
+??chr1:229,418,420-229,446,919  
+</details>
+<br> 
+
+```{r q21_ACTA1_marking_one, echo = F}
+question("Which histone mark most likely mediates repression of *ACTA1* in these cells?",
          answer("H3K9me3", message = "H3K9me3 is not the most likely repressing mark here"),
          answer("H3K27me3", correct = T),
          answer("H3K4me3",  message = "H3K4me3 is not associated with repression."),
@@ -856,15 +936,14 @@ question("Question 17: Which histone mark most likely mediates repression of *AC
          answer("H3K27ac", message = "H3K27as is not associated with repression."),
          answer("H3K36me3", message = "H3K36me3 is not associated with repression."),
          answer("none", message = "wrong"),
-         allow_retry = TRUE
-         )
+         allow_retry = TRUE)
 ```
 <br>
 H3K27me3 is not exclusive for silencers (Huang, 2019, Gen Res)[https://genome.cshlp.org/content/29/4/657]   
 
 <br>
-```{r Q18_ACTA1_marking_two, echo = F}
-question("Question 18: Which other observations support that this gene is not active? (Select ALL that apply)",
+```{r q22_ACTA1_marking_two, echo = F}
+question("Which other observations support that this gene is not active? (Select ALL that apply)",
          answer("Absence of H3K36me3 marking covering the gene body.", message = "H3K36me3 is indeed lacking but other observations are correct as well."),
          answer("Absence of signal in RNA-seq signal", message = "RNA-seq is indeed lacking but other observations are correct as well."),
          answer("Absence of H3K4me3 signal at the *ACTA1* promoter",  message = "correct"),
@@ -875,38 +954,54 @@ question("Question 18: Which other observations support that this gene is not ac
 <br>  
 
  
-<br> 
-
 ### 1.4.5 Recognizing blinded genomics data  
 So far you have browsed through ChIP-, DNaseI- and RNA-seq data. These tracks had the correct track names attached to them.   
 <br>
-Our collegue performed ChIPs for H3K9me3, H3K27me3, H3K4me3, H3K36me3, H3K4me1 and H3K27ac on CD4+ T cells but accidentally let the tubes fall before the tubes were properly labelled (always label your tubes first and *before* adding your sample!). 
+Our collegue performed RNA-seq, DNAseI-seq and ChIPs for H3K9me3, H3K27me3, H3K4me3, H3K36me3, H3K4me1 and H3K27ac on CD4+ T cells but accidentally let the tubes fall before the tubes were properly labelled (always label your tubes first and *before* adding your sample!). 
 <br>
 We know which ChIPs were performed, but which track (labelled a-f) is most likely which ChIP?  
 <br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: upload the following track hub [URL].</span>   
+<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: upload the following track hub </span> `http://mbdata.science.ru.nl/ctoenhake/edu/trackhub_unknown/hub.txt`.
 <br>  
-Which column from the following table reflects the most likely decoding?     
+Which column from the following table reflects the most likely encoding?     
 
-ChIP | encoding 1 |  encoding 2 |  encoding 3 | encoding 4   
-:------:|:------:|:------:|:------:|:------:    
-H3K9me3 |  a | f | d | b  
+Sample | encoding 1 |  encoding 2 |  encoding 3 | encoding 4  | encoding 5 | encoding 6
+:--:|:--:|:--:|:--:|:--:    
+H3K9me3 |  b | f | d | b  
 H3K27me3 | b  | a | e | c  
 H3K4me3 | c | b | f | d  
 H3K4me1 | d | c | a | e  
 H3K27ac | e | d |  b | f  
 H3K36me3 | f | e | c | a  
+DNaseI | f | e | c | a  
+RNA-seq minus | f | e | c | a  
+RNA-seq plus | f | e | c | a  
 
+<!-- 
+# S008H1
+# venous blood
+# CD4-positive, alpha-beta T cell
+# A - RNA-seq minus
+# B - DNaseI
+# C - H3K9me3
+# D - H3K27ac
+# E - H3K4me1
+# F - Input
+# G - H3K27me3
+# H - RNA-seq plus
+# I - H3K36me3
+# J - H3K4me3
+-->
 
-> `r colorize("UCSC GB session: didn't make this one yet!", "red")`    
-
-```{r Q19_recognizing_patterns, echo = F}
-question("Question 19: What is the most likely encoding?",
+```{r q23_recognizing_patterns, echo = F}
+question("What is the most likely encoding?",
   answer("encoding 1"),
   answer("encoding 2", correct = T),
   answer("encoding 3"),
   answer("encoding 4"),
-  allow_retry = TRUE
+  answer("encoding 5"),
+  answer("encoding 6"),
+ allow_retry = TRUE
 )
 ```
 <br>  
@@ -965,14 +1060,11 @@ question("Question 24: The gene body of a transcribed gene (eg *ACTB* or *CD14* 
   answer("H3K4me3"),
   answer("H3K4me1"),
   answer("H3K27ac"),
-  answer("H3K36me3", correct = T, message = "Indeed, H3K36me3 is generally associated active chromatin. Depending on where in the gene and when in the transcriptional prociess H3K36 is methylated (and to what degree), this modification has been found to have distinct roles, ranging from preventing aberrant transcriptional initiation within coding sequences to recruitment of splicing factors, dosage compensation and more. The first occrus in yeast, by recruitment of the deactylase complex enforcing a deacetylated chromatin state in the wake of transcribing RNAPII [Wagner and Carpenter, 2014, Nat Rev Mol Cell Biol](https://doi.org/10.1038/nrm3274))."),
+  answer("H3K36me3", correct = T, message = "Indeed, H3K36me3 is generally associated active chromatin. Depending on where in the gene and when in the transcriptional prociess H3K36 is methylated (and to what degree), this modification has been found to have distinct roles, ranging from preventing aberrant transcriptional initiation within coding sequences to recruitment of splicing factors, dosage compensation and more. The first occurs in yeast, by recruitment of the deactylase complex enforcing a deacetylated chromatin state in the wake of transcribing RNAPII [Wagner and Carpenter, 2014, Nat Rev Mol Cell Biol](https://doi.org/10.1038/nrm3274))."),
   allow_retry = TRUE
 )
 ```
 
-<br>  
-
- 
 <br> 
 
 Introducing next week... 
