@@ -42,9 +42,9 @@ colorize <- function(x, color) {
 ## Introduction
 This is the computer practical for the [Functional Genomics 1](https://www.ru.nl/courseguides/science/vm/osirislinks/bb/nwi-bb064b/) course. It builds upon R programming skills taught in the first year during [Genomics and Big Data](https://www.ru.nl/courseguides/science/vm/osirislinks/bp/nwi-bp031/) and a basic understanding of the R programming language is required. We will also use statistics from the course [Statistics 1](https://www.ru.nl/courseguides/science/vm/osirislinks/bp/nwi-bp012c/).  
 
-The purpose of this practical is to teach you common bio-informatics analyses performed to analyse epigenomics data. You may already be familiar with the output of these analyses from scientific publications or lectures. We will focus on **how to detect, quantify, annotate and visualise epigenetic marks**. At the end of our analyses, we will also relate epigenetic markings to gene activity as well as candidate TFs that might establish them.  
+The purpose of this practical is to teach you common bio-informatics analyses performed to analyse epigenomics data. You may already be familiar with the output of these analyses from scientific publications or lectures. We will focus on **how to detect, quantify, annotate and visualise histone tail modifications**. Althought the majority of the tutorial focusses on the analysis of ChIP-seq data, you will also use RNA- and DNaseI-seq incidentally. In week 4, you will relate epigenetic markings to gene activity as well as candidate TFs that might establish them.  
 
-For this practical, we will use **data of white blood cells** from the [the BLUEPRINT project](http://dcc.blueprint-epigenome.eu/#/home), namely: monocytes, T cells, B cells and natural killer cells. We have chosen these datasets because they are well-documented and easy to find through the BLUEPRINT data portal, and not because we want to teach you the hematopoietic system.  
+For this practical, you will use **data of white blood cells** from the [the BLUEPRINT project](http://dcc.blueprint-epigenome.eu/#/home), these can be: monocytes, T cells, B cells and natural killer cells. We have chosen these datasets because they are well-documented and easy to find through the BLUEPRINT data portal, and not because we want to teach you the hematopoietic system.  
 <br>  
 
 > ### Global learning objectives  
@@ -100,7 +100,7 @@ Use the virtual classroom space in Brightspace/Zoom meeting when you need advice
 
 ## 1.1 Learning Objectives  
 <br>
-**This week's focus will be on how sequencing data is processed and acquint ourselves with the UCSC Genome browser as a tool to visually inspect (epi-)genomics data.**   
+**This week's focus will be on how sequencing data is processed and acquint ourselves with the UCSC Genome browser as a tool to visually inspect epigenomics data.**   
 <br>
 
 > At the end of week 1 you are able to  
@@ -198,16 +198,14 @@ The sequencer determines the sequence of the DNA molecules in your sample and pr
 <br>
 ![](images/wk1_3_intro_whatbioinformaticiancsdo.png){width=60%}\    
 <br>
-A general analysis workflow for ChIP sequencing data involves the steps discussed below. In theory, all of them can be performed in R but the first steps are commonly performed by tools outside R (often on Linux server). The resulting peakfiles, files with read depth and/or read counts are then imported in R.  
+A general analysis workflow for ChIP-sequencing data involves the steps discussed below. In theory, all of them can be performed in R but the first steps are commonly performed by tools outside R (often on Linux server). The resulting peakfiles, files with read depth and/or read counts are then imported in R.  
 <br>
-Visually depicting the analysis:  
+Here's a visual of the analysis. We will discuss each part below.  
 ![](images/wk1_3_chipseq_workflow_utsoutwesternedu_mcdermottlab.png)  
 <!--ref: http://www4.utsouthwestern.edu/mcdermottlab/NGS/analysis/analysis-chipseq.html -->  
-![](images/wk1_3_chipseq_workflow_nakato2020methods.jpg)  
-<!--ref: http://www4.utsouthwestern.edu/mcdermottlab/NGS/analysis/analysis-chipseq.html -->  
+<!--![](images/wk1_3_chipseq_workflow_nakato2020methods.jpg){width=50%}    
+ref: http://www4.utsouthwestern.edu/mcdermottlab/NGS/analysis/analysis-chipseq.html -->  
 
-<br>
-Here we will discuss the steps that are necessary to turn the raw  before we can start our analyses in R:  
 <br> 
 
 #### 1. Run a quality check on the raw data  
@@ -399,12 +397,13 @@ quiz(caption = "Which answers summarize the appropriate combinations of artefact
 ```
 <br>
 
+
+<!--
 `r colorize("Exercise 2: Choose the right order of steps that is used for ChIP-seq data analysis from the following list of options", "red")`    
 
 ![](images/wk1_3_Furay_2012_naturereviews_fig2_chipseqanalysis.png){width=80%}\   
 [Furay, 2012, Nat Rev](https://pubmed.ncbi.nlm.nih.gov/23090257/)  
 
-<!--
 - **Amplification bias during the library preparation:** The amount of nucleic acids you generally obtain from your cells is often too low to be directly analyzed and one or more steps of PCR are needed (unless you use special, amplification-free protocols and sequencing methods). Not all DNA or RNA molecules behave the same in this reaction. Some are amplified more than others and this can generate a bias. We can control for amplification bias with:  
   
   + Use input sample, for example as control in peak calling  
@@ -422,23 +421,18 @@ quiz(caption = "Which answers summarize the appropriate combinations of artefact
 <br> 
 
 ### 1.3.3 Alternatively: use Publicy available data   
-Multiple public databases are available to download Genomics data from. Often various data types are available (e.g., fastq, bam, bigwig, and peak files). These ...
+Instead of working solely with our own data, we can also make use of publicly available datasets. More and more, researchers, institutes and grant agencies advocate the [FAIR principle](https://www.nature.com/articles/sdata201618) for optimal sharing of research data. Research data and metadata should be **Findable**, **Accessible**, **Interoperable** and finally **Re-Usable**. This makes it for us (other reserachers) much easier to (re-use) these data or repeat analyses.  
+<br>
+Often, various data types are available including fastq, bam, bigwig, peak files and/or count files.   
+<br>
+Large consortia often have their own data portals, like [ENCODE](https://www.encodeproject.org/), [BLUEPRINT](https://www.blueprint-epigenome.eu/), [The Human Cell Atlas](https://www.humancellatlas.org/) or [The Cancer Genome Atlas](https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga). But data can also be found in the NCBI [GEO database](https://www.ncbi.nlm.nih.gov/geo/) or [Short Read Archive](https://www.ncbi.nlm.nih.gov/sra/). There are many more databases. An extensive list of databases for genomics research can be found [here](https://sites.google.com/site/anshulkundaje/idataset).  
 
-
-In 2014 a core set of principles were drafted in order to optimize the reusability of research data, the resulting  **FAIR principles** were [published](https://www.nature.com/articles/sdata201618) in 2016. They represent a set of guidelines and best practices to ensure that data or any digital object are **Findable**, **Accessible**, **Interoperable** and **Re-usable** with special emphasis on enhancing the ability of machines to automatically find and use data.  
 
 ![](images/wk1_3_fairdata_fosteropenscience.png){width=80%}    
  <!--The Open Science Training Handbook, via https://book.fosteropenscience.eu/en/,-->  
 
-- **Findable**: The first thing to be in place to make data reusable is the possibility to find them. It should be easy to find the data and the metadata for both humans and computers. Automatic and reliable discovery of datasets and services depends on machine-readable persistent identifiers and metadata.
 
-- **Accessible**: The (meta)data should be retrievable by their identifier using a standardized and open communications protocol, possibly including authentication and authorisation. Also, metadata should be available even when the data are no longer available.
 
-- **Interoperable**: The data should be able to be combined with and used with other data or tools. The format of the data should therefore be open and interpretable for various tools, including other data records. The concept of interoperability applies both at the data and metadata level. For instance, the (meta)data should use vocabularies that follow FAIR principles.
-
-- **Re-usable**: Ultimately, FAIR aims at optimizing the reuse of data. To achieve this, metadata and data should be well-described so that they can be replicated and/or combined in different settings. Also, the reuse of the (meta)data should be stated with (a) clear and accessible license(s).
-
-An extensive list of databases for genomics research can be found [here](https://sites.google.com/site/anshulkundaje/idataset).  
 
 <br>  
 
