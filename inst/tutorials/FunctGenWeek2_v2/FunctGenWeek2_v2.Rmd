@@ -21,7 +21,7 @@ description: >
 # packages
 library(learnr)  # 0.10.1 -> conda-forge / 0.9.2.1 -> r
 library(tidyverse)  # 1.2.1 -> r / 1.3.0 -> conda-forge
-library(ggplot2)  # 3.1.1 -> r
+#library(ggplot2)  # 3.1.1 -> r
 #installed required libraries via .yaml file environment_v3_withversions.yml
 #see Home/GitHub/learnr_20201020_installing_learnr_conda_environment.txt
 library(IRanges)
@@ -183,7 +183,7 @@ Function | Purpose | Example on GRanges
 To parse peak files directly into GRanges we use the `import()` function from the rtracklayer package:   
 ```{r exampleimport_rtracklayer, eval = F, echo = T}
 # import monocyte H3K4me3 peak locations
-monocytes_h3k4me3 <- rtracklayer::import("C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr19.bed"), format = "narrowPeak")  
+monocytes_h3k4me3 <- rtracklayer::import("C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr19.bed", format = "narrowPeak")  
 ```
 <br>
 

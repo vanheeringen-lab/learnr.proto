@@ -4,3 +4,8 @@
 **/*.Rdata
 **/*.Ruserdata
 **/*.Rproj
+**/*_cache
+renv/library
+renv/lock/
+renv/python/
+renv/staging/

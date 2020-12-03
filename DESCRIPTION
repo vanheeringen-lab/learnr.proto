@@ -17,5 +17,3 @@ LazyData: true
 Imports:
   learnr (>= 0.10.1),
   tidyverse,
-  ggplot2
-  
