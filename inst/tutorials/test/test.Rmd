@@ -12,7 +12,7 @@ output:
 runtime: shiny_prerendered
 description: >
   Multi line text can be put here
-  for your convinience.
+  for your convenience.
 ---
 
 
@@ -24,7 +24,7 @@ description: >
 library(learnr)     # 0.10.1.9006 (github)
 library(gradethis)  # 0.1.0.9004  (github)
 library(testthat)   # 3.0.0 
-#library(tidyverse)  # 1.3.0
+library(tidyverse)  # 1.3.0
 #library(ggplot2)    # 3.3.2
 
 # configuration
@@ -33,10 +33,10 @@ knitr::opts_chunk$set(echo = FALSE)
 gradethis::gradethis_setup(
   exercise.timelimit = 30,  # max code execution time (sec)
 )
-tutorial_options(
-  exercise.timelimit = 30,  # max code execution time (sec)
-  # exercise.checker = NULL
-)
+# tutorial_options(
+#   exercise.timelimit = 30,  # max code execution time (sec)
+#   # exercise.checker = NULL
+# )
 
 # number of open tutorial windows (1 variable per tutorial)
 # TODO: check if this works for multiple users, or if the variable must contain a user-ID
