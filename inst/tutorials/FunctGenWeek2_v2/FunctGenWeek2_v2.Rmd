@@ -37,6 +37,7 @@ source("functions.r")
 
 # configuration
 knitr::opts_chunk$set(echo = FALSE)
+#knitr::opts_knit$set(root.dir = "/Users/christatoenhake/GitHub/learnr.proto/inst/tutorials/FunctGenWeek2_v2/")
 # gradethis::gradethis_setup()
 
 # functions
@@ -58,48 +59,17 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r set_data_dir, echo = F}
-datadir <- "/Users/christatoenhake/GitHub/learnr.proto-master/inst/tutorials/FunctGenWeek2_v2/"
+datadir <- "/Users/christatoenhake/GitHub/learnr.proto/inst/tutorials/FunctGenWeek2_v2/"
 ```
 
-
-```{r prep-txdblist, include = F}
-# this is a preperatory chunk add 'exercise.setup = "prep-txdblist"` to chunk header to make object available
-# This GRangesList object is used to calculate overlap of peaks with transcript-centered genomic elements (exons, introns, promoters, utrs etc.)  
-txdb_annotation <- readRDS(paste0(datadir, "www/prepared_rds/txdb_annotation_chr19_grangeslist.rds"))
-```
-
-```{r prep-txdbindiv, echo =F}
-# this is a preperatory chunk add 'exercise.setup = "prep-txdbindiv"` to chunk header to make object available
-# This .RData file imports GRanges objects with genomic locations of genes, transcripts, TSSs and promoters.
-# Promoters come in two flavors:  
-# 1. promoters_def = default settings from promoters() function with 2kb up and 0.2 kb downstream the TSS
-# 2. promoters_chr19_3k = for heatmaps, with 3kb upstream and 3kb downstream the TSS
-load(paste0(datadir, "www/prepared_rds/txdb_annotation_chr19_genes_tx_pr_tss_granges.RData"))
-```
-
-```{r prep-encode, echo =F}
-# this is a preperatory chunk add 'exercise.setup = "prep-encode"` to chunk header to make object available
-# This GRanges object in this .rds file contains locations of CTCF sites, distant enhancers, promoter-promimal enhancers, promoters and DNase-h3k4me3 sites
-# File was downloaded from 2020 paper: doi.org/10.1038/s41586-020-2493-4
-# Labels come from ENCODE cCRE file downloaded from the UCSC Table Brower
-# names in ucsc file were matched with cCRE_accession in nature paper file to get the  ucsc label attached to the right interval in the nature paper file
-# annotation was added by matching 
-encode_ccres <- readRDS(paste0(datadir, "www/prepared_rds/encode_ccres_chr19.rds"))
-encode_ccres_list <- split(encode_ccres, encode_ccres$ucsc_label)
-```
-
-```{r prep-mappings, echo = F}
-# this is a preperatory chunk add 'exercise.setup = "prep-mappings"` to chunk header to make object available
-entrezid_symbols <- readRDS(paste0(datadir, "www/prepared_rds/gene_entrezids_genesymbols_df.rds"))
-```
 
 ## 2.1 Introduction   
 <br>
-In week 1 we discussed the major steps imvolved in obtaining genomics data, from experiment to raw data to normalized signal and peaks. We examined histone PTM ChIP-, DNaseI-, and RNA-seq data of monocytes in the UCSC genome browser and searched for regions with increased signal, *peaks*. We looked at the position of these peaks in the chromosome and with respect to genes as well as the co-occurence of different marks.   
+In week 1 we discussed the major steps imvolved in obtaining genomics data, from experiment to raw data to normalized signal and peaks. You examined histone PTM ChIP-, DNaseI-, and RNA-seq data of monocytes in the UCSC genome browser and searched for regions with increased signal, *peaks*. You looked at the position of these peaks in the chromosome and with respect to genes as well as the co-occurence of different marks.   
 <br>
 These observations showed you that some marks are associated with particular functional elements (eg active enhancer, active promoter, silenced domains).   
 <br>
-**This week and next week we will put numbers to these observations and perform computational analyses to answer common questions including:** "*How many peaks do I have?*", "*Is this mark statistically enriched in a particular genomic element?*", "*Which and how often do marks co-occur?*","*The expression of which gene could be affected by this mark?*",  and "*What is the signal of the mark around a particular element of interest like the TSS?*"   
+**This week and next week you will put numbers to these observations and perform computational analyses to answer common questions including:** "*How many peaks do I have?*", "*Is this mark statistically enriched in a particular genomic element?*", "*Which and how often do marks co-occur?*","*The expression of which gene could be affected by this mark?*",  and "*What is the signal of the mark around a particular element of interest like the TSS?*"   
 <br>
 
 ### 2.1.1 Learning Objectives  
@@ -115,7 +85,7 @@ These observations showed you that some marks are associated with particular fun
 7. Optionally, quantify and plot the overlap among histone marks (a  tiny bit like chromHMM but much less fancy, ggplot + geom_bar with index at the bottom for the different combinations or plot the tabular output as heatmap with nubmer display).  
 8. Identify the nearest TSS to a histone ChIP-seq peak.  
 9. Identify the genes that are associated with these TSSs.  
-These refer to global learning objectives #4-#7.  
+- These refer to global learning objectives #4-#7.  
 
 <br>
 
@@ -131,7 +101,42 @@ These refer to global learning objectives #4-#7.
 
 ## 2.2 ChIP-seq peaks in R  {data-progressive=TRUE}  
 ### 2.2.1 Data import    
-In genomics we often work with **interval** data. Think of peaks, genes, exons, ... any genomic region reported with the **genomic coordinates: chr, start, and end**. These often come in a tabular format with the basic information about the location and some other information. Common file formats include BED, GFF or BigWig files.   
+In genomics you often work with **interval** data. Think of peaks, genes, exons, ... any genomic region reported with the **genomic coordinates: chr, start, and end**. As we discussed in week 1, these often come in a tabular format with the basic information about the location and some other information. Common file formats includ BED for peak files, GFF for gene annotations, and BigWig for read depth.     
+
+>#### **Background info**: File formats   
+<details><summary>What do BED, GFF, BigWig files hold and look like?</summary>
+**Peak files in BED format**:  
+>
+- 3 required columns: chromosome, start and end position of the peak region.  
+- 6 or 7 optional columns:  
+  4th: peak name  
+  5th: peak score  
+  6th: strand to denote orientation (if applicable, otherwise "\*" or "\." if unstranded)  
+  7th: signalValue
+  8th: p-value to denote statistical significance, given as -log10(p-value)  
+  9th: q-value statistical significance using false discoveray rate, given as -log10(q-value)  
+  10th (only for sharp peaks not broad domains): location of peak summit relative to the "start" coordinate.  
+>
+> Example:  
+![](images/wk1_3_file_format_bed.png){width=80%}  
+> Further reading on the file formats on the UCSC Genome Browser FAQ page: [BED](http://genome.ucsc.edu/FAQ/FAQformat.html#format1), and the [narrowPeak BED](http://genome.ucsc.edu/FAQ/FAQformat.html#format12) and [broadPeak BED](http://genome.ucsc.edu/FAQ/FAQformat.html#format13).  
+> <br>
+> **Gene annotations in GFF**:  
+General Feature Format - GFF format
+-	Common file format for gene annotations (including splice variants, cDNA sequences, exons, rRNA, ncRNA, etc).
+-	Begins with meta-data in headerlines, starting with #
+-	Records reported in 9 fixed columns
+-	Column 9 can contains various attirbutes (eg gene symbol, the transcript to which the exon belongs).
+- Downloaded for example from [Ensembl](https://www.ensembl.org/Homo_sapiens/Info/Index). 
+>
+> Example:  
+![](images/wk1_3_file_format_gff.png){width=80%}      
+> Further reading on the gff file formats: [UCSC Genome Browser](http://genome.ucsc.edu/FAQ/FAQformat.html#format3), or [ENSEMBL](https://m.ensembl.org/info/website/upload/gff3.html).  
+> <br>
+> **Read depth in bigWig**:  
+BigWig files are binary versions of the larger wiggle files. BigWig files are faster to upload and use but can't be viewed by us. Wiggle files can be viewed but are slow to upload. Wiggle files report a genomic region with the data value for that region. For this practical it is not neccessary to know the details of how these files are generatd. But if you are curious, read the UCSC Genome browser documentation on [wiggle](https://genome.ucsc.edu/goldenPath/help/wiggle.html) and [bigWig](https://genome.ucsc.edu/goldenPath/help/bigWig.html) file formats.  
+</details>
+
 <br>
 Peak data can be imported into a data.frame in r with:  
 ```{r exampleimport, eval =F, echo =T}
@@ -142,7 +147,7 @@ The data.frame datastructure is, however, not the most efficient way to work wit
 <br>
 Interval data such as genomic peaks can be more efficiently handled with the IRanges package which works with a data structure especially developed for **ranges of integers**: IRanges objects.  
 <br>
-To construct an IRanges object we require at least two of the following three values:  
+To construct an IRanges object you need to define at least two of the following three values:  
 
 1. a starting coordinate  
 2. a finishing coordinate  
@@ -159,61 +164,78 @@ Here's an example GRanges object called `my_gr` with the functions to set and re
 Notice that this object holds the **genomic coordinates** and **2 metadata columns**. Metadata is data about the data:  
 
 Genomic coordinates |  Metadata columns   
-:--|:--  
+:--|:---  
 Printed on the left-hand side of the \|-sign | Printed on the right-hand side of the \|-sign     
 Extract using `granges(object_name)` |  Extract as DataFrame with `mcols(object_name)` or `object_name$column_name` for a specific column   
 Restricted to variables `seqnames`, `ranges` and `strand` | Almost anything can be stored in the metadata
 
 <br>
-Information about the genome is stored in the `seqinfo` part of the object. In the example you see that the peaks are located in human genome 38 which holds 455 sequences in total of which 1 circular (mitochondrial genome). (Sequuences that can not be confidently placed on a specific chromosome is stored in chrUn, chr*N*_random and chr*N*_region [explanation on UCSC GB website](http://genome.ucsc.edu/FAQ/FAQdownloads#download10).)   
+Information about the genome is stored in the "seqinfo"" part of the object. In the example you see that the peaks are located in human genome 38 which holds 455 sequences in total of which 1 circular (mitochondrial genome). (Sequences that can not be confidently placed on a specific chromosome is stored in chrUn, chr*N*_random and chr*N*_region [explanation on UCSC GB website](http://genome.ucsc.edu/FAQ/FAQdownloads#download10).)   
 <br>
-GRanges objects follow the **tidy data principle**: each row of a Ranges object corresponds to an interval, and each column will represent a variable about that interval, and generally each object will represent a single unit of an observation (like gene annotations).   
-<br>
-We can use **dplyr**-like functions to manipulate these objects and use the **pipe** operator `%>%` to combine functions in a workflow. A brief reminder of common dplyr-functions and examples of plyranges-relatives on GRanges objects:  
+GRanges objects follow the **tidy data principle**: each row of a Ranges object corresponds to an interval, and each column will represent a variable about that interval, and generally each object will represent a single unit of an observation (like gene annotations). You can use **dplyr**-like functions from the plyranges package to manipulate these objects and use the **pipe** operator `%>%` to combine functions in a workflow.  
 
+>#### **Refresher**: dplyr     
+<details><summary>Common dplyr-functions and examples of plyranges-relatives on GRanges objects</summary>   
+>
 Function | Purpose | Example on GRanges   
-:--|:--|:--     
+:--|:----|:----     
 `select()` | subset variables (=columns) |  `select(my_gr, GC)`
 `group_by()` | group data into rows with the same value for the specified variable. |  `my_gr %>% group_by(strand)`.  
 `filter()` | subset observations (= rows) | `filter(my_gr, GC < 0.4)` or `my_gr %>% group_by(strand) %>%  filter(GC == max(GC))`.     
 `summarize()` | Summarise variables, often per group | `group_by(my_gr, strand) %>% summarize(n = n(), gc = max(GC))`   
+</details>  
 
-<br>  
-To parse peak files directly into GRanges we use the `import()` function from the rtracklayer package:   
+<br>
+To parse peak files directly into GRanges you use the `import()` function from the rtracklayer package:   
 ```{r exampleimport_rtracklayer, eval = F, echo = T}
+# load the required library
+library(rtracklayer)  
 # import monocyte H3K4me3 peak locations
 monocytes_h3k4me3 <- rtracklayer::import("C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr19.bed", format = "narrowPeak")  
 ```
 <br>
 
-`r colorize("remove (part of) this description, let it come back after comparing withs of H3K4_me3 and H3K4me1", "red")`
+> #### **Background info**: 
+GRanges and rtracklayer are bioconductor packages. But what is Bioconductor? 
+> <details><summary>The bioconductor repository with r packages developed for the analysis of high-throughput genomics datain R.</summary>  
+[Bioconductor](https://www.bioconductor.org/) is a special repository of packages for the analysis of high throughput genomic data in r. Packages are often heavily dependend on each other and regular releases and a special installer ensure that you install package version that can work together. Usually you would use the `biocManager::install()` command to install these packages. But in this tutorial, all required packages are already installed.  
+<br>
+Bioconductor packages that you will be using include:   
+>
+Package | Purpose   
+--|--------    
+[GenomicRanges](https://bioconductor.org/packages/release/bioc/vignettes/GenomicRanges/inst/doc/GenomicRangesIntroduction.html) | Provides the `GRanges` data structures to store and handle genomic intervals.  
+[plyranges](https://bioconductor.org/packages/release/bioc/html/plyranges.html) | `dplyr`-like interface for interacting and manipulating `Ranges` data structures.    
+[GenomicFeatures](https://www.bioconductor.org/packages/release/bioc/html/GenomicFeatures.html) | Functions to retrieve and manage genomic features from database packages.  
+[rtracklayer](https://www.bioconductor.org/packages/release/bioc/html/rtracklayer.html) | Provides functions to import and work with annotation files with various formats (GFF, BED, bedGraph, BED15, WIG, BigWig and 2bit).   
+`TxDb` packages | Provide an R representation of gene models, each genome has a separate package.   
+`OrgDb` packages | Contain mappings between a unique gene identifier and other kinds of identifiers for a certain genome (eg from Entrez gene identifier to Gene Symbol)  
+<br>
+Bioconductor packages can use **data structures** different from `vectors`,`matrices` or `data.frames`. The `GRanges` data structure provided by the `GenomicRanges` package is an example and is used by many. We will come to those shortly.   
+<br>
+These "Bioconductor-specific-objects", like `GRanges`, generally have their own set of functions or methods that you can explore using `methods(class = "...")`. To find out the `class`, use `class(object_name)`.  
+<br>
+Here's a list of basic functions to explore objects and/or call the help on packages or functions:   
+>
+- Use `class()` to found out what kind of data structure you are dealing with  
+- Use `show()` or `print()` to have r print a summary of your data    
+- use `methods(class = "...")` to get a list of (default) methods or functions you can use to extract and manipulate the data, also called *assessor* functions or *getter* and *setter* functions       
+- use `help(package = "[packageName]")` to display the help page     
+</details>
 
-> *Background*: you will come across **narrowPeak** and **broadPeak** files. These are both outputs from MACS2 peak calling.  
-> 
-- narrowPeak files are for more focused signals like transcription factor ChIP-seq but also some histone marks.  
-- broadPeak mode is used for more defuse signals.   
-> 
-> The outputs are very similar except that the broadPeak mode, the peak summit won't be called and the values in the 5th, and 7-9th columns are the mean value across all positions in the peak region.  
-> 
-> narrowPeak file | broadPeak file  
-> :-- |:--  
-H3K27ac | H3K27me3   
-h3k4me3 | H3K36me3  
-H3K9/14ac | H3K9me3  
-H2A.Zac | H3K4me1  
-
-
-Let's take a quick look at one of these files.  
+<br>  
+Let's take a quick look at one `monocytes_h3k4me3`.   
 
 > **Exercise 1:**  
-Print the head 2 lines of `monocytes_h3k4me3`.  
+Print the head of `monocytes_h3k4me3`.  
 
 ```{r q1_head_h3k4me3-setup, echo = F}
-monocytes_h3k4me3 <- rtracklayer::import(paste0(datadir, "www/blueprint/bed/C000S5H2.ERX547984.h3k4me3.bwa.GRCh38.20150527.chr19.bed"), format = "narrowPeak")
+library(rtracklayer)
+monocytes_h3k4me3 <- rtracklayer::import(paste0(datadir, "www/blueprint/bed/C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr19.bed"), format = "narrowPeak")
 ```
 
 ```{r q1_head_h3k4me3, exercise = TRUE}
-
+# the object "monocytes_h3k4me3" has already been imported for you
 
 ```
 
@@ -233,41 +255,27 @@ grade_code()
 
 > *Note 2*: The original .BED files lacked column headers. The `rtracklayer::import()` function appendended variable names and converted the data to the data type (eg numeric, integer, character etc.) according to the file format we defined.  
 
-We have the following information about the identified peaks (ref: [MACS2 github](https://github.com/macs3-project/MACS)):  
-
-Column | Information | narrowPeak description | broadPeak description   
--- | -- | -- | --  
-1. | chromosome name | same | same    
-2. | peak start | same | same       
-3. | peak end | same | same      
-4. | peak name | same | same   
-5. | score | -10log(qvalue) \*\ 10, rounded down to integer value) | mean of -10log(qvalue) \*\ 10 *across all positions*  
-6. | strand | +, - or \*\ for unstranded | same  
-7. | fold_enrichment | at peak summit |  mean across all positions  
-8. | -log10(qvalue) (*e.g.if qvalue = 1e-10, this value is 10*) | at peak summit  | mean *across all positions*  
-9. | -log10(pvalue) | at peak summit | mean *across all positions*   
-10. | relative summit | position relative to peak start | not reported   
-
 
 <br>
 **Let's do some exploratory analyses on these data.**  
 <br>
 
 ### 2.2.2 Exploratory data analysis   
-A common first step in genomics data analysis is to make some exploratory plots. We will do so for `monocytes_h3k4me3`.   
+A common first step in genomics data analysis is to make some exploratory plots. You will do so for the peaks called on H3K4me3 and H3K27me3 ChIP-seq tracks for monocytes (used in the week 1). These are stored in the R objects `monocytes_h3k4me3` and `monocytes_h3K27me3`.   
 <br>
 
 > **Exercise 2:**  
 >
-> * Determine the number of h3k4me3 peaks in monocytes.  
+> * Determine the number of H3K4me3 and H3K27me3 peaks in monocytes.  
 > * What is the distribution of peak sizes and scores? 
 
 ```{r q2a_explore-setup, echo = F}
-monocytes_h3k4me3 <- rtracklayer::import(paste0(datadir, "www/blueprint/bed/C000S5H2.ERX547984.h3k4me3.bwa.GRCh38.20150527.chr19.bed"), format = "narrowPeak")
+monocytes_h3k4me3 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547984.h3k4me3.bwa.GRCh38.20150527.chr19.bed", format = "narrowPeak")
+
 ```
 
 ```{r q2a_explore, exercise = T}
-# How many peaks do we have?  
+# How many peaks do are stored in monocytes_h3k4me3  
 
 ```
 
@@ -303,7 +311,7 @@ grade_code()
 ```
 
 ```{r q2c_explore-setup, echo = F}
-monocytes_h3k4me1 <- rtracklayer::import(paste0(datadir, "www/blueprint/bed/C000S5H2.ERX547981.H3K4me1.bwa.GRCh38.broad.20150527.chr19.bed"), format = "broadPeak")
+monocytes_h3k4me1 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547981.H3K4me1.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak")
 ```
 
 ```{r q2c_explore, exercise = T}
@@ -368,7 +376,7 @@ grade_code()
 ```
 <br>
 
-> *Note*: plotting with the ggplots packages is also possible, as long as we convert the data we are interested to `data.frame` objects by running for example: 
+> *Note*: plotting with the ggplots packages is also possible, as long as you convert the data you are interested to `data.frame` objects by running for example: 
 ```{r example_to_get_metadata, echo =T, eval = F}
 meta_h3k4me3 <- as.data.frame(mcols(monocytes_h3k4me3))
 ```
@@ -447,6 +455,40 @@ question("The promoters of which gene(s) are covered by the h3k4me3 peak with th
          answer("Both", message = "Only one of the genes listed here. Look at the direction of transcription indicated by the arrowheads in the introns of the genes.")
          )
 ```
+
+
+`r colorize("remove (part of) this description, let it come back after comparing withs of H3K4_me3 and H3K4me1", "red")`
+
+> *Background*: you will come across **narrowPeak** and **broadPeak** files. These are both outputs from MACS2 peak calling.  
+> 
+- narrowPeak files are for more focused signals like transcription factor ChIP-seq but also some histone marks.  
+- broadPeak mode is used for more defuse signals.   
+> 
+> The outputs are very similar except that the broadPeak mode, the peak summit won't be called and the values in the 5th, and 7-9th columns are the mean value across all positions in the peak region.  
+> 
+> narrowPeak file | broadPeak file  
+> :-- |:--  
+H3K27ac | H3K27me3   
+h3k4me3 | H3K36me3  
+H3K9/14ac | H3K9me3  
+H2A.Zac | H3K4me1  
+
+You have the following information about the identified peaks (ref: [MACS2 github](https://github.com/macs3-project/MACS)):  
+
+Column | Information | narrowPeak description | broadPeak description   
+-- | -- | -- | --  
+1. | chromosome name | same | same    
+2. | peak start | same | same       
+3. | peak end | same | same      
+4. | peak name | same | same   
+5. | score | -10log(qvalue) \*\ 10, rounded down to integer value) | mean of -10log(qvalue) \*\ 10 *across all positions*  
+6. | strand | +, - or \*\ for unstranded | same  
+7. | fold_enrichment | at peak summit |  mean across all positions  
+8. | -log10(qvalue) (*e.g.if qvalue = 1e-10, this value is 10*) | at peak summit  | mean *across all positions*  
+9. | -log10(pvalue) | at peak summit | mean *across all positions*   
+10. | relative summit | position relative to peak start | not reported   
+
+
 <br>
 **Later on in this tutorial we will learn how to annotate peaks with the gene that they most likely control. First we will calculate the fraction of overlap among two `GRanges` objects. **  
 <br>
@@ -795,22 +837,22 @@ So far we looked at h3k4me3 marking. How do the other marks overlap with genomic
 We have created a `GRangesList` `monocytes_list` by:  
 ```{r prepare files, echo = F}
 # H3k4me1 
-monocytes_h3k4me1 <- rtracklayer::import(paste0(datadir, "www/blueprint/bed/C000S5H2.ERX547981.H3K4me1.bwa.GRCh38.broad.20150527.chr19.bed"), format = "broadPeak")
+monocytes_h3k4me1 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547981.H3K4me1.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak")
 
 # H3K4me3  
-monocytes_h3k4me3 <- rtracklayer::import(paste0(datadir, "www/blueprint/bed/C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr19.bed"), format = "narrowPeak")
+monocytes_h3k4me3 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr19.bed", format = "narrowPeak")
 
 # H3K9me3 
-monocytes_h3k9me3 <- rtracklayer::import(paste0(datadir, "www/blueprint/bed/C000S5H2.ERX547982.H3K9me3.bwa.GRCh38.broad.20150527.chr19.bed"), format = "broadPeak")
+monocytes_h3k9me3 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547982.H3K9me3.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak")
 
 # H3K27ac 
-monocytes_h3k27ac <- rtracklayer::import(paste0(datadir, "www/blueprint/bed/C000S5H2.ERX547980.H3K27ac.bwa.GRCh38.20150527.chr19.bed"), format = "narrowPeak")
+monocytes_h3k27ac <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547980.H3K27ac.bwa.GRCh38.20150527.chr19.bed", format = "narrowPeak")
 
 # H3K27me3   
-monocytes_h3k27me3 <- rtracklayer::import(paste0(datadir, "www/blueprint/bed/C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.broad.20150527.chr19.bed"), format = "broadPeak")
+monocytes_h3k27me3 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak")
 
 # H3K36me3
-monocytes_h3k36me3 <- rtracklayer::import(paste0(datadir, "www/blueprint/bed/C000S5H2.ERX547979.H3K36me3.bwa.GRCh38.broad.20150527.chr19.bed"), format = "broadPeak")
+monocytes_h3k36me3 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547979.H3K36me3.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak")
 ```
 
 ```{r grangeslist, echo = T}
@@ -818,10 +860,6 @@ monocytes_h3k36me3 <- rtracklayer::import(paste0(datadir, "www/blueprint/bed/C00
 monocytes_list  <- GRangesList(monocytes_h3k4me1, monocytes_h3k4me3, monocytes_h3k9me3, monocytes_h3k27ac, monocytes_h3k27me3, monocytes_h3k36me3)
 # add names to each element in the list
 names(monocytes_list) <- c("h3k4me1", "h3k4me3", "h3k9me3", "h3k27ac", "h3k27me3", "h3k36me3")
-```
-
-```{r grangeslist_length, echo = T}
-load(paste0(datadir, "www/prepared_rds/txdb_annotation_chr19_genes_tx_pr_tss_granges.RData"))
 
 # print the length of your list  
 length(monocytes_list)
@@ -901,7 +939,7 @@ Instead of the length, let's look at the distribution of these peaks among featu
 monocytes_list  <- GRangesList(monocytes_h3k4me1, monocytes_h3k4me3, monocytes_h3k9me3, monocytes_h3k27ac, monocytes_h3k27me3, monocytes_h3k36me3)
 # add names to each element in the list
 names(monocytes_list) <- c("h3k4me1", "h3k4me3", "h3k9me3", "h3k27ac", "h3k27me3", "h3k36me3")
-# we need the `TxDb` object and limits its active chromosomes to chromosome 19
+# you need the `TxDb` object and limits its active chromosomes to chromosome 19
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 seqlevels(txdb) <- "chr19"
@@ -929,7 +967,7 @@ allmarks_features
 
 ## 2.5 Annotation of ChIP-seq peaks
 ### 2.5.1 Distance to TSS   
-In this part of the analysis we will assign peaks to their closest TSS, assuming that it likely is involved in regulating the expression regulates that gene.  
+In this part of the analysis you will assign peaks to their closest TSS, assuming that it likely is involved in regulating the expression regulates that gene.  
 <br>
 The `GenomicRanges` package has the function `distanceToNearest(x, subject)` to help you identify the distance between intervals in `x` and the nearest neighbor in `subject`. In this case, the intervals are the peaks and the subject are the TSSs. The function outputs a `Hits` objects with distances.  
 <br>
@@ -966,7 +1004,7 @@ boxplot(mcols(h3k4me3_to_tss)[,1])
 <br>  
 
 ### 2.5.2 Find associating gene  
-We can use this `Hits` object to subset peaks to those that are less than 10 Kb away from the TSS. We can than use the function `subjectHits()` to get the genes associated to each peak.  
+You can use this `Hits` object to subset peaks to those that are less than 10 Kb away from the TSS. You can than use the function `subjectHits()` to get the genes associated to each peak.  
 <br>
 
 >**Exercise 16**  
@@ -1020,7 +1058,7 @@ grade_code()
 ```
 
 <br>
-Besides the distance, we are also (very!) interested in the distribution of the ChIP-seq signal around the TSS. We will look at that next week.  
+Besides the distance, we are also (very!) interested in the distribution of the ChIP-seq signal around the TSS. You will look at that next week.  
 
 
 

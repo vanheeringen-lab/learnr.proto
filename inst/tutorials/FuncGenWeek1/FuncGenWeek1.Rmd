@@ -180,6 +180,7 @@ Phred quality score | Probability of incorrect base call | Accuracy | Charactere
 Here's another visualization of how Phred scores are encoded :   
 ![](images/wk1_2_phred_quality_scores_TorstenSeemannpresentation.png){width=80%}   
 
+> #### Background box:   
 <details><summary>Here's the complete encoding of Phred scrores 0-40.</summary>
 > *Background*:  
 ![](images/wk1_1_phred_ascii.png){width=80%}   
@@ -231,20 +232,21 @@ If the QC does not support major technical problems like a systematic base bias 
 
 ```{r quiz_fastqc}
 quiz(
-    question("What is the sequence length?",
+    question("What is the read length in fastq report 1 and 2?",
              answer("45"),
              answer("40", correct = T),   
              answer("Can't be answered using these reports"), 
              allow_retry = TRUE,
              random_answer_order = TRUE),
-    question("Which shows the **best per base sequence quality**?",
+    question("Of fastq report 1 and 2, which shows the **best per base sequence quality**?",
              answer("report 1", correct = T),
              answer("report 2"),
              allow_retry = TRUE))
 ```
 <br>
 
-> *Background*: For detailed discussion on FASTQC reports see the FASTQC website of the Babraham institute, and their tutorial on Quality Control in Sequencing Experiments [ref](https://www.bioinformatics.babraham.ac.uk/training.html#sequenceqc).  
+> #### Background box:  
+> For detailed discussion on FASTQC reports see the FASTQC website of the Babraham institute, and their tutorial on Quality Control in Sequencing Experiments [ref](https://www.bioinformatics.babraham.ac.uk/training.html#sequenceqc).  
 
 <br>
 
@@ -267,9 +269,29 @@ The aligner thus requires as input the quality-filtered and trimmed fastq files 
 The outputted alignment is stored in (*huge!* ) TAB-delimited text Sequence Alignment Map files, **SAM files**. The compressed version of SAM files are called **BAM files** (Binary Alginment Map).  
 <br>
 
+> #### Background box:  
 <details><summary>Click here for additional information about SAM/BAM file format.</summary>
-> *Background*: The SAM/BAM files contains a header with information about the mapping procedure. This is followed by the read alignments with 1 line per read. The latter contains information about the read sequence, how much of it was mapped to the reference genome (eg. the whole read or only part of it), how well it alinged, and lots of other information, dependent on the aligner.  
+><br>
+> *Background*: SAM/BAM files contain two sections: (1) a header with information about the mapping procedure and (2) records of read alignments with 1 line per read. The latter contains information about the read sequence, how much of it was mapped to the reference genome (eg. the whole read or only part of it), how well it alinged, and lots of other information, dependent on the aligner.  
 <br>
+Each record minimally holds 11 columns (additional columns can be added by the aligner and post-alignment analytics performed on the file):  
+>![](images/wk1_3_BAM_fields_broadinstitute.png){width=100%}  
+>
+ColumnNR | Description  
+:--|:--------------  
+1. | Read name     
+2. | 12 "bits" flag summarizing of the alignment. Webtools to explain the meaning of each flag: [samformat](https://www.samformat.info/sam-format-flag), or [Broad Institute](https://broadinstitute.github.io/picard/explain-flags.html)  
+3. | Chromosome in the reference genome the read aligns 
+4. | Position within the chromosome the read aligns  
+5. | Mapping quality score, different programs use different scores    
+6. | CIGAR string, is a summary of the alignment per nt  
+7. | Chromosome where the paired read aligns (if there is no paired read 0 or *)   
+8. | Position within where the paried read aligns (if there is no paired read 0 or *)  
+9. | Length of the complete fragment, from the first mapped base of read 1 to the last mapped base of read 2. 
+10. | Called bases    
+11. | Phred quality score of the read   
+>
+>
 To give you a feel for how SAM files looks like, here's an example of the header and one record:  
 ![](images/wk1_3_bam_header_example_sandrews_tutorial201911.png){width=100%}     
 <!-- ref: Simon Andrews, Babraham Bioinformatics, Quality control for Sequencing Experiments pdf, v2019-11 --> 
@@ -277,26 +299,10 @@ To give you a feel for how SAM files looks like, here's an example of the header
 <!-- ref: Simon Andrews, Babraham Bioinformatics, Quality control for Sequencing Experiments pdf, v2019-11 --> 
 This example tells you among others that the library was mapped with [hisat2](http://daehwankimlab.github.io/hisat2/manual/) to the mouse reference genome GRCm38 with certain additional settings. The single displayed read is mapping to chr18, starting at position 57944851.    
 <br>
-In summary:  
-![](images/wk1_3_BAM_fields_broadinstitute.png){width=100%}   
-Each record holds at least 11 columns (exact number depends on the aligner and post-alignment analytics performed on the file):  
 >
-ColumnNR | Description | Example  
-:--|:--|:--  
-1. | Read name | HWI-D00436:394:CBGLBANXX:1:1101:1222:1861    
-2. | 12 "bits" flag summarizing of the alignment. Webtools to explain the meaning of each flag: [samformat](https://www.samformat.info/sam-format-flag), or [Broad Institute](https://broadinstitute.github.io/picard/explain-flags.html) | 16  
-3. | Chromosome in the reference genome the read aligns | chr18
-4. | Position within the chromosome the read aligns | 5794485  
-5. | Mapping quality score, different programs use different scores | 60    
-6. | CIGAR string, is a summary of the alignment per nt | 50M 
-7. | Chromosome where the paired read aligns | chr18 (if there is no paired read 0 or *)   
-8. | Position within where the paried read aligns |  5794685 (or 0 if there is no paired read)  
-9. | Length of the complete fragment, from the first mapped base of read 1 to the last mapped base of read 2. | 200 (0 if there is no pair)   
-10. | Called bases | AAAAGATCTCTTGAT...   
-11. | Phred quality score of the read | GGGGGGGGGGGGGGG...    
+> The full SAM/BAM file format specification can be read in this [pdf ](http://samtools.github.io/hts-specs/SAMtags.pdf) from [SAMtools](http://samtools.sourceforge.net/).    
 
 </details>
-
 <br>
 
 #### 4. Filter artefacts and reads aligning to multiple regions  
@@ -304,26 +310,56 @@ From the initial alignment we often identify and remove PCR artefacts, reads ali
 <br>
 
 #### 5. Visualize read depth    
-Files are created that count how many reads align to each nucleotide in the reference genome. Nucleotides with a relative high score pinpoint the likely locations of the ChIPped factor or histone PTM; to a region of accessible chromatin in ATAC-seq; or to the region that was likely transcribed and detected in RNA-seq.  
+Files are created that count how many reads align to each nucleotide in the reference genome. Genomic positions with a relative high score pinpoint the likely locations of the ChIPped factor or histone PTM; to a region of accessible chromatin in ATAC-seq; or to the region that was likely transcribed and detected in RNA-seq.  
 <br>
-These files can be uploaded to the UCSC Genome Browser which we will look at in more detail today as well. Various file types can store this kind of data. We wil use bigwig files (.bw file extension), these are fast and relatively small but we can't view them.    
+These files can be uploaded to the UCSC Genome Browser which we will look at in more detail today as well. Various file types can store this kind of data (including wiggle and bedGraph). We wil use BigWig files, which are binary versions of the wiggle (.bw file extension), these are fast and relatively small but we can't view them.    
 <br>
+
+> #### Background box:   
 <details><summary>A fictional example of alignment and a read depth graph</summary>  
 ![](images/wk1_3_read_depth_Pavlopoulos2018.png){width=80%}  
 <!-- ref: Pavlopoulos et al (2013) BioData Mining 6, Article number: 13 (2013), figure 6 -->
 </details> 
 <br>
+<details><summary>Read depth stored as a bedGraph file:</summary>  
+> bedGraph files are easier to read by the human eye compared to Wiggles. As they basically store the same information, we discuss the bedGraphs here.  
+> bedGraph files are similar to the BED files discussed in the next section. BedGraph files commonly contain two sections: (1) header that informs the genome browser; (2) records of regions with a certain read coverage.  
+The records contain minimally 4 columns:  
+`chromosome - region start - region end - read depth at all positions within the region`.  
+An example:  
+![](images/wk1_3_bedgraph_format_bedgraph.png){width=80%}    
+Further reading: The UCSC Genome browser documentation on [bedGraph](https://genome.ucsc.edu/goldenPath/help/bedgraph.html), [wiggle](https://genome.ucsc.edu/goldenPath/help/wiggle.html) and [bigWig](https://genome.ucsc.edu/goldenPath/help/bigWig.html) file formats.  
+</details> 
+<br>
 
 #### 6. Call peaks  
-Reads are scattered through the genome but locations where the used antibody recognizes its target (eg. DNA-binding TF, histone, histone variant or histone PTM) will collect more reads. **Peak calling** is the computational process to identify these regions, often with respect to a control dataset where no antibody or no specific antibody was used, resp.  **input control** and **IgG control** . A commonly used tool for this step is [MACS2](10.1186/gb-2008-9-9-r137). MACS2 was also used to call peaks in the datasets that we will be using.  
+Reads are scattered through the genome but locations where the used antibody recognizes its target (eg. DNA-binding TF, histone, histone variant or histone PTM) will collect more reads. **Peak calling** is the computational process to identify these regions, often with respect to a control dataset where no antibody or no specific antibody was used, resp.  **input control** and **IgG control** . A commonly used tool for this step is [MACS2](https://doi.org/10.1186/gb-2008-9-9-r137). MACS2 was also used to call peaks in the datasets that we will be using.  
 <br>
 Peak calling is a statistical procedure and never black and white. It depends among others on thresholds used (p-value, false-discovery rate) and the control sample. It is always wise to visually inspect the resulting peaks in the UCSC genome browser. If the called peaks do not correspond to the sites with high read coverage, you may need to adjust the settings for peak calling.    
 <br>
-Peaks are repored as regions, or **genomic intervals** with their genomic coordinates: **chr start end**. As well as a **score** that indicates the strength of the signal observed for this peak. We will look at these files more closesly in week 2.  
+Peaks are repored as genomic regions, or **intervals** with genomic coordinates: **chr**, **start** and **end** and a **name**, and **score** column. The **score** indicates the strength of the signal observed for this peak.   
+<br>
+These peak data are stored in .BED files (which stands for "Browser Extensible Data"). BED files have 3 required columns and 9 optional ones. The required columns are the: chromosome, start and end. For peak files 6 or 7 optional columns are used:  
+
+-  4th: peak name  
+-  5th: score (equals -10log(qvalue) \*\ 10, rounded down to integer value)   
+-  6th: strand to denote orientation (if applicable, otherwise "\*" or "\." if unstranded)  
+-  7th: fold enrichment fo the signal at the summit or averaged over the complete region    
+-  8th: p-value to denote statistical significance, given as -log10(p-value)  
+-  9th: q-value statistical significance using false discoveray rate, given as -log10(q-value)  
+-  10th (only for sharp peaks not broad domains): location of peak summit relative to the "start" coordinate
+
+Here's an exmaple of three types of BED files:  
+![](images/wk1_3_file_format_bed.png){width=80%}     
+Further reading on these file formats on the UCSC Genome Browser FAQ page: [BED](http://genome.ucsc.edu/FAQ/FAQformat.html#format1), and the [narrowPeak BED](http://genome.ucsc.edu/FAQ/FAQformat.html#format12) and [broadPeak BED](http://genome.ucsc.edu/FAQ/FAQformat.html#format13).  
+<br>
+You will work with these files in the analyses of week 2.  
 <br>
 
 #### 7. Read counting  
-Count reads that fall within genes, other genomic elements or peak regions. These counts and the actual peak locations are used for eg. differential gene expression analyses in RNA-seq or differential TF-binding in ChIP-seq (comparing differentiated vs undifferentiated or control vs treatment). A well-known, widely used tool for this purpose is DESeq2.   
+Count reads that fall within genes, other genomic elements like promoters or enhancers, or peak regions. These counts are used for for example differential gene expression analyses in RNA-seq or differential TF-binding in ChIP-seq (comparing differentiated vs undifferentiated or control vs treatment). A well-known, widely used tool for this purpose is DESeq2.  
+<br>
+Alternatively, you can also intersect the read depth reported in the .bigWig files of step (5.) with the peak files from step (6.). This is what you will do in week 3.  
 <br>
 Sample clustering can be included here as additional QC. It should identify which samples are closely related and if they don't, this might point to a label swap or more severe issue like not-working stimulus in one of the replicates.  
 <br>
@@ -480,8 +516,8 @@ Additional important actions and terms that were not explicitly discussed in the
 ### 1.4.2 Go to the UCSC Genome browser  
 **Let's go to the UCSC genome browser....**  
 
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Go to the [UCSC Genome Browser](https://genome.ucsc.edu/index.html) (blue text is a link, use right-mouse click to open in new window).</span>   
-<br> 
+> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: Go to the [UCSC Genome Browser](https://genome.ucsc.edu/index.html) (blue text is a link, use right-mouse click to open in new window).</span>   
+
 The starting page has been updated since the video was made but still holds the same blue bar at the top with **Genomes**, **Tools**, etc.:  
 ![](images/wk1_4b_ucsc_genome_browser_topmenubar.png){width=80%}\     
 
@@ -491,17 +527,16 @@ The starting page has been updated since the video was made but still holds the 
 
 > *Tip*: A pop-up may appear now or one stap later, redirected you to the official European mirror site if those servers are geographically closer, that's ok.  
 
-<br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: To access the human genome, select the "Genomes" tab.</span>     
-<br>
+> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: To access the human genome, select the "Genomes" tab.</span>  
+
 On the left you can browse and select the genome you are interested in (not a drop-down menu anymore as in the video). By default, the human genome is selected.   
 <br>
 We can go to a position of our choice by entering the gene or chromosomal coordinates under **Position/Search Term** or immediatly go to the 'Current position' by clicking on `GO` on the right-hand side or **Genome Browser** in the menu bar on top.  
-<br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Ensure that "Human" is selected in the REPRESENTED SPECIES tree and "Dec. 2013 (GRCh38/hg38)" is selected under Human Assembly (red arrows in image below).</span>     
-<br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Go to *ACTB* gene (gene coding for non-muscular actin part of cytoskeleton).</span>    
-<br>
+
+> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: Ensure that "Human" is selected in the REPRESENTED SPECIES tree and "Dec. 2013 (GRCh38/hg38)" is selected under Human Assembly (red arrows in image below).</span>   
+
+> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: Go to *ACTB* gene (gene coding for non-muscular actin part of cytoskeleton).</span> 
+
 *Genomes page, ready to go to ACTB gene in Human genome GRCh38*:  
 ![](images/wk1_4b_ucsc_gb_actb_question_startpage.png){width=90%}\    
 
@@ -545,11 +580,10 @@ The data window displays various **tracks** or **track sets**. Tracks runs the c
 > 2. Scroll to the area below the data window, here you see a possibly overwhelming list of potential tracks, most are `hidden`. Using the pull down menu you can change display settings of multiple tracks at once. Always make sure to hit the `refresh` button below the browser window to ensure all changes are performed.  
 </details>
 
-<br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: hide all tracks and tracksets except for the ruler and GENCODE v32 tracks.</span>   
-<br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: for GENCODE v32, via "Configure GENCODE v32", make sure the option "splice variants" is unchecked.</span>     
-<br>
+> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: hide all tracks and tracksets except for the ruler and GENCODE v32 tracks.</span>   
+
+> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: for GENCODE v32, via "Configure GENCODE v32", make sure the option "splice variants" is unchecked.</span>     
+
 
 >#### **Optional check**:   
 <details><summary>In case you want to check your settings, these screenshots could help you:</summary>  
@@ -600,10 +634,9 @@ quiz(caption = "",
 )
 
 ```
-<br>
 
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Go to the gene *SPI1* </span>    
-<br>
+> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: Go to the gene *SPI1* </span>    
+
 *SPTI1* encodes the myeloid and B-cell specific transcription factor PU.1 [Pham 2012 Blood](https://doi.org/10.1182/blood-2012-01-402453).  
 
 >#### **Optional check**:   
@@ -640,9 +673,9 @@ question("What statement about the *SPI1* gene is correct? (Select ALL that appl
 
 <br>
 To upload the data we have already put them together in a so-called track hub, hosted by our own server. We can add this to our browser session by going to the tab "My Data" in the top menu and select "Track Hubs". In the "My hubs" tab you can paste a URL that points to the location of data you want to upload.   
-<br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Upload the required data using the following URL and return back to the Genome Browser:</span> `http://mbdata.science.ru.nl/ctoenhake/edu/trackhub_monocytes/hub.txt`.       
-<br>  
+
+> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: Upload the required data using the following URL and return back to the Genome Browser:</span> `http://mbdata.science.ru.nl/ctoenhake/edu/trackhub_monocytes/hub.txt`.       
+ 
 
 >#### **Optional check**: 
 <details><summary>Screenshots showing where to go to add the trackhub: </summary>  
@@ -695,9 +728,10 @@ We have the following datasets:
 + Input ChIP-seq, black
 
 <br>
+`r colorize("Auto-scaling", col = "red")`  
 What we haven't discussed so far is the **y-axis** at the left side of the tracks with **signal information** such as the ones just uploaded. Using this y-axis we can evaluate signal intensities. The height is currently set to 30, 50 or 100. This corresponds to the number of reads mapping to that location per million reads in the library. You can change the height of the y-axis by right-mouse click on the trakname, select the "Configure [trackname]" option and change under "Vertical viewing range", the min" and "max". Hit `APPLY` afterwards.  
-<br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Go back to the *ACTB* locus </span>  
+
+> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: Go back to the *ACTB* locus </span>  
 
 >#### **Optional check**:    
 <details><summary>Your browser should be showing genomic region:</summary>  
@@ -723,8 +757,8 @@ quiz(caption = "",
 )
   
 ```
-<br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: From the *ACTB* locus, zoom out 3x to see the surrounding region.</span>     
+
+> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: From the *ACTB* locus, zoom out 3x to see the surrounding region.</span>     
 
 > #### **Optional check**:  
 <details><summary> Your browser should be showing:</summary>  
@@ -765,12 +799,12 @@ question("We define the promoter as 3kb upstream of the TSS. Which histone marks
 **It would be cumbersume if we would have to identify all peaks manually, not to mention a highly biased procedure. Luckily we have peak calling software to help us with that. In the following section we will use those results along with the tracks.**   
 <br>
 The peaks are already loaded, see the list of files in "BLUEPRINT monocytes" section below the browser.  
-<br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Turn the display of all peak tracks to "dense" using the drop-down menu.</span>    
-<br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: From *ACTB* locus, zoom out 100x.</span>     
-<br>
-A prominant H3K27me3 peaks upstream of *ACTB* comes in view.  
+
+> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: Turn the display of all peak tracks to "dense" using the drop-down menu.</span>    
+
+> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: From *ACTB* locus, zoom out 100x. A prominant H3K27me3 peaks upstream of *ACTB* comes in view.  </span>     
+
+
 
 > #### **Optional check**:  
 <details><summary> Your browser should be showing:</summary>  
@@ -879,8 +913,8 @@ question("Which marks mark the enhancer 20kb downstream of *CD14*?",
 ```
 <br>
 So far we have seen active promoters, bivalent promoters and enhancers. A region silenced by H3K9me3 is loacted appr. 120kb upstream of *CD14*.   
-<br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Navigate and zoom-out to chr5:140250000-141720000 .</span>    
+
+> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: Navigate and zoom-out to chr5:140250000-141720000 .</span>    
 
 ```{r q19_cd14_near_silencing}
 question("The expression of what gene family is silenced by this  H3K9me3-domain?",
@@ -900,8 +934,8 @@ question("What is the approximate size of the H3K9me3 silenced region? (*Tip2: h
 ```
 <br>
 Silencing does not necessarily have to be mediated by H3K9me3.  
-<br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: Which of the following genes is silenced by H3K27me3? *ACTA1*,  *EED*, *GATA3*, *HDAC1*, *MYOD1* andncoding muscular actin.</span>  
+
+> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: Which of the following genes is silenced by H3K27me3? *ACTA1*,  *EED*, *GATA3*, *HDAC1*, *MYOD1* andncoding muscular actin.</span>  
 
 > #### **Optional check**:  
 <details><summary> Table with genomic locations of these genes:</summary>  
@@ -943,8 +977,9 @@ So far you have browsed through ChIP-, DNaseI- and RNA-seq data. These tracks ha
 Our collegue performed RNA-seq, DNAseI-seq and ChIPs for H3K9me3, H3K27me3, H3K4me3, H3K36me3, H3K4me1 and H3K27ac on CD4+ T cells but accidentally let the tubes fall before the tubes were properly labelled (always label your tubes first and *before* adding your sample!). 
 <br>
 We know which experiments were performed, but which track (labelled a-f) is most likely which technique?  
-<br>
-<span style="color: goldenrod; font-family: Arial; font-size:16px;">**Action**: upload the following track hub </span> `http://mbdata.science.ru.nl/ctoenhake/edu/trackhub_unknown/hub.txt`.
+
+> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: upload the following track hub </span> `http://mbdata.science.ru.nl/ctoenhake/edu/trackhub_unknown/hub.txt`.
+
 <br>  
 Note that the y-axis scale of these tracks is set to "auto-scale to data view". In the monocyte track we had set these to fixed values based on our experience with these datasets. "Auto-scaling" means that the y-axis adjusts to the reported signal in the corresponding genomic region.  
 <br>

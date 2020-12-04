@@ -5,6 +5,7 @@
 **/*.Ruserdata
 **/*.Rproj
 **/*_cache/
+**/*.html
 renv/library/
 renv/lock/
 renv/python/
