@@ -16,13 +16,12 @@ prep_week2 <- function(){
 
   # store the variables in an .Rdata object
   save(
-    #txdb_annotation, genes, promoters_3k, promoters_def, transcripts, encode_ccres, encode_ccres_list, entrezid_symbols, monocytes_h3k4me3,
     monocytes_h3k4me3, monocytes_h3k4me1, monocytes_h3k9me3, monocytes_h3k27ac, monocytes_h3k27me3, monocytes_h3k36me3, monocytes_list,
     file =  "inst/extdata/week2.Rdata"
   )
 
   # install the package
-  dev_path = "."  # should be something like "/home/siebrenf/git/edu/learnr.proto"
+  dev_path = "."  # tools::file_path_as_absolute(".") should be something like "/home/siebrenf/git/edu/learnr.proto"
   devtools::install(
     pkg=dev_path,
     dependencies=F

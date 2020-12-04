@@ -42,9 +42,6 @@ gradethis::gradethis_setup()
 # data accessible to all exercises
 rdata = system.file("extdata", "week2.Rdata", package = "learnr.proto")
 load(rdata)
-
-# txdb19 <- TxDb.Hsapiens.UCSC.hg19.knownGene
-# txdb38 <- TxDb.Hsapiens.UCSC.hg38.knownGene
 ```
 
 
