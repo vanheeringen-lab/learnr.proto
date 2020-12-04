@@ -10,3 +10,4 @@ renv/staging/
 inst/tutorials/**/*.Rdata
 inst/tutorials/**/*_cache/
 inst/tutorials/*/*.html
+inst/tutorials/*/*_files/
