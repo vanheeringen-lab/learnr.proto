@@ -1,65 +1,50 @@
 ---
 title: "Week 2: Exploratory & Overlap analysis"
-# progress stored in ~/.local/share/R/learnr/tutorial/storage/siebrenf/prototype/
-tutorial:
-  id: "prototype"  # folder name
-  version: 0.1     # subfolder name
+tutorial:      # where learnr stores the progress
+  id: "FG2"    # folder name
+  version: 0.1 # subfolder name
 output: 
   learnr::tutorial:
     fig_caption: no
-    progressive: false
+    progressive: true
     allow_skip: true
     css: css/custom.css
 runtime: shiny_prerendered
 description: >
   Multi line text can be put here
-  for your convinience.
+  for your convenience.
 ---
 
 
 ```{r setup, include=FALSE}
-# packages
-library(learnr)  # 0.10.1 -> conda-forge / 0.9.2.1 -> r
-library(tidyverse)  # 1.2.1 -> r / 1.3.0 -> conda-forge
-#library(ggplot2)  # 3.1.1 -> r
-#installed required libraries via .yaml file environment_v3_withversions.yml
-#see Home/GitHub/learnr_20201020_installing_learnr_conda_environment.txt
+library(learnr)     # 0.10.1.9006 (github)
+library(gradethis)  # 0.1.0.9004  (github)
+library(testthat)   # 3.0.0 
+library(tidyverse)  # 1.3.0
+library(learnr.proto)
+
 library(IRanges)
 library(GenomicRanges)
 library(plyranges)
 library(rtracklayer)
 library(VennDiagram)
-#library(UpSetR)
 library(GenomicFeatures)
-#library(ChIPpeakAnno)
-#library(genomation)
-source("functions.r")
+# library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+# library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+# library(ChIPpeakAnno)
+# library(UpSetR)
+# library(genomation)
 
 # configuration
 knitr::opts_chunk$set(echo = FALSE)
-#knitr::opts_knit$set(root.dir = "/Users/christatoenhake/GitHub/learnr.proto/inst/tutorials/FunctGenWeek2_v2/")
-# gradethis::gradethis_setup()
+gradethis::gradethis_setup()
 
-# functions
-# checker <- function(label, user_code, check_code, envir_result, evaluate_result, ...) {
-#  list(message = check_code, correct = TRUE, location = "append")
-# }
-#tutorial_options(
-#  exercise.timelimit = 10,  # max code execution time
-  #exercise.checker = checker)
+# data accessible to all exercises
+rdata = system.file("extdata", "week2.Rdata", package = "learnr.proto")
+load(rdata)
 
-# # what to do when the browser window is closed
-# session$onSessionEnded(function() {
-# 
-#   # TODO save progress
-# 
-#   stopApp()
-#   })
-
-```
-
-```{r set_data_dir, echo = F}
-datadir <- "/Users/christatoenhake/GitHub/learnr.proto/inst/tutorials/FunctGenWeek2_v2/"
+# txdb19 <- TxDb.Hsapiens.UCSC.hg19.knownGene
+# txdb38 <- TxDb.Hsapiens.UCSC.hg38.knownGene
 ```
 
 
@@ -189,9 +174,12 @@ Function | Purpose | Example on GRanges
 To parse peak files directly into GRanges you use the `import()` function from the rtracklayer package:   
 ```{r exampleimport_rtracklayer, eval = F, echo = T}
 # load the required library
-library(rtracklayer)  
+library(rtracklayer)
+
 # import monocyte H3K4me3 peak locations
-monocytes_h3k4me3 <- rtracklayer::import("C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr19.bed", format = "narrowPeak")  
+monocytes_h3k4me3 <- import("C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr19.bed", format = "narrowPeak")
+
+# (you could also use rtracklayer::import("C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr19.bed", format = "narrowPeak") and skip loading the library)
 ```
 <br>
 
@@ -229,26 +217,37 @@ Let's take a quick look at one `monocytes_h3k4me3`.
 > **Exercise 1:**  
 Print the head of `monocytes_h3k4me3`.  
 
-```{r q1_head_h3k4me3-setup, echo = F}
-library(rtracklayer)
-monocytes_h3k4me3 <- rtracklayer::import(paste0(datadir, "www/blueprint/bed/C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr19.bed"), format = "narrowPeak")
-```
+<!-- # ```{r q1_head_h3k4me3-setup, echo = F} -->
+<!-- # library(rtracklayer) -->
+<!-- # monocytes_h3k4me3 <- rtracklayer::import(paste0(datadir, "www/blueprint/bed/C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr19.bed"), format = "narrowPeak") -->
+<!-- # ``` -->
 
 ```{r q1_head_h3k4me3, exercise = TRUE}
 # the object "monocytes_h3k4me3" has already been imported for you
+monocytes_h3k4me3
 
 ```
+
+<!-- # ```{r q1_head_h3k4me3-hint-1} -->
+<!-- # head("object", n="rows") -->
+<!-- # ``` -->
 
 <div id="q1_head_h3k4me3-hint">
 **Hint:** You may want to use the `head(.., n = ..)` function.  
 </div>
 
-```{r q1_head_h3k4me3-solution}
-head(monocytes_h3k4me3, n = 2)
-```
+<!-- # ```{r q1_head_h3k4me3-solution} -->
+<!-- # head(monocytes_h3k4me3, n = 2) -->
+<!-- # ``` -->
+<!-- #  -->
+<!-- # ```{r q1_head_h3k4me3-code-check, eval = F} -->
+<!-- # grade_code() -->
+<!-- # ``` -->
 
-```{r q1_head_h3k4me3-code-check, eval = F}
-grade_code()
+```{r q1_head_h3k4me3-check}
+grade_result(
+  pass_if(~identical(.result, head(monocytes_h3k4me3, n = 2)))
+)
 ```
 
 > *Note 1*: We have restricted all peak files to chromosome 19 to limit their file size. That is why "seqinfo" holds only one sequence.  
@@ -269,13 +268,14 @@ A common first step in genomics data analysis is to make some exploratory plots.
 > * Determine the number of H3K4me3 and H3K27me3 peaks in monocytes.  
 > * What is the distribution of peak sizes and scores? 
 
-```{r q2a_explore-setup, echo = F}
-monocytes_h3k4me3 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547984.h3k4me3.bwa.GRCh38.20150527.chr19.bed", format = "narrowPeak")
-
-```
+<!-- # ```{r q2a_explore-setup, echo = F} -->
+<!-- # monocytes_h3k4me3 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547984.h3k4me3.bwa.GRCh38.20150527.chr19.bed", format = "narrowPeak") -->
+<!-- #  -->
+<!-- # ``` -->
 
 ```{r q2a_explore, exercise = T}
-# How many peaks do are stored in monocytes_h3k4me3  
+# How many peaks do are stored in monocytes_h3k4me3?
+monocytes_h3k4me3
 
 ```
 
@@ -283,11 +283,11 @@ monocytes_h3k4me3 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547984.h
 **Hint:** You may want to use the `length()` function.  
 </div>
 
-```{r q2a_explore-solution}
-length(monocytes_h3k4me3)
-```
+<!-- # ```{r q2a_explore-solution} -->
+<!-- # length(monocytes_h3k4me3) -->
+<!-- # ``` -->
 
-```{r q2a_explore-check, eval = F}
+```{r q2a_explore-check}
 grade_result(
   pass_if(~identical(.result, 2838))
 )
@@ -302,20 +302,23 @@ summary(...(...))
 **Hint:** You may want to retrieve peak widths with `width()` function.  
 </div>
 
-```{r q2b_explore-solution}
-summary(width(monocytes_h3k4me3))
+<!-- # ```{r q2b_explore-solution} -->
+<!-- # summary(width(monocytes_h3k4me3)) -->
+<!-- # ``` -->
+
+```{r q2b_explore-check}
+grade_result(
+  pass_if(~identical(.result, summary(width(monocytes_h3k4me3))))
+)
 ```
 
-```{r q2b_explore-code-check, eval = F}
-grade_code()
-```
-
-```{r q2c_explore-setup, echo = F}
-monocytes_h3k4me1 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547981.H3K4me1.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak")
-```
+<!-- # ```{r q2c_explore-setup, echo = F} -->
+<!-- # monocytes_h3k4me1 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547981.H3K4me1.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak") -->
+<!-- # ``` -->
 
 ```{r q2c_explore, exercise = T}
 # What is the distribution of peak sizes for H3K4me1?
+monocytes_h3k4me1
 
 ```
 
@@ -323,12 +326,14 @@ monocytes_h3k4me1 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547981.H
 **Hint:** You may want to use `score()` to retrieve the peak scores.  
 </div>
 
-```{r q2c_explore-solution}
-summary(score(monocytes_h3k4me3))
-```
+<!-- # ```{r q2c_explore-solution} -->
+<!-- # summary(score(monocytes_h3k4me1)) -->
+<!-- # ``` -->
 
-```{r q2c_explore-code-check, eval = F}
-grade_code()
+```{r q2c_explore-check}
+grade_result(
+  pass_if(~identical(.result, summary(score(monocytes_h3k4me1))))
+)
 ```
 
 <br>
@@ -353,7 +358,7 @@ Let's plot some of the above generated outputs using **base** plotting functions
 hist(width(monocytes_h3k4me3), main = "Monocytes h3k4me3 ChIP-seq, chr19", xlab = "peak size", col = "gray")
 ```
 
-```{r q3a_exploreplot-code-check, eval = F}
+```{r q3a_exploreplot-check, eval = F}
 grade_code()
 ```
 
@@ -390,6 +395,7 @@ What is the number of peaks with width > 10kb.
 
 ```{r q4_filter, exercise = T}
 # How many monocytes_h3k4me3 peaks have width > 10kb>
+monocytes_h3k4me3
 
 ```
 
@@ -401,12 +407,12 @@ What is the number of peaks with width > 10kb.
 **Hint:** You may want to use `length(..[..(..) > 10000,])`   
 </div>
 
-```{r q4_filter-solution}
-# using [ ]-subsetting
-length(monocytes_h3k4me3[width(monocytes_h3k4me3) > 10000,])
-```
+<!-- # ```{r q4_filter-solution} -->
+<!-- # # using [ ]-subsetting -->
+<!-- # length(monocytes_h3k4me3[width(monocytes_h3k4me3) > 10000,]) -->
+<!-- # ``` -->
 
-```{r q4_filter-check, eval = F}
+```{r q4_filter-check}
 grade_result(
   pass_if(~identical(.result, 4))
 )
@@ -543,7 +549,7 @@ We want to know how many of the promoters overlap with a h3k4me3 peak and vise v
 > **Exercise 8:**  
 > Use `findOverlaps()` to determine the overlap between (query) `monocytes_h3k4me3` and (subject) `promoters`.     
 
-```{r overlap_exercise7, echo = F}
+```{r overlap_exercise7}
 # prepare data for exercise 10
 library(TxDb.Hsapiens.UCSC.hg38.knownGene)
 txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene 
@@ -559,7 +565,9 @@ promoters <- resize(tss, width = 1000, fix = "end")
 promoters <- resize(promoters, width = 1200, fix = "start")
 
 # load the monocyte data
-load("www/prepared_rds/blueprint_monocyte_chr19_granges.RData")
+rdata = system.file("extdata", "week2", "prepared_rds", "blueprint_monocyte_chr19_granges.RData", package = "learnr.proto")
+load(rdata)
+#load("www/prepared_rds/blueprint_monocyte_chr19_granges.RData")
 ```
 
 ```{r q8_overlap, exercise = T, exercise.setup = "overlap_exercise7"}
@@ -592,6 +600,26 @@ grade_code()
 - Use `unique()` to minimize this output to unique peaks.  
 - Use `length()` to count the number of unique intervals of the query and the subject. 
 
+```{r q10_overlap}
+# prepare data for exercise 10
+library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene 
+
+# extract gene coordinates  
+genes <- unique(genes(txdb, filter = list(tx_chrom = "chr19")))
+
+# identify TSS (in this case 1 per gene even though we know that genes have multiple TSSs)
+tss <- resize(genes, width = 1, fix = "start")
+
+# consider 1kb upstream and 200bp downstream the TSS as promoter
+promoters <- resize(tss, width = 1000, fix = "end")
+promoters <- resize(promoters, width = 1200, fix = "start")
+
+# Find overlap between monocytes_h3k4me3 peaks and promoters
+overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters)
+```
+
+
 ```{r q11a_overlap, exercise = T, exercise.setup = "q10_overlap"}
 # What is the number of unique h3k4me3 peaks reported in 'overlap'?
 length(unique(..(..))) 
@@ -608,7 +636,7 @@ grade_result(
 )
 ```
 
-```{r q11b_overlap, exercise = T, exercise.setup = "q11_overlap"}
+```{r q11b_overlap, exercise = T, exercise.setup = "q10_overlap"}
 # What is the proportion of h3k4me3 peaks that overlap?
 length(unique(..(..)))/length(..)
 ```
@@ -623,7 +651,7 @@ grade_result(
 )
 ```
 
-```{r q11c_overlap, exercise = T, exercise.setup = "q11_overlap"}
+```{r q11c_overlap, exercise = T, exercise.setup = "q10_overlap"}
 # What is the proportion of promoters that overlap?
 length(unique(..(..)))/length(..)
 ```
@@ -691,7 +719,7 @@ Use a binomial test to test for enrichment of h3k4me3 at promoters.
 > - We set `alternative = "greater"` because we test for *enrichment* and our alternative hypothesis is that the true probability is *larger* than the expected probability.  
 
 <br>
-```{r q12_binomtest, exercise = T, exercise.setup = "q11_overlap", exercise.setup = "fraction_promoters"}
+```{r q12_binomtest, exercise = T, exercise.setup = "q10_overlap", exercise.setup = "fraction_promoters"}
 # binomial test for enrichment of h3k4me3 peaks in promoters:  
 binom.test(length(unique(..(overlap))), length(..), prom_fraction_chr19, alternative = "greater" )
 
@@ -716,7 +744,9 @@ Use a binomial test to test for enrichment of H3K27ac at promoters.
 > - Use the function `binom.test(x, n, p, alternative = "greater")` to call the test  
 > - We set `alternative = "greater"` because we test for *enrichment* and our alternative hypothesis is that the true probability is *larger* than the expected probability.  
 
-```{r overlap_exercise13, exercise.setup = 'prep-txdbindiv', echo = F}
+```{r overlap_exercise13} 
+# this chunk no longer exists: exercise.setup = 'prep-txdbindiv'}
+
 # prepare data for exercise 13
 
 # identify TSS (in this case 1 per gene even though we know that genes have multiple TSSs)
@@ -726,7 +756,9 @@ promoters <- resize(tss, width = 1000, fix = "end")
 promoters <- resize(promoters, width = 1200, fix = "start")
 
 # load the monocyte data
-load("www/prepared_rds/blueprint_monocyte_chr19_granges.RData")
+rdata = system.file("extdata", "week2", "prepared_rds", "blueprint_monocyte_chr19_granges.RData", package = "learnr.proto")
+load(rdata)
+#load("www/prepared_rds/blueprint_monocyte_chr19_granges.RData")
 
 # fraction of promoters on chr19
 prom_fraction_chr19 <- sum(width(GenomicRanges::reduce(promoters)))/seqlengths(promoters)["chr19"]
@@ -772,14 +804,14 @@ question("Is H3K27ac enriched at promoters?",
 To understand the function of a ChIPped mark or factor we often want to know to which genomic features it binds.
 <br>
 
-```{r q13a_anno-setup, echo = F}
+```{r q13a_anno-setup}
 # we need the `TxDb` object and limits its active chromosomes to chromosome 19
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 seqlevels(txdb) <- "chr19"
 
 # laod package to annotate peaks with genes
-require(ChIPpeakAnno)   
+library(ChIPpeakAnno)   
 ```
 
 > **Exercise 13**  
@@ -812,7 +844,9 @@ pie(h3k4me3_features$percentage)
 grade_code()
 ```
 
-```{r q13b_anno, exercise = T, exercise.setup = "anno_h3k4me3_prep"}
+```{r q13b_anno, exercise = T}
+# this chunk no longer exists: exercise.setup = "anno_h3k4me3_prep"}
+
 # make barplot
 bp <- ..(..$.., ylab="%")
 # add percentages to the bars with text()  
@@ -835,25 +869,25 @@ grade_code()
 So far we looked at h3k4me3 marking. How do the other marks overlap with genomic features? Instead of rerunning the above code for each mark individually, we combine the individual peak objects into a list of `GRanges` objects with the function `GRangesList()`.   
 <br>  
 We have created a `GRangesList` `monocytes_list` by:  
-```{r prepare files, echo = F}
-# H3k4me1 
-monocytes_h3k4me1 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547981.H3K4me1.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak")
-
-# H3K4me3  
-monocytes_h3k4me3 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr19.bed", format = "narrowPeak")
-
-# H3K9me3 
-monocytes_h3k9me3 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547982.H3K9me3.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak")
-
-# H3K27ac 
-monocytes_h3k27ac <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547980.H3K27ac.bwa.GRCh38.20150527.chr19.bed", format = "narrowPeak")
-
-# H3K27me3   
-monocytes_h3k27me3 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak")
-
-# H3K36me3
-monocytes_h3k36me3 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547979.H3K36me3.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak")
-```
+<!-- # ```{r prepare files, echo = F} -->
+<!-- # # H3k4me1  -->
+<!-- # monocytes_h3k4me1 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547981.H3K4me1.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak") -->
+<!-- #  -->
+<!-- # # H3K4me3   -->
+<!-- # monocytes_h3k4me3 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr19.bed", format = "narrowPeak") -->
+<!-- #  -->
+<!-- # # H3K9me3  -->
+<!-- # monocytes_h3k9me3 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547982.H3K9me3.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak") -->
+<!-- #  -->
+<!-- # # H3K27ac  -->
+<!-- # monocytes_h3k27ac <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547980.H3K27ac.bwa.GRCh38.20150527.chr19.bed", format = "narrowPeak") -->
+<!-- #  -->
+<!-- # # H3K27me3    -->
+<!-- # monocytes_h3k27me3 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak") -->
+<!-- #  -->
+<!-- # # H3K36me3 -->
+<!-- # monocytes_h3k36me3 <- rtracklayer::import("www/blueprint/bed/C000S5H2.ERX547979.H3K36me3.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak") -->
+<!-- # ``` -->
 
 ```{r grangeslist, echo = T}
 # make a list of your GRanges objects
@@ -934,7 +968,7 @@ Instead of the length, let's look at the distribution of these peaks among featu
 > 
 > For each item in `monocytes_list` determine the overlap with genomic features. Use the `assignChromosomeRegion(object,TxDb=txdb, nucleotideLevel=FALSE)` to assign peaks to features. 
 
-```{r anno_grlist_prep, echo = F}
+```{r anno_grlist_prep}
 # make a list of your GRanges objects
 monocytes_list  <- GRangesList(monocytes_h3k4me1, monocytes_h3k4me3, monocytes_h3k9me3, monocytes_h3k27ac, monocytes_h3k27me3, monocytes_h3k36me3)
 # add names to each element in the list
@@ -947,7 +981,7 @@ seqlevels(txdb) <- "chr19"
 
 ```{r annotate_with_list}
 # laod package to annotate peaks with genes
-require(ChIPpeakAnno)   
+library(ChIPpeakAnno)   
 
 # calucluate the overlap with features
 # this code takes rather long to run!!!!
@@ -975,7 +1009,9 @@ The `GenomicRanges` package has the function `distanceToNearest(x, subject)` to 
 >**Exercise 15**  
 Use `distanceToNearest()` to get the distance between h3k4me3 peaks and the nearest TSS.  
 
-```{r q15_distance_tss, exercise = T, exercise.setup = "overlap_exercise10"}
+```{r q15_distance_tss, exercise = T}
+# this chunk does not exist: exercise.setup = "overlap_exercise10"}
+
 # calculate the distances from peaks to tss
 h3k4me3_to_tss <- ..(.., ..)
 ```
@@ -1010,8 +1046,10 @@ You can use this `Hits` object to subset peaks to those that are less than 10 Kb
 >**Exercise 16**  
 Subset the h3k4me3_to_tss for distances =< 10kb and select the associated genes from `genes` object.  
 
-```{r prepare_closegene_q16, echo = F}
-load("www/prepared_rds/txdb_annotation_chr19_genes_tx_pr_tss_granges.RData")  
+```{r prepare_closegene_q16}
+rdata = system.file("extdata", "week2", "prepared_rds", "txdb_annotation_chr19_genes_tx_pr_tss_granges.RData", package = "learnr.proto")
+load(rdata)
+# load("www/prepared_rds/txdb_annotation_chr19_genes_tx_pr_tss_granges.RData")  
 h3k4me3_to_tss <- distanceToNearest(monocytes_h3k4me3, tss)
 ```
 
