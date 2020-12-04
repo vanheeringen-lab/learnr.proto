@@ -1,2 +1,5 @@
+^renv$
+^renv\.lock$
 ^learnr\.proto\.Rproj$
 ^\.Rproj\.user$
+^.*_cache$
