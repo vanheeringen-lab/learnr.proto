@@ -236,19 +236,19 @@ monocytes_h3k4me3
 **Hint:** You may want to use the `head(.., n = ..)` function.  
 </div>
 
-<!-- # ```{r q1_head_h3k4me3-solution} -->
-<!-- # head(monocytes_h3k4me3, n = 2) -->
-<!-- # ``` -->
-<!-- #  -->
-<!-- # ```{r q1_head_h3k4me3-code-check, eval = F} -->
-<!-- # grade_code() -->
-<!-- # ``` -->
-
-```{r q1_head_h3k4me3-check}
-grade_result(
-  pass_if(~identical(.result, head(monocytes_h3k4me3, n = 2)))
-)
+```{r q1_head_h3k4me3-solution, eval = F}
+head(monocytes_h3k4me3, n = 2)
 ```
+
+```{r q1_head_h3k4me3-code-check, eval = F}
+grade_code()
+```
+
+<!-- # ```{r q1_head_h3k4me3-check} -->
+<!-- # grade_result( -->
+<!-- #   pass_if(~identical(.result, head(monocytes_h3k4me3, n = 2))) -->
+<!-- # ) -->
+<!-- # ``` -->
 
 > *Note 1*: We have restricted all peak files to chromosome 19 to limit their file size. That is why "seqinfo" holds only one sequence.  
 
@@ -283,15 +283,14 @@ monocytes_h3k4me3
 **Hint:** You may want to use the `length()` function.  
 </div>
 
-<!-- # ```{r q2a_explore-solution} -->
-<!-- # length(monocytes_h3k4me3) -->
-<!-- # ``` -->
-
-```{r q2a_explore-check}
-grade_result(
-  pass_if(~identical(.result, 2838))
-)
+```{r q2a_explore-solution, eval = F}
+length(monocytes_h3k4me3)
 ```
+
+```{r q2a_explore-code-check, eval = F}
+grade_code()
+```
+
 
 ```{r q2b_explore, exercise = T}
 # What is the distribution of peak widths?   
@@ -302,14 +301,12 @@ summary(...(...))
 **Hint:** You may want to retrieve peak widths with `width()` function.  
 </div>
 
-<!-- # ```{r q2b_explore-solution} -->
-<!-- # summary(width(monocytes_h3k4me3)) -->
-<!-- # ``` -->
+```{r q2b_explore-solution, eval = F}
+summary(width(monocytes_h3k4me3))
+```
 
-```{r q2b_explore-check}
-grade_result(
-  pass_if(~identical(.result, summary(width(monocytes_h3k4me3))))
-)
+```{r q2b_explore-code-check, eval = F}
+grade_code()
 ```
 
 <!-- # ```{r q2c_explore-setup, echo = F} -->
@@ -326,14 +323,12 @@ monocytes_h3k4me1
 **Hint:** You may want to use `score()` to retrieve the peak scores.  
 </div>
 
-<!-- # ```{r q2c_explore-solution} -->
-<!-- # summary(score(monocytes_h3k4me1)) -->
-<!-- # ``` -->
+```{r q2c_explore-solution, eval = F}
+summary(score(monocytes_h3k4me1))
+```
 
-```{r q2c_explore-check}
-grade_result(
-  pass_if(~identical(.result, summary(score(monocytes_h3k4me1))))
-)
+```{r q2c_explore-code-check, eval = F}
+grade_code()
 ```
 
 <br>
@@ -353,14 +348,15 @@ Let's plot some of the above generated outputs using **base** plotting functions
 **Hint:** You may want to use `width()` to retrieve the peak widths and plot with `hist()`    
 </div>
 
-```{r q3a_exploreplot-solution}
+```{r q3a_exploreplot-solution, eval = F}
 # plot the distribution of peak sizes for h3k4me3 as histogram 
 hist(width(monocytes_h3k4me3), main = "Monocytes h3k4me3 ChIP-seq, chr19", xlab = "peak size", col = "gray")
 ```
 
-```{r q3a_exploreplot-check, eval = F}
+```{r q3a_exploreplot-code-check, eval = F}
 grade_code()
 ```
+
 
 ```{r q3b_exploreplot, exercise = T}
 # plot the same data as boxplot
@@ -371,7 +367,7 @@ grade_code()
 **Hint:** You may want to plot with `boxplot()`. Which axis will hold the widht information, x or y?     
 </div>
 
-```{r q3b_exploreplot-solution}
+```{r q3b_exploreplot-solution, eval = F}
 # plot the same data as boxplot, ensue that "peak size" labels the right axis (x or y)
 boxplot(width(monocytes_h3k4me3), main = "Monocytes h3k4me3 ChIP-seq, chr19", ylab = "peak size", col = "gray")
 ```
@@ -407,15 +403,13 @@ monocytes_h3k4me3
 **Hint:** You may want to use `length(..[..(..) > 10000,])`   
 </div>
 
-<!-- # ```{r q4_filter-solution} -->
-<!-- # # using [ ]-subsetting -->
-<!-- # length(monocytes_h3k4me3[width(monocytes_h3k4me3) > 10000,]) -->
-<!-- # ``` -->
+```{r q4_filter-solution, eval = F}
+# using [ ]-subsetting
+length(monocytes_h3k4me3[width(monocytes_h3k4me3) > 10000,])
+```
 
-```{r q4_filter-check}
-grade_result(
-  pass_if(~identical(.result, 4))
-)
+```{r q4_filter-code-check, eval = F}
+grade_code()
 ```
 
 > **Exercise 5:**  
@@ -426,7 +420,7 @@ Filter `monocytes_h3k4me3` for peaks with width > 10kb using `filter()` from `pl
 .. %>% plyranges::..(.. > ..)
 ```
 
-```{r q5_filter-solution}
+```{r q5_filter-solution, eval = F}
 # filter monocytes_h3k4me3 for peaks with size above 10kb
 monocytes_h3k4me3 %>% plyranges::filter(width > 10000)
 ```
@@ -449,10 +443,15 @@ grade_code()
 **Hint:** You may want to use `score == max(score)`  
 </div>
 
-```{r q6_maxscore-solution}
+```{r q6_maxscore-solution, eval = F}
 # find the peak peak with highest score
 monocytes_h3k4me3 %>% filter(score == max(score))
 ```
+
+```{r q6_maxscore-code-check, eval = F}
+grade_code()
+```
+
 
 ```{r q7_ucsc, exercize = T}
 question("The promoters of which gene(s) are covered by the h3k4me3 peak with the highest score?",
@@ -578,7 +577,7 @@ overlap <- ..(query = .., subject = ..)
 show(..)
 ```
 
-```{r q8_overlap-solution}
+```{r q8_overlap-solution, eval = F}
 # Find overlap between monocytes_h3k4me3 peaks and promoters
 overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters)
 
@@ -625,45 +624,50 @@ overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters)
 length(unique(..(..))) 
 ```
 
-```{r q11a_overlap-solution}
+```{r q11a_overlap-solution, eval = F}
 # What is the number of unique h3k4me3 peaks reported in 'overlap'?
 length(unique(queryHits(overlap)))
 ```
 
-```{r q11a_overlap-check, eval = F}
-grade_result(
-  pass_if(~identical(.result, 1008))
-)
+```{r q11a_overlap-code-check, eval = F}
+# grade_result(
+#   pass_if(~identical(.result, 1008))
+# )
+grade_code()
 ```
+
 
 ```{r q11b_overlap, exercise = T, exercise.setup = "q10_overlap"}
 # What is the proportion of h3k4me3 peaks that overlap?
 length(unique(..(..)))/length(..)
 ```
 
-```{r q11b_overlap-solution}
+```{r q11b_overlap-solution, eval = F}
 length(unique(queryHits(overlap)))/length(monocytes_h3k4me3)
 ```
 
-```{r q11b_overlap-check, eval = F}
-grade_result(
-  pass_if(~identical(round(.result, digits= 3), round(0.3551797, digits = 3)))
-)
+```{r q11b_overlap-code-check, eval = F}
+# grade_result(
+#   pass_if(~identical(round(.result, digits= 3), round(0.3551797, digits = 3)))
+# )
+grade_code()
 ```
+
 
 ```{r q11c_overlap, exercise = T, exercise.setup = "q10_overlap"}
 # What is the proportion of promoters that overlap?
 length(unique(..(..)))/length(..)
 ```
 
-```{r q11c_overlap-solution}
+```{r q11c_overlap-solution, eval = F}
 length(unique(subjectHits(overlap)))/length(promoters)
 ```
 
-```{r q11c_overlap-check, eval = F}
-grade_result(
-  pass_if(~identical(round(.result, digits= 3), round(0.6495084, digits = 3)))
-)
+```{r q11c_overlap-code-check, eval = F}
+# grade_result(
+#   pass_if(~identical(round(.result, digits= 3), round(0.6495084, digits = 3)))
+# )
+grade_code()
 ```
 <br>
 Let's plot this overlap in a venn diagram with the `plot.pairwise.venn()` function of the `VennDiagram` package.  
@@ -725,7 +729,7 @@ binom.test(length(unique(..(overlap))), length(..), prom_fraction_chr19, alterna
 
 ```
 
-```{r q12_binomtest-solution}
+```{r q12_binomtest-solution, eval = F}
 binom.test(length(unique(subjectHits(overlap))), length(monocytes_h3k4me3), prom_fraction_chr19, alternative = "greater" )
 ```
 
@@ -769,7 +773,7 @@ prom_fraction_chr19 <- sum(width(GenomicRanges::reduce(promoters)))/seqlengths(p
 overlap2 <- ...
 ```
 
-```{r q13a_h3k27ac-solution}
+```{r q13a_h3k27ac-solution, eval = F}
 overlap2 <- findOverlaps(query = monocytes_h3k27ac, subject = promoters)
 ```
 
@@ -779,7 +783,7 @@ overlap2 <- findOverlaps(query = monocytes_h3k27ac, subject = promoters)
 ..(..(..(..(..))), ..(..), prom_fraction_chr19, alternative = "greater" )
 ```
 
-```{r q13b_h3k27ac-solution}
+```{r q13b_h3k27ac-solution, eval = F}
 # binomial test for enrichment of H3K27ac peaks in promoters:  
 binom.test(length(unique(subjectHits(overlap2))), length(monocytes_h3k27ac), prom_fraction_chr19, alternative = "greater" )
 ```
@@ -830,7 +834,7 @@ h3k4me3_features
 
 ```
 
-```{r q13a_anno-solution}
+```{r q13a_anno-solution, eval = F}
 # calculate the overlap with features
 h3k4me3_features <- assignChromosomeRegion(monocytes_h3k4me3, TxDb=txdb, precedence = c("Promoters","immediateDownstream", "fiveUTRs", "threeUTRs", "Exons", "Introns" ), nucleotideLevel=FALSE)
 # show the results
@@ -844,6 +848,7 @@ pie(h3k4me3_features$percentage)
 grade_code()
 ```
 
+
 ```{r q13b_anno, exercise = T}
 # this chunk no longer exists: exercise.setup = "anno_h3k4me3_prep"}
 
@@ -853,7 +858,7 @@ bp <- ..(..$.., ylab="%")
 text(bp, h3k4me3_features$percentage, signif(h3k4me3_features$percentage, 4), pos=1, main = "Mono h3k4me3 in features")
 ```
 
-```{r q13anno-solution}
+```{r q13anno-solution, eval = F}
 # make barplot
 bp <- barplot(h3k4me3_features$percentage, ylab="%", las = 2)
 # add percentages to the bars with text()  
@@ -943,7 +948,7 @@ bp <- ..(.., ylab = "Number of peaks", main = "Monocytes ChIP-seq; chr19")
 text(bp, counts_vector, labels=names(counts_vector), pos=1)
 ```
 
-```{r q14_barplot-solution}
+```{r q14_barplot-solution, eval = F}
 # print the length of each element at once with apply
 counts_list <- lapply(monocytes_list, length)
 
@@ -1016,7 +1021,7 @@ Use `distanceToNearest()` to get the distance between h3k4me3 peaks and the near
 h3k4me3_to_tss <- ..(.., ..)
 ```
 
-```{r q15_distance_tss-solution}
+```{r q15_distance_tss-solution, include = F}
 # calculate the distances from peaks to tss
 h3k4me3_to_tss <- distanceToNearest(monocytes_h3k4me3, tss)
 ```
@@ -1062,7 +1067,7 @@ distances <- mcols(h3k4me3_to_tss)[,1]
 h3k4me3_to_tss_close <- ..[..,..]
 ```
 
-```{r q16a_closegenes-solution }
+```{r q16a_closegenes-solution, eval = F}
 # save the distances in a vector
 distances <- mcols(h3k4me3_to_tss)[,1]
 
@@ -1083,7 +1088,7 @@ monocytes_h3k4me3_genes <- unique(genes[..(..)])
 show(monocytes_h3k4me3_genes)
 ```
  
-```{r 16b_closegenes-solution}
+```{r 16b_closegenes-solution, eval = F}
 # obtain the genes
 monocytes_h3k4me3_genes <- unique(genes[subjectHits(h3k4me3_to_tss_close)])
 
@@ -1097,8 +1102,3 @@ grade_code()
 
 <br>
 Besides the distance, we are also (very!) interested in the distribution of the ChIP-seq signal around the TSS. You will look at that next week.  
-
-
-
-
-
