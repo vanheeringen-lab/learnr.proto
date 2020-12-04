@@ -1,0 +1,33 @@
+---
+title: "Week 4: "
+tutorial:      # where learnr stores the progress
+  id: "FG4"    # folder name
+  version: 0.1 # subfolder name
+output: 
+  learnr::tutorial:
+    fig_caption: no
+    progressive: true
+    allow_skip: true
+    css: css/custom.css
+runtime: shiny_prerendered
+description: >
+  Multi line text can be put here
+  for your convenience.
+---
+
+
+```{r setup, include=FALSE}
+library(learnr)     # 0.10.1.9006 (github)
+library(gradethis)  # 0.1.0.9004  (github)
+library(testthat)   # 3.0.0 
+library(tidyverse)  # 1.3.0
+library(learnr.proto)
+
+# configuration
+knitr::opts_chunk$set(echo = FALSE)
+gradethis::gradethis_setup()
+
+# data accessible to all exercises
+rdata = system.file("extdata", "week4.Rdata", package = "learnr.proto")
+load(rdata)
+```
