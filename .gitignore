@@ -1,12 +1,12 @@
-.Rproj.user
 **/.DS_Store
 **/.Rhistory
-**/*.Rdata
 **/*.Ruserdata
-**/*.Rproj
-**/*_cache/
-**/*.html
+.Rproj.user
+*.Rproj
 renv/library/
 renv/lock/
 renv/python/
 renv/staging/
+inst/tutorials/**/*.Rdata
+inst/tutorials/**/*_cache/
+inst/tutorials/*/*.html
