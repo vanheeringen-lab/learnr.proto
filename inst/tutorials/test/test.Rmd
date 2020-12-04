@@ -42,15 +42,30 @@ tutorial_options(
   exercise.timelimit = 10,  # max code execution time
   #exercise.checker = checker
   )
+
+# number of open tutorial windows (1 variable per tutorial)
+# TODO: check if this works for multiple users, or if the variable must contain a user-ID
+instances <- reactiveValues(test = 0)
 ```
 
 ```{r, context="server"} 
-# stop the tutorial when the browser window is closed
-session$onSessionEnded(function() {
-  stopApp()
+isolate({
+  val <- instances$test + 1
+  instances$test <- val
+})
+
+session$onSessionEnded(function(){
+  isolate({
+    val <- instances$test - 1
+    instances$test <- val
+    
+    if (instances$test < 1) {
+      cat("\nBrowser closed. Terminating...")
+      stopApp()
+    }
+  })
 })
 ```
-
 
 ## embedding
 
