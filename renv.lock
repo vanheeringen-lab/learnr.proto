@@ -771,8 +771,8 @@
       "RemoteRepo": "learnr.dashboard",
       "RemoteUsername": "vanheeringen-lab",
       "RemoteRef": "HEAD",
-      "RemoteSha": "948a7684133e25af34e411b574a7df651d60c579",
-      "Hash": "f890164ac373124f07899c859d8d1c38"
+      "RemoteSha": "b63dae0cec630af39e9d118b1d430479a3c61094",
+      "Hash": "3d173968e972654d878188ec9992375f"
     },
     "lifecycle": {
       "Package": "lifecycle",
