@@ -762,6 +762,18 @@
       "RemoteSha": "7eb2b298699733a9a64d9c15a728b0ca6a4d68d5",
       "Hash": "23eb4cd5810cabc316d6a229ce429119"
     },
+    "learnr.dashboard": {
+      "Package": "learnr.dashboard",
+      "Version": "0.1.0",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "learnr.dashboard",
+      "RemoteUsername": "vanheeringen-lab",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "948a7684133e25af34e411b574a7df651d60c579",
+      "Hash": "f890164ac373124f07899c859d8d1c38"
+    },
     "lifecycle": {
       "Package": "lifecycle",
       "Version": "0.2.0",
@@ -1170,10 +1182,10 @@
     },
     "survival": {
       "Package": "survival",
-      "Version": "3.2-7",
+      "Version": "3.1-12",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "39c4ac6d22dad33db0ee37b40810ea12"
+      "Hash": "1c5bb53bd428f3c42a25b7aeb983d8c7"
     },
     "sys": {
       "Package": "sys",
