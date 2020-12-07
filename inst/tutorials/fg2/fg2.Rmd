@@ -47,11 +47,11 @@ load(rdata)
 
 ## 2.1 Introduction   
 <br>
-In week 1 we discussed the major steps imvolved in obtaining genomics data, from experiment to raw data to normalized signal and peaks. You examined histone PTM ChIP-, DNaseI-, and RNA-seq data of monocytes in the UCSC genome browser and searched for regions with increased signal, *peaks*. You looked at the position of these peaks in the chromosome and with respect to genes as well as the co-occurence of different marks.   
+In week 1 we discussed the major steps involved in obtaining genomics data, from experiment to raw data to normalized signal and peaks. You examined histone PTM ChIP-, DNaseI-, and RNA-seq data of monocytes in the UCSC genome browser and searched for regions with increased signal, *peaks*. You looked at the position of these peaks in the chromosome and with respect to genes as well as the co-occurrence of different marks.   
 <br>
-These observations showed you that some marks are associated with particular functional elements (eg active enhancer, active promoter, silenced domains).   
+These observations showed examples of marks associated with a particular functional elements (e.g. active enhancer, active promoter, silenced domains). Manual annotation of each peak region would be an overkill and dangerously subjective. 
 <br>
-**This week and next week you will put numbers to these observations and perform computational analyses to answer common questions including:** "*How many peaks do I have?*", "*Is this mark statistically enriched in a particular genomic element?*", "*Which and how often do marks co-occur?*","*The expression of which gene could be affected by this mark?*",  and "*What is the signal of the mark around a particular element of interest like the TSS?*"   
+**This week and next week you will perform computational analyses to annotate peaks and answer common questions including:** "*How many peaks do I have?*", "*Is this mark statistically enriched in a particular genomic element?*", "*Which and how often do marks co-occur?*","*The expression of which gene could be affected by this mark?*",  and "*What is the signal of the mark around a particular element of interest like the TSS?*"   
 <br>
 
 ### 2.1.1 Learning Objectives  
@@ -83,14 +83,15 @@ These observations showed you that some marks are associated with particular fun
 
 ## 2.2 ChIP-seq peaks in R  {data-progressive=TRUE}  
 ### 2.2.1 Data import    
-In genomics you often work with **interval** data. Think of peaks, genes, exons, ... any genomic region reported with the **genomic coordinates: chr, start, and end**. As we discussed in week 1, these often come in a tabular format with the basic information about the location and some other information. Common file formats includ BED for peak files, GFF for gene annotations, and BigWig for read depth.     
+In genomics you often work with **interval** data. Think of peaks, genes, exons, ... any genomic region reported with the **genomic coordinates: chr, start, and end**. As we discussed in week 1, these often come in a tabular format with the basic information about the location and some other information. Common file formats include BED for peak files, GFF for gene annotations, and BigWig for read depth.     
 
 >#### **Background info**: File formats   
-<details><summary>What do BED, GFF, BigWig files hold and look like?</summary>
-**Peak files in BED format**:  
+<details><summary>What do BED, GFF, BigWig files hold and look like?</summary>   
+**Browser Extensible Data - BED format**:  
 >
-- 3 required columns: chromosome, start and end position of the peak region.  
-- 6 or 7 optional columns:  
+- Used for peaks, motif locations or other custom intervals.  
+- Has 3 required columns: chromosome, start and end position.  
+- 6 or 7 optional columns, in case of peaks:  
   4th: peak name  
   5th: peak score  
   6th: strand to denote orientation (if applicable, otherwise "\*" or "\." if unstranded)  
@@ -103,20 +104,23 @@ In genomics you often work with **interval** data. Think of peaks, genes, exons,
 ![](images/wk1_3_file_format_bed.png){width=80%}  
 > Further reading on the file formats on the UCSC Genome Browser FAQ page: [BED](http://genome.ucsc.edu/FAQ/FAQformat.html#format1), and the [narrowPeak BED](http://genome.ucsc.edu/FAQ/FAQformat.html#format12) and [broadPeak BED](http://genome.ucsc.edu/FAQ/FAQformat.html#format13).  
 > <br>
-> **Gene annotations in GFF**:  
-General Feature Format - GFF format
--	Common file format for gene annotations (including splice variants, cDNA sequences, exons, rRNA, ncRNA, etc).
--	Begins with meta-data in headerlines, starting with #
--	Records reported in 9 fixed columns
--	Column 9 can contains various attirbutes (eg gene symbol, the transcript to which the exon belongs).
-- Downloaded for example from [Ensembl](https://www.ensembl.org/Homo_sapiens/Info/Index). 
+> **General Feature Format - GFF format**:   
+-	Common file format for storing gene annotations not only including genes but also transcripts/splice variants, cDNA sequences, exons, rRNA, ncRNA, etc.  
+-	Begins with meta-data in headerlines, starting with #  
+-	Records reported in 9 fixed columns  
+-	Column 9 can contains various attirbutes (eg gene symbol, the transcript to which the exon belongs).  
+- Downloaded for example from [Ensembl](https://www.ensembl.org/Homo_sapiens/Info/Index).  
 >
-> Example:  
+> Example:   
 ![](images/wk1_3_file_format_gff.png){width=80%}      
 > Further reading on the gff file formats: [UCSC Genome Browser](http://genome.ucsc.edu/FAQ/FAQformat.html#format3), or [ENSEMBL](https://m.ensembl.org/info/website/upload/gff3.html).  
 > <br>
-> **Read depth in bigWig**:  
-BigWig files are binary versions of the larger wiggle files. BigWig files are faster to upload and use but can't be viewed by us. Wiggle files can be viewed but are slow to upload. Wiggle files report a genomic region with the data value for that region. For this practical it is not neccessary to know the details of how these files are generatd. But if you are curious, read the UCSC Genome browser documentation on [wiggle](https://genome.ucsc.edu/goldenPath/help/wiggle.html) and [bigWig](https://genome.ucsc.edu/goldenPath/help/bigWig.html) file formats.  
+> **Wiggle or bigWig files**:  
+- Read depth is often stored in BigWig files.  
+- BigWig files are binary versions of (mucht larger) wiggle files.  
+- BigWig files are faster to upload and use but can't be viewed by us.  
+- Wiggle files can be viewed but are slow to upload.   
+- Wiggle files report a genomic region with the data value for that region. For this practical it is not neccessary to know the details of how these files are generatd. But if you are curious, read the UCSC Genome browser documentation on [wiggle](https://genome.ucsc.edu/goldenPath/help/wiggle.html) and [bigWig](https://genome.ucsc.edu/goldenPath/help/bigWig.html) file formats.  
 </details>
 
 <br>
@@ -125,7 +129,7 @@ Peak data can be imported into a data.frame in r with:
 object_name <- read.table("location/of/peak_file.bed")
 ```
 <br>
-The data.frame datastructure is, however, not the most efficient way to work with interval data. E.g. a simple manipulation such as shifting all reported intervals 2 bp to the right, requires you to manipulate the "start" and "end" columns at the same time.  
+The data.frame data structure is, however, not the most efficient way to work with interval data. E.g. a simple manipulation such as shifting all reported intervals 2 bp to the right, requires you to manipulate the "start" and "end" columns at the same time.  
 <br>
 Interval data such as genomic peaks can be more efficiently handled with the IRanges package which works with a data structure especially developed for **ranges of integers**: IRanges objects.  
 <br>
@@ -138,7 +142,25 @@ To construct an IRanges object you need to define at least two of the following 
 <br>
 The GRanges objects of the GenomicRanges package are very similar but require a additional **sequence name** (in other words a chromosome) for every interval and an optional **strand** column.  
 <br> 
-Here's an example GRanges object called `my_gr` with the functions to set and retrieve its content:     
+Here we create GRanges object called `gr` with 3 interals on chr1:  
+```{r create gr, echo = T, eval = T}
+# create `gr`
+gr_chr1 <-  GRanges(seqnames = c("chr1"), # argument is recycled  
+              ranges = IRanges(start=c(5,10,25), width = c(13,17,6)),
+              strand = c("-","+", "+"),
+              color = c("black", "red", "green"))
+# add names to `gr_chr1`
+names(gr_chr1) <- paste("interval", LETTERS[1:3], sep = "_")
+# print the object:
+gr_chr1
+```
+When we visualize these intervals we see three 'blocks' along the horizontal axis:
+```{r plot gr, echo = F}
+plotRanges(gr_chr1, col = gr_chr1$color)
+rm(gr_chr1)
+```
+<br>
+There are several functions to retrieve and set the values in GRanges objects. Here is an image of a GRanges object called `gr` with the respective functions. You will use these functions soon.  
 
 ![](images/wk2_2_GRanges_fields_my_gr.png){width=100%}  
 
@@ -168,9 +190,9 @@ Function | Purpose | Example on GRanges
 </details>  
 
 <br>
-To parse peak files directly into GRanges you use the `import()` function from the rtracklayer package:   
+To parse peak files directly into GRanges you use the `import()` function from the rtracklayer package, for example:    
 ```{r exampleimport_rtracklayer, eval = F, echo = T}
-# load the required library
+# load the required library, is usually done once at the start of your analysis.  
 library(rtracklayer)
 
 # import monocyte H3K4me3 peak locations
@@ -180,9 +202,9 @@ monocytes_h3k4me3 <- import("C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr1
 ```
 <br>
 
-> #### **Background info**: 
-GRanges and rtracklayer are bioconductor packages. But what is Bioconductor? 
-> <details><summary>The bioconductor repository with r packages developed for the analysis of high-throughput genomics datain R.</summary>  
+> #### **Background info**: But what is Bioconductor?   
+GRanges and rtracklayer are bioconductor packages.   
+> <details><summary>The bioconductor repository with r packages developed for the analysis of high-throughput genomics datain R.</summary>   
 [Bioconductor](https://www.bioconductor.org/) is a special repository of packages for the analysis of high throughput genomic data in r. Packages are often heavily dependend on each other and regular releases and a special installer ensure that you install package version that can work together. Usually you would use the `biocManager::install()` command to install these packages. But in this tutorial, all required packages are already installed.  
 <br>
 Bioconductor packages that you will be using include:   
@@ -209,7 +231,7 @@ Here's a list of basic functions to explore objects and/or call the help on pack
 </details>
 
 <br>  
-Let's take a quick look at one `monocytes_h3k4me3`.   
+Let's take a quick look at `monocytes_h3k4me3` and `monocytes_h3K27me3`.   
 
 > **Exercise 1:**  
 Print the head of `monocytes_h3k4me3`.  
