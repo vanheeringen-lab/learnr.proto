@@ -5,7 +5,7 @@ tutorial:      # where learnr stores the progress
   version: 0.1 # subfolder name
 output: 
   learnr::tutorial:
-    fig_caption: no
+    fig_caption: true
     progressive: true
     allow_skip: true
     css: css/custom.css
@@ -120,7 +120,6 @@ Briefly review ChIP-seq, library preperation for next-generation sequencing and 
 <br>  
 
 >#### **Refresher**: Illumina technology   
-><br>
 <details><summary>Click here for a Illumina sequencing technology refresher.</summary>
 There are several manufacturers of sequencing machines and reagents. **Illumina** is a common one. The Illumina technology is summarized in the following videos (optional):  
 > 
@@ -132,8 +131,9 @@ There are several manufacturers of sequencing machines and reagents. **Illumina*
 >1. Library preperation (also called sample preperation):  
 >    i) Extract DNA from your sample.  
 >    ii) Fragment this DNA.  
->    iii) Ligate **adapters** to the fragment these contain a sample specific sequence (= **barcode** or **index**), regions complementary to oligo's that are found on the flow cell (these oligo's are called P5 and P7) and primer bindings sites for sequencing (Rd1 SP and Rd2 SP):  
-    ![](images/wk1_1_illuminalibrary.png){width=80%}  
+>    iii) Ligate **adapters** to the fragment these contain a sample specific sequence (= **barcode** or **index**), regions complementary to oligo's that are found on the flow cell (these oligo's are called P5 and P7) and primer bindings sites for sequencing (Rd1 SP and Rd2 SP):   
+![](images/wk1_1_illuminalibrary.png){width=80%}   
+*[Ref](https://www.illumina.com/techniques/sequencing/dna-sequencing/chip-seq.html) Illumina, Precise analysis of DNA–protein binding sequences.* 
 >2. Load library on the **flow cell**:    
 >    i) The flow cell is a glass slide with P5 and P7 oligo's attached to the surface.  
 >    ii) The DNA fragments are denatures and single stranded fragments anneal to P5 and P7 oligo's present on the flow cell.    
@@ -148,9 +148,8 @@ There are several manufacturers of sequencing machines and reagents. **Illumina*
 >    iii) The emmission wave length and signal intensity determine the **base call** and the **quality** of the reading.    
 >    iv) A special index read primer is used to sequence the barcode.    
 >    v) For paired-end sequencing, the above procedure is repeated with the reverse strand.    
-<a href = "https://hbctraining.github.io/Intro-to-ChIPseq/lessons/02_QC_FASTQC.html">
-![Intro-to-ChIPseq, hbctraining](images/wk1_1_illuminasequencing.png){width=80%}    
-</a>
+![](images/wk1_1_illuminasequencing.png){width=80%}    
+*[Ref](https://hbctraining.github.io/Intro-to-ChIPseq/lessons/02_QC_FASTQC.html): Harvard Chan Bioinformatics Core training (2019, may 14th) Intro-to-ChIPseq lesson 2.* 
 </details>
 
 <!--Currently Illumina also has the nextSeq 500 series (besides MiSeq and HiSeq mentioned in the video). One of the main difference being that the MiSeq and HiSeq use four fluorescent colors (G = blue ,C = green, A = yellow and T = red) while the nextSeq series use 2-color chemistry (green and red). The effect being that with each cycle for the NextSeq, only two images need to be taken, As ar read as clusters appearing in both images and Gs are read as clusters that are not present in either of the two.-->    
@@ -158,7 +157,8 @@ There are several manufacturers of sequencing machines and reagents. **Illumina*
 <br>
 The **sequencer** analyzes a set number of bases, eg 42, 50 or 100 bp, called a **read**. The resulting **base calls** and their **quality scores** are stored in **fastq files** which have the .fq or .fastq extension (or compressed as .fq.gz or .fastq.gz). These are always organized in the same manner with 4 lines per read. This is an example with 2 DNA sequences (8 lines):  
 <br>
-![](images/wk1_2_fastq_layout.png){width=100%}     
+![](images/wk1_2_fastq_layout.png){width=80%}     
+Modified with own data from: [Ref](https://vicbioinformatics.com/documents/Intro%20to%20NGS%20-%20Torsten%20Seemann%20-%20PeterMac%20-%2027%20Jul%202012.pdf) Torsten Seemann, Victorian Bioinformatics Consortium, Introduction to NGS.*  
 <br>
 
 1.  Header starts with '@'-sign and contains a unique sequence ID (the element up to the fist space). This header often follows a set substructure. Element after the space often includes the sample barcode.    
@@ -167,26 +167,32 @@ The **sequencer** analyzes a set number of bases, eg 42, 50 or 100 bp, called a 
 4. Quality score for each nucleotide, also called **Phred score**. 
 
 <br> 
-The Phred scores represents the probability (p) that the reported call is incorrect. You do not need to learn this encoding by heart but they will come back in the Quality Control step of our analysis, therefore we discuss briefly how they are encoded:    
+The Phred scores represents the probability that the reported call is incorrect. This probability is encoded with a single character. This encoded Phred score will come back in the Quality Control but there's no need to learn this encoding by heart. To give you a brief idea, here's a visual summary of the characters with their Phred scores and corresponding interpretation:   
 
-Phred quality score | Probability of incorrect base call | Accuracy | Characterer     
+![](images/wk1_2_phred_quality_scores_TorstenSeemannpresentation.png){width=80%}   
+[Ref](https://vicbioinformatics.com/documents/Intro%20to%20NGS%20-%20Torsten%20Seemann%20-%20PeterMac%20-%2027%20Jul%202012.pdf) Torsten Seemann, Victorian Bioinformatics Consortium, Introduction to NGS.*  
+
+In general for Illumina sequencing:  
+
+- Good quality is generally Phred > 28 - 30    
+- Concerning quality is Phred < 20  
+
+<!--Phred quality score | Probability of incorrect base call | Accuracy | Character     
 :--:|:--:|:--:|:--:|:--      
 0 | 1 in 1 | 0% | !  
 10 | 1 in 10 | 90% | +  
 20 | 1 in 100 | 99% | 5  
 30 | 1 in 1000 | 99.9% | ?  
-40 | 1 in 10000 | 99.99% | J  
+40 | 1 in 10000 | 99.99% | J-->  
 
-Here's another visualization of how Phred scores are encoded :   
-![](images/wk1_2_phred_quality_scores_TorstenSeemannpresentation.png){width=80%}   
 
 > #### Background box:   
 <details><summary>Here's the complete encoding of Phred scrores 0-40.</summary>
-> *Background*:  
-![](images/wk1_1_phred_ascii.png){width=80%}   
-<!--ref: Amixon TRAINING, Bioinformatics for beginners - File formats Part 2. - Short reads, written on 01/07/2013, visited on 29/11/2020, through: https://www.omixon.com/bioinformatics-for-beginners-file-formats-part-2-short-reads/-->
-
-</details>
+<a href = "https://www.omixon.com/bioinformatics-for-beginners-file-formats-part-2-short-reads/">
+![](images/wk1_1_phred_ascii.png){width=90%} </a>  
+</a>
+*[Ref](https://www.omixon.com/bioinformatics-for-beginners-file-formats-part-2-short-reads): Amixon (2013/07/01) Bioinformatics for beginners - File formats Part 2. - Short reads.*
+></details>
 
 <br>
 Before we can start our data analysis and identify for example regions marked by activating and repressing histone marks, we need to process the raw data. This includes cleaning up, mapping, visualizing the sequenced reads and identifying genomic regions where reads tend to pile up (in other words "peaks"). Which is what we will discuss next.   
@@ -197,12 +203,13 @@ Before we can start our data analysis and identify for example regions marked by
 The sequencer determines the sequence of the DNA molecules in your sample and produces massive amounts of data. In an ideal world, these data would 100% reflect reality. But..... It doesn't and it is often your or a bio-informaticians task to discriminate valuable signal from artefacts and noise, the latter being accumulations of reads in regions that don't actually contain binding sites of the protein or mofidified histone of interest.   
 <br>
 ![](images/wk1_3_intro_whatbioinformaticiancsdo.png){width=60%}\    
+*[Ref](http://biocomicals.blogspot.com/2011/05/thats-what-bioinformaticians-do.html) Biocomicals (2011, May 2) That's what bioinformaticians do...*
 <br>
 A general analysis workflow for ChIP-sequencing data involves the steps discussed below. In theory, all of them can be performed in R but the first steps are commonly performed by tools outside R (often on Linux server). The resulting peakfiles, files with read depth and/or read counts are then imported in R.  
 <br>
 Here's a visual of the analysis. We will discuss each part below.  
-![](images/wk1_3_chipseq_workflow_utsoutwesternedu_mcdermottlab.png)  
-<!--ref: http://www4.utsouthwestern.edu/mcdermottlab/NGS/analysis/analysis-chipseq.html -->  
+![](images/wk1_3_chipseq_workflow_utsoutwesternedu_mcdermottlab.png){width=90%}  
+*[Ref](http://www4.utsouthwestern.edu/mcdermottlab/NGS/analysis/analysis-chipseq.html) UT Southestern Medical Center, Computational Biology/Bioinformatic Core - Analysis ChIP-seq.*   
 <!--![](images/wk1_3_chipseq_workflow_nakato2020methods.jpg){width=50%}    
 ref: http://www4.utsouthwestern.edu/mcdermottlab/NGS/analysis/analysis-chipseq.html -->  
 
@@ -214,13 +221,11 @@ We run the raw fastq files through [FASTQC](https://www.bioinformatics.babraham.
 The **Per base sequence quality** plot is one of the most important plots generated. It summarizes the base call accuracy (Y-axis) for each cycle (X-axis) across the library. See this example:  
  <br>
 ![](images/wk1_3_fastqc_per_base_quality_vb1.png){width=80%}  
+[Ref](https://vicbioinformatics.com/documents/Intro%20to%20NGS%20-%20Torsten%20Seemann%20-%20PeterMac%20-%2027%20Jul%202012.pdf) Torsten Seemann, Victorian Bioinformatics Consortium, Introduction to NGS.*  
 
 This exmaple shows the average Phred quality for a library sequenced to 72 bp. The majority of bases have a good quality, the quality drops for the last two bases and we should (in this case) remove these from the end of the read. 
 
 For most runs, quality should be good for most reads through the whole run. If quality is low, we can use the other plots and tables to try to understand why this is.
-
-- Good (Illumina) quality is generally Phred > 28 - 30    
-- Concerning (Illumina) quality is Phred < 20  
 
 If the QC does not support major technical problems like a systematic base bias that occured during sequencing or contamination during sample prep with foreign DNA, we can continue.  
 
@@ -266,7 +271,7 @@ Since the publication of the human genome, successive versions have been release
 <br>
 The aligner thus requires as input the quality-filtered and trimmed fastq files together with the reference genome.  
 <br>
-The outputted alignment is stored in (*huge!* ) TAB-delimited text Sequence Alignment Map files, **SAM files**. The compressed version of SAM files are called **BAM files** (Binary Alginment Map).  
+The outputted alignment is stored in (*huge!*) TAB-delimited text Sequence Alignment Map files, **SAM files**. The compressed version of SAM files are called **BAM files** (Binary Alginment Map).  
 <br>
 
 > #### Background box:  
@@ -274,8 +279,6 @@ The outputted alignment is stored in (*huge!* ) TAB-delimited text Sequence Alig
 ><br>
 > *Background*: SAM/BAM files contain two sections: (1) a header with information about the mapping procedure and (2) records of read alignments with 1 line per read. The latter contains information about the read sequence, how much of it was mapped to the reference genome (eg. the whole read or only part of it), how well it alinged, and lots of other information, dependent on the aligner.  
 <br>
-Each record minimally holds 11 columns (additional columns can be added by the aligner and post-alignment analytics performed on the file):  
->![](images/wk1_3_BAM_fields_broadinstitute.png){width=100%}  
 >
 ColumnNR | Description  
 :--|:--------------  
@@ -294,9 +297,8 @@ ColumnNR | Description
 >
 To give you a feel for how SAM files looks like, here's an example of the header and one record:  
 ![](images/wk1_3_bam_header_example_sandrews_tutorial201911.png){width=100%}     
-<!-- ref: Simon Andrews, Babraham Bioinformatics, Quality control for Sequencing Experiments pdf, v2019-11 --> 
 ![](images/wk1_3_bam_record_example_sandrews_tutorial201911.png){width=100%}     
-<!-- ref: Simon Andrews, Babraham Bioinformatics, Quality control for Sequencing Experiments pdf, v2019-11 --> 
+*[Ref](https://www.bioinformatics.babraham.ac.uk/training.html#sequenceqc)Simon Andrews, Babraham Bioinformatics, Quality control for Sequencing Experiments pdf, v2019-11*  
 This example tells you among others that the library was mapped with [hisat2](http://daehwankimlab.github.io/hisat2/manual/) to the mouse reference genome GRCm38 with certain additional settings. The single displayed read is mapping to chr18, starting at position 57944851.    
 <br>
 >
@@ -318,7 +320,7 @@ These files can be uploaded to the UCSC Genome Browser which we will look at in 
 > #### Background box:   
 <details><summary>A fictional example of alignment and a read depth graph</summary>  
 ![](images/wk1_3_read_depth_Pavlopoulos2018.png){width=80%}  
-<!-- ref: Pavlopoulos et al (2013) BioData Mining 6, Article number: 13 (2013), figure 6 -->
+*[Ref](https://doi.org/10.1186/1756-0381-6-13) Pavlopoulos et al (2013) BioData Mining, 6(13)*  
 </details> 
 <br>
 <details><summary>Read depth stored as a bedGraph file:</summary>  
@@ -464,10 +466,7 @@ Large consortia often have their own data portals, like [ENCODE](https://www.enc
 
 
 ![](images/wk1_3_fairdata_fosteropenscience.png){width=80%}    
- <!--The Open Science Training Handbook, via https://book.fosteropenscience.eu/en/,-->  
-
-
-
+*[Ref](https://book.fosteropenscience.eu/en/): The Open Science Training Handbook*    
 
 <br>  
 
@@ -500,12 +499,15 @@ Watch the following youtube video's to get familiar with the UCSC Genome Browser
 <br>
 Additional important actions and terms that were not explicitly discussed in the videos:  
   
-- **Selecting a region in the genome browser**: hold shift-key and click/drag with your left mouse key over the region. A pop-up appears to 'Zoom in', 'Add highlight' or 'Cancel' (cancel = do nothing).  
-  ![](images/wk1_4_gb_drag_and_select.png){width=60%}  
+**Selecting a region in the genome browser**:  
+Hold shift-key and click/drag with your left mouse key over the region. A pop-up appears to 'Zoom in', 'Add highlight' or 'Cancel' (cancel = do nothing):   
+![](images/wk1_4_gb_drag_and_select.png){width=50%}  
 
-- **Upstream** and **downstream** refer to a position relative to the coding strand of a gene. Upstream means to the 5' end and beyond. Downstream means to the 3' end and beyond. Thus, depending on the orientation of the gene, upstream can mean that you move in the direction of the start of the chromosome or to the end of the chromosome.  
-    ![](images/wk1_4_upstream_downstream_munca.jpg){width=80%}  
-<!--https://www.mun.ca/biology/scarr/iGen3_05-03.html--> 
+<br>
+**Upstream and downstream**:  
+These terms refer to a position relative to the coding strand of a gene. Upstream means to the 5' end and beyond. Downstream means to the 3' end and beyond. Thus, depending on the orientation of the gene, upstream can mean that you move in the direction of the start of the chromosome or to the end of the chromosome.  
+![](images/wk1_2_wiki_genestructure_updownstream.png){width=80%}  
+*Modified from [Ref](https://en.wikipedia.org/wiki/Gene_structure): Wikipedia, Gene Structure*   
 
 <!-- *Optional videos*: finding the coordinates of a sequence using blat, handy for eg. primers, and using the Table Browser to, among others, obtain DNA, RNA or protein sequences:  
 1. [UCSC Genome Browser Blat, 9m39s](https://www.youtube.com/watch?v=E6DDNGDXH8A)   
@@ -516,7 +518,7 @@ Additional important actions and terms that were not explicitly discussed in the
 ### 1.4.2 Go to the UCSC Genome browser  
 **Let's go to the UCSC genome browser....**  
 
-> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: Go to the [UCSC Genome Browser](https://genome.ucsc.edu/index.html) (blue text is a link, use right-mouse click to open in new window).</span>   
+> **Action: Go to the [UCSC Genome Browser](https://genome.ucsc.edu/index.html)** (blue text is a link, use right-mouse click to open in new window).   
 
 The starting page has been updated since the video was made but still holds the same blue bar at the top with **Genomes**, **Tools**, etc.:  
 ![](images/wk1_4b_ucsc_genome_browser_topmenubar.png){width=80%}\     
@@ -527,15 +529,15 @@ The starting page has been updated since the video was made but still holds the 
 
 > *Tip*: A pop-up may appear now or one stap later, redirected you to the official European mirror site if those servers are geographically closer, that's ok.  
 
-> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: To access the human genome, select the "Genomes" tab.</span>  
+> **Action: To access the human genome, select the "Genomes" tab.**   
 
 On the left you can browse and select the genome you are interested in (not a drop-down menu anymore as in the video). By default, the human genome is selected.   
 <br>
 We can go to a position of our choice by entering the gene or chromosomal coordinates under **Position/Search Term** or immediatly go to the 'Current position' by clicking on `GO` on the right-hand side or **Genome Browser** in the menu bar on top.  
 
-> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: Ensure that "Human" is selected in the REPRESENTED SPECIES tree and "Dec. 2013 (GRCh38/hg38)" is selected under Human Assembly (red arrows in image below).</span>   
+> **Action: Ensure that "Human" is selected in the REPRESENTED SPECIES tree and "Dec. 2013 (GRCh38/hg38)" is selected under Human Assembly (red arrows in image below).**    
 
-> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: Go to *ACTB* gene (gene coding for non-muscular actin part of cytoskeleton).</span> 
+> **Action: Go to *ACTB* gene (gene coding for non-muscular actin part of cytoskeleton).**  
 
 *Genomes page, ready to go to ACTB gene in Human genome GRCh38*:  
 ![](images/wk1_4b_ucsc_gb_actb_question_startpage.png){width=90%}\    
@@ -580,9 +582,9 @@ The data window displays various **tracks** or **track sets**. Tracks runs the c
 > 2. Scroll to the area below the data window, here you see a possibly overwhelming list of potential tracks, most are `hidden`. Using the pull down menu you can change display settings of multiple tracks at once. Always make sure to hit the `refresh` button below the browser window to ensure all changes are performed.  
 </details>
 
-> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: hide all tracks and tracksets except for the ruler and GENCODE v32 tracks.</span>   
+> **Action: hide all tracks and tracksets except for the ruler and GENCODE v32 tracks.**    
 
-> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: for GENCODE v32, via "Configure GENCODE v32", make sure the option "splice variants" is unchecked.</span>     
+> **Action: for GENCODE v32, via "Configure GENCODE v32", make sure the option "splice variants" is unchecked.**      
 
 
 >#### **Optional check**:   
@@ -635,7 +637,7 @@ quiz(caption = "",
 
 ```
 
-> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: Go to the gene *SPI1* </span>    
+> **Action: Go to the gene *SPI1*. **     
 
 *SPTI1* encodes the myeloid and B-cell specific transcription factor PU.1 [Pham 2012 Blood](https://doi.org/10.1182/blood-2012-01-402453).  
 
@@ -664,7 +666,7 @@ question("What statement about the *SPI1* gene is correct? (Select ALL that appl
 
 ```
 
-**Wonderfull, you are now able to navigate in the genome browser, recognize genes, their location within the chromosome, and their coding elements as well as their orientation. These are important reference points used when we visualize genomics data.**  
+**Wonderful, you are now able to navigate in the genome browser, recognize genes, their location within the chromosome, and their coding elements as well as their orientation. These are important reference points used when we visualize genomics data.**  
 
 <br>
 
@@ -674,7 +676,7 @@ question("What statement about the *SPI1* gene is correct? (Select ALL that appl
 <br>
 To upload the data we have already put them together in a so-called track hub, hosted by our own server. We can add this to our browser session by going to the tab "My Data" in the top menu and select "Track Hubs". In the "My hubs" tab you can paste a URL that points to the location of data you want to upload.   
 
-> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: Upload the required data using the following URL and return back to the Genome Browser:</span> `http://mbdata.science.ru.nl/ctoenhake/edu/trackhub_monocytes/hub.txt`.       
+> **Action: Upload the required data using the following URL and return back to the Genome Browser**</span> `http://mbdata.science.ru.nl/ctoenhake/edu/trackhub_monocytes/hub.txt`       
  
 
 >#### **Optional check**: 
@@ -728,83 +730,38 @@ We have the following datasets:
 + Input ChIP-seq, black
 
 <br>
-`r colorize("Auto-scaling", col = "red")`  
-What we haven't discussed so far is the **y-axis** at the left side of the tracks with **signal information** such as the ones just uploaded. Using this y-axis we can evaluate signal intensities. The height is currently set to 30, 50 or 100. This corresponds to the number of reads mapping to that location per million reads in the library. You can change the height of the y-axis by right-mouse click on the trakname, select the "Configure [trackname]" option and change under "Vertical viewing range", the min" and "max". Hit `APPLY` afterwards.  
+What we haven't discussed so far is the **y-axis** on the left side of the tracks with **signal information** such as the ones just uploaded. Using this y-axis you can evaluate signal intensities. The height is currently set to 30, 40, 50 or 100. This corresponds to the number of reads mapping to that location per million reads in the library.  
+<br>
+Leave the settings as they are for now. But, FYI: you can change the height of the y-axis by right-mouse click on the trackname, select the "Configure [trackname]" option and change under "Vertical viewing range", the "min" and "max". Alternatively, you can set the "Data view scaling" to "auto-scale" which adjusts the y-axis limits to the signal in view. Hit `APPLY` afterwards.    
 
-> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: Go back to the *ACTB* locus </span>  
+> **Action: Go back to the *SPI1* locus.** 
 
 >#### **Optional check**:    
 <details><summary>Your browser should be showing genomic region:</summary>  
 <br>
-> chr7:5,527,148-5,530,601      
+> chr11:47,354,860-47,378,576          
 </details>
 
 ```{r q9_ACTB_expression}
 quiz(caption = "",
-  question("A.) Look at the RNA-seq tracks, would you conclude that the ACTB gene is active?",
+  question("A.) Look at the RNA-seq tracks, would you conclude that the SPTI gene is actively transcribed?",
        answer("Yes", correct = TRUE),
        answer("No"),
       allow_retry = T),
   
-  question("B.) If you would only have ChIP-seq data, which dataset is the most preferred one to answer (A.)?",
+  question("B.) Which (three) ChIP-seq datasets could you ahve used to answer (A.)?",
          answer("monocyte_H3K9me3", message = "H3K9me3 is associated with silencing, not active genes."),
          answer("monocyte_H3K27me3", message = "H3K27me3 is associated with silencing, not active genes."),
-         answer("monocyte_H3K4me3", message = "H3K4me3 is definitely number two, but another histone PTM is more directly associated with transcription."),
+         answer("monocyte_H3K4me3", correct = TRUE, message = "H3K4me3 is found at the 5' site of genes and is associated with gene activity."),
          answer("monocyte_H3K4me1", message = "H3K4me1 is not the best mark from this list to recognize active genes."),
-         answer("monocyte_H3K27ac", message = "H3K27ac is not the best mark from this list to recognize active genes."),
-         answer("monocyte_H3K36me3", correct = TRUE, message = "Indeed, H3K36me3 is the histone mark with the highest correlation to transcription."),
+         answer("monocyte_H3K27ac", correct = TRUE,  message = "H3K27ac is also often found at the proximal-promoter of transcriptionally active genes"),
+         answer("monocyte_H3K36me3", correct = TRUE, message = "Indeed, H3K36me3 is enriched at gene bodies of transcriptionally active genes."),
          allow_retry = TRUE)
 )
   
 ```
 
-> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: From the *ACTB* locus, zoom out 3x to see the surrounding region.</span>     
-
-> #### **Optional check**:  
-<details><summary> Your browser should be showing:</summary>  
-<br>
-chr7:5,523,694-5,534,055 approximately, a few bases more or less is not a problem.   
-</details>
-
-
-Within the ChIP- and DNaseI-seq tracks we can discriminate regions of high signal from the background. These are the peaks.  
-<br>
-*Figure for the following quesiton:*  
-![](images/wk1_4_gb_actb_recognize_peaks.png){width=70%}    
-```{r q10_ACTB_DNaseIseq}
-question("Which of the following regions points to a DNaseI-seq peak? (Select ALL that apply.)",
-  answer("A", message = "Nice try but this region is part of a H3K4me3 peak."),
-  answer("B", correct = TRUE, message = "Observe that peak B is located at the *ACTB* TSS/promoter"),
-  answer("C", correct = TRUE, message = "Peak C might be located in the distal *ACTB* promoter." ),
-  answer("D", message  = "Try again. If anything, you may be looking at the H3K4me1 signal." ),
-  allow_retry = TRUE
-     )
-```
-
-```{r q11_ACTB_histone_marks_one}
-question("We define the promoter as 3kb upstream of the TSS. Which histone marks are detected at the ACTB promoter? Hint, hold shift+mouse click-and-drag to highlight a 3kb region upstream of the ACTB TSS. (Select ALL that apply)",
-  answer("H3K9me3", message = "H3K9me3 is not detected here"),
-  answer("H3K27me3", message = "H3K27me3 is not detected here"),
-  answer("H3K4me3", correct = TRUE, message = "H3K4me3 is indeed covering this promoter."),
-  answer("H3K4me1", correct = TRUE, message = "H3K4me1 is indeed covering this promoter."),
-  answer("H3K27ac", correct = TRUE, message = "H3K27ac is indeed covering this promoter."),
-  answer("H3K36me3", message = "H3K36me3 is detected covering the gene body, not the promoter."),
-  answer("none", message = "wrong"),
-         allow_retry = T)
-```
-<br>
- 
-
-### 1.4.4 Peaks from peak calling software 
-**It would be cumbersume if we would have to identify all peaks manually, not to mention a highly biased procedure. Luckily we have peak calling software to help us with that. In the following section we will use those results along with the tracks.**   
-<br>
-The peaks are already loaded, see the list of files in "BLUEPRINT monocytes" section below the browser.  
-
-> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: Turn the display of all peak tracks to "dense" using the drop-down menu.</span>    
-
-> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: From *ACTB* locus, zoom out 100x. A prominant H3K27me3 peaks upstream of *ACTB* comes in view.  </span>     
-
-
+> **Action: Navigate to the *ACTB* locus, zoom out 100x. A prominent H3K27me3 peaks *upstream* of *ACTB* comes in view.**       
 
 > #### **Optional check**:  
 <details><summary> Your browser should be showing:</summary>  
@@ -812,8 +769,7 @@ The peaks are already loaded, see the list of files in "BLUEPRINT monocytes" sec
 chr7:5,356,175-5,701,574 approximately, a few bases more or less is not a problem.   
 </details>
 
-
-```{r q12_FSCN1_bivalent_promoter}
+```{r q10_FSCN1_promoter}
 question("A prominant H3K27me3 peaks *upstream* of *ACTB* comes in view. The promoter of which gene is covered by this mark?)",
          answer("*ACTB*", message = "The *ACTB* promoter is not covered by H3K27me3."),
          answer("*FSCN1*", correct = T),
@@ -824,97 +780,91 @@ question("A prominant H3K27me3 peaks *upstream* of *ACTB* comes in view. The pro
          )
 ```
 
-```{r q13_FSCN1_bivalent_promoter}
-question("What additional histone marks, mark the H3K27me3-covered region? Optionally, zoom in to the peak using mouse-click-and-drag. (Select ALL that apply.)",
-         answer("H3K9me3", message = "we don't see H3K9me3"),
-         answer("H3K4me3", correct = T),
-         answer("H3K4me1", correct = T),
-         answer("H3K27ac", message = "A very thin line, not a 'clear' peak"),
-         answer("H3K36me3", message = "We don't see H3K36me3 signal."),
-         answer("none", message = "We are referring to peak region ??chr7:5,590,487-5,597,207."),
-         allow_retry = T
+> **Action: Zoom in that gene including the prominant H3K27me3 peak.
+
+> #### **Optional check**:  
+<details><summary> Your browser should be showing:</summary>  
+<br>
+chr7:5,587,501-5,611,400  approximately, a few bases more or less is not a problem.   
+</details>
+
+
+```{r q11_FSCN1_promoter}
+question("Based on the tracks currently shown and the current track settings, would you agree more with proposition A or B?",
+        answer("A, the prominent H3K4me3 signal in combination with the H3K36me3 signal (albeit low) suggests that FSCN1 is transcribed", message = "This is a tricky question and both answers are suboptimal, because of some technicalities we had to set one of the answers to correct and this was not the one we chose. A is not correct as, based on the current view and settings, we do not see signal in the RNA-seq track and as RNAs-eq is generally more sensitive than ChIP-seq. However, proposition B is not optimal either because FSCN1 might be expressed at a low level and we should rescale the y-axis before we can draw a conclusion. **Action: adjust the \"Data view scaling\" for the	RNA-seq tracks to \"auto-scale\""),
+        answer("B, the prominent H3K27me3 signal in combination with absence of signal in the RNA-plus track suggest FSCN1 is likely NOT transcribed.", correct = T, message = "This is a tricky question and both answers are suboptimal.  is not correct as, based on the current view and settings, we do not see signal in the RNA-seq track and as RNAs-eq is generally more sensitive than ChIP-seq. However, proposition B is not optimal because FSCN1 might be expressed at a low level and we should rescale the y-axis before we can draw a conclusion. **Action: adjust the \"Data view scaling\" for the	RNA-seq tracks to \"auto-scale\"")
          )
 ```
 
-```{r q14_FSCN1_expression}
-question("Is *FSCN1* transcribed?",
-         answer("Yes"),
-         answer("No", correct = T, message = "This is a candidate bivalent promoter. *FSCN1* encodes a member of the fascin family (3 genes in humans) of actin-binding proteins. Fascin proteins organize filamentous actin polymers into parallel bundles. This is required for the formation of actin-based cellular protrusions during cell migration, motility, adhesion and cellular interactions of neurons, glial cells and also dendritic cells [Bros, 2003, J Immunol](https://doi.org/10.4049/jimmunol.171.4.1825). The bivalent marking of this promoter in monocytes makes sense, knowing that a proportion of monocytes differentiates into dendritic cell (also called antigen-presenting cell in this [scheme](https://www.blueprint-epigenome.eu/UserFiles/File/cell%20types%20images%20etc/Haematopoiesis_original.pdf))."),
+
+```{r q12_FSCN1_expression}
+question("Based on the tracks currently shown and the current track settings, would you conclude *FSCN1* is transcribed?",
+         answer("No"),
+         answer("Yes", correct = T, message = "*FSCN1* is transcribed at a low level in monocytes. It encodes a member of the fascin family (3 genes in humans) of actin-binding proteins. Fascin proteins organize filamentous actin polymers into parallel bundles. This is required for the formation of actin-based cellular protrusions during cell migration, motility, adhesion and cellular interactions of neurons, glial cells and also dendritic cells [Bros, 2003, J Immunol](https://doi.org/10.4049/jimmunol.171.4.1825). Monocytes can differentiate into dendritic cells and this is accompanied by upregulation of this gene."),
          allow_retry = T)
 ```
 <br>
-The region inbetween *ACTB* and *FSCN1* is marked as well. What marks do you observe and what functional elements could they point to?  
-<br>
-```{r q15_ACTB_enhacer_one}
-quiz(caption = "", 
-     question("Epigenetic marks inbetween *ACTB* and *FSCN1* (Select ALL that apply.)",
-  answer("H3K9me3", message = "H3K9me3 is not detected here"),
-  answer("H3K27me3", message = "H3K27me3 is not detected here"),
-  answer("H3K4me3", correct = TRUE),
-  answer("H3K4me1", correct = TRUE),
-  answer("H3K27ac", correct = TRUE),
-  answer("H3K36me3", message = "H3K36me3 is detected covering the gene body, not the promoter."),
-  answer("DNaseI-seq", correct = TRUE), 
-  allow_retry = TRUE),
 
-  question("What functional element do these marks most likely reflect?",
-  answer("terminator"),
-  answer("promoter"),
-  answer("TSS"),
-  answer("enhancer", correct = TRUE, message = "At least the region spanning chr7:5560200-5564149 is reported a super-enhancer and controls among others the *ACTB* gene."),
-  answer("centromere"),
-  answer("telomere"),
-  answer("coding region"), 
-  allow_retry = TRUE)
-)
-```
+### 1.4.4 Peaks from peak calling software 
+**It would be cumbersome if we would have to identify all peaks manually, not to mention a highly biased procedure. Luckily we have peak calling software to help us with that. In the following section we will use those results along with the tracks.**   
 <br>
-Another highly expressed gene in this cell type is *CD14*, remember it's protein was used to select these cells on.  
-Answer the following question about this gene using the UCSC Genome Browser:   
-<br>
+The peaks are already loaded, see the list of files in "BLUEPRINT monocytes" section below the browser.  
+
+> **Action: Turn the display of all peak tracks to "dense" using the drop-down menu.**  *Tip*: drag the peak tracks to the corresponding signal track.     
+
+> **Action: Go to the *MBD2* locus and zoom out 3x to see the surrounding region.**      
+
+MBD2, methyl-CpG binding Domain 2, as the name suggests, recognizes methylated CpG dinucleotides and functions in transcriptional silencing [ref](https://www.genecards.org/cgi-bin/carddisp.pl?gene=MBD2&keywords=mbd2).  
 
 > #### **Optional check**:  
-<details><summary> Genomic location of *CD14*:</summary>  
+<details><summary> Your browser should be showing:</summary>  
 <br>
-chr5:140,631,728-140,633,701     
+chr18:54,078,542-54,297,733 approximately, a few bases more or less is not a problem.   
 </details>
 
-```{r q17_cd14_questions}
-question("What statement about *CD14* is correct? (Select ALL that apply)",
-  answer("*CD14* gene is encoded on the minus-strand", correct = TRUE),
-  answer("More transcript is detected from the minus strand compared to the plus strand of the *CD14* locus.", correct = T),
-  answer("*CD14* is transcribed but the coding region is not covered by H3K36me3"),
-  answer("The TTS of *CD14* gene has a higher coordinate than its TSS"), 
-  answer("*CD14* is encoded on the long arm of chr5", correct = TRUE),
-  answer("*CD14* is encoded on the short arm of chr5"),
-  answer("The TSS of *CD14* is not accessible for DNaseI"), 
-  answer("A DNaseI-peak appr. 1.5 kb upstream of the TSS could mark the distal promoter.", correct = TRUE),
-  allow_retry = TRUE)
+<br>
+```{r q13_MBD2_histone_marks_one}
+quiz(caption = "", 
+     question("Is MBD2 activley transcribed in these cells?",
+              answer("Yes", correct = T),
+              answer("No"),
+              allow_retry = T),
+     question("Which marks are detected around the *MBD2* promoter? In general we define the promoter as 3-5kb upstream the TSS.",
+              answer("H3K9me3", message = "H3K9me3 is not detected here"),
+              answer("H3K27me3", message = "H3K27me3 is not detected here"),
+              answer("H3K4me3", correct = TRUE, message = "H3K4me3 is present at the MBD2 promoter."),
+              answer("H3K4me1", correct = TRUE, message = "H3K4me1 is present at the MBD2 promoter."),
+              
+              answer("H3K27ac", correct = TRUE, message = "H3K27ac is present at the MBD2 promoter."),
+              answer("H3K36me3", message = "H3K36me3 is found downstream the TSS"),
+              answer("DNaseI", correct = TRUE, message = "DNaseI peak is present at that the MBD2 promoter."),
+         allow_retry = T)
+     )
 ```
-<br> 
-Approximately 20 kb downstream of *CD14* is another enhancer marked by a prominent DNaseI-seq signal. What histone marks mark this enhancer? (You might need to zoom out to find the region 20kb downstream.)   
+<br>
+Downstream of *CEBPA* is an enhancer located. What marks mark this enhancer?  
 
 > #### **Optional check**:  
 <details><summary> We're referring to a enhancer located at:</summary>  
 <br>
-Approximately: chr5:140611060-140612601  
+Approximately: chr19:33,250,188-33,305,852  
 </details>
 
 
-```{r q18_cd14_enhancer}
-question("Which marks mark the enhancer 20kb downstream of *CD14*?",
+```{r q18_cebpa_enhancer}
+question("Which marks mark the enhancer downstream of *CEBPA*?",
   answer("H3K9me3", message = "not H3K9me3"),
   answer("H3K27me3", message = "not H3K27me3"),
-  answer("H3K4me3", message = "not H3K4me3"),
+  answer("H3K4me3", correct = T, message = "Note that although H3K4me3 is generally a promoter signal, we see it here a little bit as well. This might be due to cross-reactivity of the H3K4me1 Ab and cross-linking/contact between the promoter and the enhancer."),
   answer("H3K4me1", correct = T),
   answer("H3K27ac", correct = T),
-  answer("H3K36me3", message = "not H3K36me3"),
+  answer("DNaseI", correct = T),
   allow_retry = T)
 ```
 <br>
-So far we have seen active promoters, bivalent promoters and enhancers. A region silenced by H3K9me3 is loacted appr. 120kb upstream of *CD14*.   
+So far we have seen active promoters, bivalent promoters and enhancers. A region silenced by H3K9me3 is located appr. 120kb upstream of *CD14*.   
 
-> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: Navigate and zoom-out to chr5:140250000-141720000 .</span>    
+> **Action: Navigate and zoom out to chr5:140250000-141720000.**     
 
 ```{r q19_cd14_near_silencing}
 question("The expression of what gene family is silenced by this  H3K9me3-domain?",
@@ -935,7 +885,7 @@ question("What is the approximate size of the H3K9me3 silenced region? (*Tip2: h
 <br>
 Silencing does not necessarily have to be mediated by H3K9me3.  
 
-> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: Which of the following genes is silenced by H3K27me3? *ACTA1*,  *EED*, *GATA3*, *HDAC1*, *MYOD1* andncoding muscular actin.</span>  
+> **Action: Which of the following genes is silenced by H3K27me3? *ACTA1*,  *EED*, *GATA3*, *HDAC1*, *MYOD1*, *ATOH1* **     
 
 > #### **Optional check**:  
 <details><summary> Table with genomic locations of these genes:</summary>  
@@ -947,6 +897,7 @@ gene | genomic location | product
 *GATA3* | chr10:8,054,810-8,074,890 | TF in various cell types (e.g. mammary gland maturation, T cells and keratinocytes)   
 *HDAC1* | chr1:32,292,083-32,333,626 | Histone deacetylase 1    
 *MYOD1* | chr11:17,719,571-17,722,136 | TF for myogenic differentiation  
+*ATOH1* | chr4:93,818,790-93,840,929 | TF for sensory hair cell differentiation  
 </details>
 
 ```{r q21_ACTA1_marking_one}
@@ -956,29 +907,19 @@ question("Which hgenes are silenced by H#K27me3?",
          answer("*GATA3*", correct = T),
          answer("*HDAC1*",  message = "*HDAC1* is not silenced."),
          answer("*MYOD*", correct = T),
+         answer("ATOH1", correct = T),
          allow_retry = T)
 ```
 <br>
-```{r q22_ACTA1_marking_two}
-question("Which additional observations support that *ACT1* is not active?",
-         answer("Absence of H3K36me3 marking covering the gene body.", message = "H3K36me3 is indeed lacking but other observations are correct as well."),
-         answer("Absence of signal in RNA-seq signal", message = "RNA-seq is indeed lacking but other observations are correct as well."),
-         answer("Absence of activating signals like DNaseI and H3K4me3 at the *ACTA1* promoter",  message = "The promoter lacks active signals but other answers are correct as well."),
-         answer("All the above", correct = TRUE, message = "Indeed, the absence of signals in RNA-seq, H3K36me3 *and* active promoter signals all support that this gene is not expressed. Also observe that in this case H3K27me3 signal covers a relatively broad domain compared to the bivalent promoter at *FSCN1*" ),
-         allow_retry = TRUE
-         )
-```
-<br>  
 
- 
 ### 1.4.5 Recognizing blinded genomics data  
 So far you have browsed through ChIP-, DNaseI- and RNA-seq data. These tracks had the correct track names attached to them.   
 <br>
-Our collegue performed RNA-seq, DNAseI-seq and ChIPs for H3K9me3, H3K27me3, H3K4me3, H3K36me3, H3K4me1 and H3K27ac on CD4+ T cells but accidentally let the tubes fall before the tubes were properly labelled (always label your tubes first and *before* adding your sample!). 
+Our colleague performed RNA-seq, DNaseI-seq and ChIPs for H3K9me3, H3K27me3, H3K4me3, H3K36me3, H3K4me1 and H3K27ac on CD4+ T cells but accidentally let the tubes fall before the tubes were properly labeled (always label your tubes first and *before* adding your sample!). 
 <br>
-We know which experiments were performed, but which track (labelled a-f) is most likely which technique?  
+We know which experiments were performed, but which track (labeled a-f) is most likely which technique?  
 
-> <span style="color: black; font-family: Arial; font-size:14px;">**Action**: upload the following track hub </span> `http://mbdata.science.ru.nl/ctoenhake/edu/trackhub_unknown/hub.txt`.
+> **Action: upload the following track hub** `http://mbdata.science.ru.nl/ctoenhake/edu/trackhub_unknown/hub.txt`.
 
 <br>  
 Note that the y-axis scale of these tracks is set to "auto-scale to data view". In the monocyte track we had set these to fixed values based on our experience with these datasets. "Auto-scaling" means that the y-axis adjusts to the reported signal in the corresponding genomic region.  
