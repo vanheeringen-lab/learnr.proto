@@ -29,59 +29,69 @@ library(tidyverse)  # 1.3.0
 
 # configuration
 knitr::opts_chunk$set(echo = FALSE)
-# when using gradethis, additional options are passed to tutorial_options()
-gradethis::gradethis_setup(
-  exercise.timelimit = 30,  # max code execution time (sec)
-)
-# tutorial_options(
-#   exercise.timelimit = 30,  # max code execution time (sec)
-#   # exercise.checker = NULL
-# )
-
-# number of open tutorial windows (1 variable per tutorial)
-# TODO: check if this works for multiple users, or if the variable must contain a user-ID
-# instances <- reactiveValues(test = 0)
+gradethis::gradethis_setup()
 ```
 
 ```{r, context="server"}
-# isolate({
-#   val <- instances$test + 1
-#   instances$test <- val
-# })
-#
-# session$onSessionEnded(function(){
-#   isolate({
-#     val <- instances$test - 1
-#     instances$test <- val
-#
-#     if (instances$test < 1) {
-#       cat("\nBrowser closed. Terminating...")
-#       stopApp()
-#     }
-#   })
-# })
+isolate({
+  # obtain the session id
+  # source 1: https://shiny.rstudio.com/reference/shiny/latest/session.html
+  # source 2: https://stackoverflow.com/questions/18900955/get-environment-identifier-in-r
+  session_id <- sub('<environment: (.*)>', '\\1', capture.output(session$userData))
+  
+  # # send the session ID to the log (indicates the tutorial is loaded)
+  # write(paste0("Session ID: ", session_id), stderr())
+  
+  # send the session ID to the javascript chunk
+  session$sendCustomMessage("session_id", session_id)
+})
 
-# # idle timer: https://community.rstudio.com/t/keeping-track-of-idle-time-during-app-usage/1735
-# (function() {
-#   var timeoutWarningMsecs = 5 * 1000;
-#   var idleTimer;
-#
-#   function onTimeout() {
-#     alert('warning: session is about to time out!');
-#   }
-#
-#   function startIdleTimer() {
-#     if (idleTimer) clearTimeout(idleTimer);
-#     idleTimer = setTimeout(onTimeout, timeoutWarningMsecs);
-#   }
-#
-#   $(document).on('shiny:message shiny:inputchanged', startIdleTimer);
-#
-# })();
+# stop the tutorial when "input[[session_id]]" is updated
+observeEvent(input[[session_id]], ignoreNULL=T, {
+  write(paste0("\nTutorial terminated due to inactivity.\nRestart to continue where you left off!\n"), stderr())
+  stopApp()
+})
 ```
 
+```{js}
+// This chunk stops the tutorial if it has been idle for too long
 
-## embedding
+// Situation: We need to stop inactive tutorials to prevent the server from grinding to a halt.
+// Problem: refreshing the tutorial and closing the browser send the same signal to shiny.
+// since we cannot distinguish the two, this signal cannot be used to stop the tutorial.
+// Solution: Use a timeout system. 
+// Method: this chunk will update shiny variable "input[[session_id]]" 
+//   when the session has been running idle for longer than "timeoutSec" seconds.
+// This signal is then be used by Shiny (server-side) to stop the session.
+
+// source1: https://community.rstudio.com/t/keeping-track-of-idle-time-during-app-usage/1735
+// source2: https://bookdown.org/yihui/rmarkdown/language-engines.html#javascript-and-css
+$(function() {
+  var timeoutSec = 5*60;
+  var idleTimer;
+
+  // receive this session's ID
+  Shiny.addCustomMessageHandler("session_id", function(s_id) {
+    session_id = s_id;  // assigns the variable globally
+  });
+
+  // assign session ID as reactive variable "input[[session_id]]" 
+  function onTimeout() {
+    alert("Tutorial stopped due to inactivity.\nRestart to continue where you left off!")
+    Shiny.setInputValue(session_id, "TRUE");
+  }
+
+  function startIdleTimer() {
+    if (idleTimer) clearTimeout(idleTimer);
+    idleTimer = setTimeout(onTimeout, timeoutSec * 1000);
+  }
+  
+  $(document).on('shiny:message shiny:inputchanged', startIdleTimer);
+
+})();
+```
+
+## Embedding
 
 ### local image:
 
