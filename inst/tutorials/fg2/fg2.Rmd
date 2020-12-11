@@ -463,61 +463,93 @@ A template code for a ggplot2 plot:
 > *[ggplot2 cheatsheet](https://github.com/rstudio/cheatsheets/raw/master/data-visualization-2.1.pdf)*  
 </details>  
 
-> **Exercise 3a:**  
+### Exercise 3:  
+
+> You will make a barplot showing the number of peaks per ChIP experiment.  
+
+- GRanges objects of each mark are concatenated in the GRangesList object `monocytes_list`.  
+- We applied the `length()` function on each object in this list.  
+- Hit "Run Code" to repeat these steps and show the output
+
+```{r peakcount, exercise = T}
+# obtain number of peaks for each element in monocytes_list:
+peak_counts <- sapply(monocytes_list, length)
+# convert output to a data.frame 
+peak_counts <- as.data.frame(peak_counts)
+# add a column for the chip target 
+peak_counts$chip <- rownames(peak_counts)
+# print the result
+peak_counts
+```
+> Plot the number of peaks per ChIP in a barplot using `ggplot()` and `geom_bar()`  
+
+```{r barplotpeakcount, exercise = T}
+# plot the number of peaks per chip
+
+
+
+```
+
+```{r barplotpeakcount-solution, exercise = T}
+# plot the number of peaks per chip
+
+
+
+```
+
+
+### Exercise 4a:   
+
 > Finish the code below to 
 >
-> * Extract the metadata of H3K4me3 peaks and write it into a dataframe object 'metadata_h3k4me3'
-> * Define 'peak_size' variable, holding the peak widths. 
+> 1. Extract the metadata of H3K4me3 peaks and write it into a dataframe object 'metadata_h3k4me3'
+> 2. Define 'peak_size' variable, holding the peak widths. 
 
-```{r q3_extractmetadata, exercise = T}
+```{r q4_extractmetadata, exercise = T}
 # extract metadata 
 metadata_h3k4me3 <- as.data.frame(mcols(..))
 # add column 'peak_size' with the width of H3K4me3 peaks
 metadata_h3k4me3$peak_size <- ...(monocytes_h3k4me3)
 ```
 
-```{r q3_extractmetadata-solution, eval = F}
+```{r q4_extractmetadata-solution, eval = F}
 # extract metadata 
 metadata_h3k4me3 <- as.data.frame(mcols(monocytes_h3k4me3))
 # add column 'peak_size' with the width of H3K4me3 peaks
 metadata_h3k4me3$peak_size <- width(monocytes_h3k4me3)
 ```
 
-```{r q3_extractmetadata-code-check, eval = F}
+```{r q4_extractmetadata-code-check, eval = F}
 grade_code()
 ```
 
-> **Exercise 3b:**  
-> Plot the peak size distribution of H3K4me3 peaks as a histogram using `ggplot()` and `geom_histogram()`  
+### Exercise 4b:   
 
-```{r prepare-q3plotpeaksizeh3k4me3}
+> Now plot the peak size distribution of H3K4me3 peaks as a histogram using `ggplot()` and `geom_histogram()`  
+
+```{r prepare-q4plotpeaksizeh3k4me3}
 # extract metadata 
 metadata_h3k4me3 <- as.data.frame(mcols(monocytes_h3k4me3))
 # add column 'peak_size' with the width of H3K4me3 peaks
 metadata_h3k4me3$peak_size <- width(monocytes_h3k4me3)
 ```
 
-
-```{r q3plotpeaksizeh3k4me3, exercise = T}
+```{r q4plotpeaksizeh3k4me3, exercise = T}
 # plot the H3K4me3 peak_size as a histogram:  
-ggplot(data = metadata_h3k4me3)+
-  geom_histogram(mapping = aes(x = peak_size), fill = "gray", col = "black", bins = 100)+
+..(data = metadata_h3k4me3)+
+  ..(mapping = ..(x = ..), fill = "gray", col = "black", bins = 100)+
   theme_bw()
 ```
 
-<div id="q3plotpeaksizeh3k4me3-hint">
-**Hint:** use ggplot().    
+<div id="q4plotpeaksizeh3k4me3-hint">  
+
+- use ggplot() and geom_histogram()   
+- Map peak_size to the x-axis.    
+- `mapping =` is always paired with `aes()`.    
+
 </div>
 
-<div id="q3plotpeaksizeh3k4me3-hint">
-**Hint:** Map peak_size to the x-axis.    
-</div>
-
-<div id="q3plotpeaksizeh3k4me3-hint">
-**Hint:** `mapping =` is always paired with `aes()`.      
-</div>
-
-```{r q3b_plot_peaksize_h3k4me3-solution, eval = F}
+```{r q4b_plot_peaksize_h3k4me3-solution, eval = F}
 # plot the H3K4me3 peak_size as a histogram:  
 ggplot(data = metadata_h3k4me3)+
   geom_histogram(mapping = aes(x = peak_size), fill = "gray", col = "black", bins = 100)+
@@ -526,6 +558,14 @@ ggplot(data = metadata_h3k4me3)+
  
 
 Alternatively, you could have plotted this distribution as a boxplot:  
+```{r }
+# plot the H3K4me3 peak_size as a boxplot:  
+ggplot(data = metadata_h3k4me3)+
+  geom_histogram(mapping = aes(x = peak_size), fill = "gray", col = "black", bins = 100)+
+  theme_bw()
+```
+
+
 
 Let's compare this distribution with that of H3K4me1 peaks in monocytes.  
 
