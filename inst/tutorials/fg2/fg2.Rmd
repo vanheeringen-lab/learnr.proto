@@ -42,6 +42,8 @@ gradethis::gradethis_setup()
 # data accessible to all exercises
 rdata = system.file("extdata", "week2.Rdata", package = "learnr.proto")
 load(rdata)
+monocytes_all <- unlist(monocytes_list)
+monocytes_all$chip <- names(monocytes_all)
 ```
 
 ```{r timeout1, context="server"}
@@ -128,12 +130,59 @@ These observations showed examples of marks associated with a particular functio
 9. Identify the genes that are associated with these TSSs.  
 - These refer to global learning objectives #4-#7.  
 
+### Exercises
+In this tutorial you will have multiple-choice and checkbox questions like in **fg1** but also complete-the-code exercises. The latter can be evaluated on the computed outcome (e.g a computed p-value), in other cases, the code itself is checked. 
+<br>
+For short lines of code, you have to decide which function or object to use and how to write this in code. For some longer lines of codes, we left blanks as "___" that indicate where in the code you should add the function or object name.  
 <br>
 
-***  
-<br> 
+- Hit `Start Over` to remove any adjustments you made and start again.   
+- Hit `Hint` (when provided) for clues.  
+- Hit `Run Code` to preview your code and the output.  
+- Hit `Submit Answer` (if present) to submit the code. As 'submitting' not always shows the code output, it is advised to use `Run Code` first.  
 
-> TEASER... let's look at some of the plots you will make.    
+<br>
+```{r exemplemc}
+quiz(caption = "Example questions:",
+     question("What number is the letter A in the English alphabet?",
+        answer("8"),
+        answer("14"),
+        answer("1", correct = TRUE),
+        answer("23")
+     ),
+     question("Where are you right now? (select ALL that apply)",
+          answer("Planet Earth", correct = TRUE),
+          answer("Pluto"),
+          answer("At a computing device", correct = TRUE),
+          answer("In the Milky Way", correct = TRUE),
+          incorrect = "Incorrect. You're on Earth, in the Milky Way, at a computer.")
+)
+```
+
+**Example coding exercise:**  
+
+> * Print the head of file `monocytes_h3k4me3`.   
+
+```{r examplecode, exercise = T}
+# print the head of `monocytes_h3k4me3`
+monocytes_h3k4me3
+```
+
+<div id="examplecode-hint">
+**Hint:** You may want to use the `head(...)` function.  
+</div>
+
+```{r examplecode-solution, eval = F}
+head(monocytes_h3k4me3)
+```
+
+```{r examplecode-check-code}
+grade_result(
+  pass_if(
+    ~identical(.result, head(monocytes_h3k4me3))
+    )
+ )
+```
 
 <br>  
 
@@ -228,7 +277,19 @@ There are several functions to retrieve and set the values in GRanges objects. H
 
 ![](images/wk2_2_GRanges_fields_my_gr.png){width=100%}   
 <br>
-Notice that this object holds the **genomic coordinates** and **2 metadata columns**. Metadata is data about the data:  
+A list of the above functions (and more) for GRanges can also be called with `methods(class = "...")`. This also command works for other objects as well. You just need to figure out the class of the object in question using `class([object_name])`.  
+<br>
+You can print a summary of the GRanges object with `show(object_name)` and `print(object_name)` (this works for many  other R objects as well).  
+<br>
+
+### 2.2.5 Slots in GRanges objects     
+Notice that `gr` holds:  
+
+- the genomic coordinates in a **GRanges** slot  
+- 2 columns as **metadata**  (metadata is data about the data)    
+- a genome in the **seqinfo** slot  
+
+The main differences between the metadata and the genomic coordinates are:  
 
 Genomic coordinates |  Metadata columns   
 :--|:---  
@@ -237,10 +298,10 @@ Extract using `granges(object_name)` |  Extract as DataFrame with `mcols(object_
 Restricted to variables `seqnames`, `ranges` and `strand` | Almost anything can be stored in the metadata
 
 <br>
-Information about the genome is stored in the "seqinfo" part of the object. In the example you see that the peaks are located in human genome 38 which holds 455 sequences in total of which 1 circular (mitochondrial genome). (Sequences that can not be confidently placed on a specific chromosome is stored in chrUn, chr*N*_random and chr*N*_region [explanation on UCSC GB website](http://genome.ucsc.edu/FAQ/FAQdownloads#download10).)   
-<br>
+Information about the genome is stored in the **seqinfo** part of the object. In the example you see that the peaks are located in human genome 38 which holds 455 sequences in total of which 1 circular (mitochondrial genome). (Sequences that can not be confidently placed on a specific chromosome is stored in chrUn, chr*N*_random and chr*N*_region [explanation on UCSC GB website](http://genome.ucsc.edu/FAQ/FAQdownloads#download10).)   
 
-### 2.2.5 Importing peak files   
+
+### 2.2.6 Importing peak files as GRanges     
 To parse peak files directly into GRanges you use the `import()` function from the rtracklayer package, for example:    
 ```{r exampleimport_rtracklayer, eval = F, echo = T}
 # load the required library, is usually done once at the start of your analysis.  
@@ -307,111 +368,85 @@ Column | Section in GRanges object | Variable | Description
 8. | Metadata | qValue | -log10(qvalue), the false discovery rate determined by swapping test and control.  
 9. | Metadata | peak  | location of peak summit relative to the peak start.  
 
-> #### **Background**: GRanges and rtracklayer are Bioconductor packages, but what is Bioconductor?   
-> <details><summary>Bioconductor is a repository with R packages developed for the analysis of high-throughput genomics data in R.</summary>   
-[Bioconductor](https://www.bioconductor.org/) is a special repository of packages for the analysis of high throughput genomic data in R. Packages are often heavily dependend on each other and regular releases and a special installer ensure that you install package version that can work together. Usually you would use the `biocManager::install()` command to install these packages. But in this tutorial, all required packages are already installed.  
-<br>
-Bioconductor packages that you will be using include:   
->
-Package | Purpose   
---|--------    
-[GenomicRanges](https://bioconductor.org/packages/release/bioc/vignettes/GenomicRanges/inst/doc/GenomicRangesIntroduction.html) | Provides the `GRanges` data structures to store and handle genomic intervals.  
-[plyranges](https://bioconductor.org/packages/release/bioc/html/plyranges.html) | `dplyr`-like interface for interacting and manipulating `Ranges` data structures.    
-[GenomicFeatures](https://www.bioconductor.org/packages/release/bioc/html/GenomicFeatures.html) | Functions to retrieve and manage genomic features from database packages.  
-[rtracklayer](https://www.bioconductor.org/packages/release/bioc/html/rtracklayer.html) | Provides functions to import and work with annotation files with various formats (GFF, BED, bedGraph, BED15, WIG, BigWig and 2bit).   
-TxDb packages | Provide an R representation of gene models, each genome has a separate package.   
-OrgDb packages | Contain mappings between a unique gene identifier and other kinds of identifiers for a certain genome (eg from Entrez gene identifier to Gene Symbol)  
-<br>
-Bioconductor packages can use **data structures** different from `vectors`,`matrices` or `data.frames`. The `GRanges` data structure provided by the `GenomicRanges` package is an example and is used by many. We will come to those shortly.   
-<br>
-These "Bioconductor-specific-objects", like `GRanges`, generally have their own set of functions or methods that you can explore using `methods(class = "...")`. To find out the `class`, use `class(object_name)`.  
-<br>
-Here's a list of basic functions to explore objects and/or call the help on packages or functions:   
->
-- Use `class()` to found out what kind of data structure you are dealing with  
-- Use `show()` or `print()` to have r print a summary of your data    
-- use `methods(class = "...")` to get a list of (default) methods or functions you can use to extract and manipulate the data, also called *assessor* functions or *getter* and *setter* functions       
-- use `help(package = "[packageName]")` to display the help page     
-</details>
-
 ## 2.3 Exploratory data analysis   
 ### 2.3.1 Peak counts
-A common first step in genomics data analysis is to make look at some basic characteristics of our data by making exploratory plots. You will do so for the peaks called on H3K4me3 and H3K4me1 ChIP-seq tracks for monocytes (used in the week 1). These are stored in the R objects `monocytes_h3k4me3` and `monocytes_h3k4me1`.   
+A common first step in genomics data analysis is to make look at some basic characteristics of our data by making exploratory plots.  
 <br>
 
 ### Exercise 2a:    
 
-> Determine the number of H3K4me3 and H3K4me1 peaks in monocytes.  
+> Determine the number of H3K4me3 and H3K4me1 peaks in monocytes. Peak data are stored in the R objects `monocytes_h3k4me3` and `monocytes_h3k4me1`.    
 
-```{r q2a_explore, exercise = T}
+```{r q2a_exploreh3k4me3, exercise = T}
 # How many peaks are stored in monocytes_h3k4me3?
 monocytes_h3k4me3
 
 ```
 
-<div id="q2a_explore-hint">
+<div id="q2a_exploreh3k4me3-hint">
 **Hint:** You may want to use the `length()` function.  
 </div>
 
-```{r q2a_explore-solution, eval = F}
+```{r q2a_exploreh3k4me3-solution, eval = F}
 length(monocytes_h3k4me3)
 ```
 
-```{r q2a_explore-check, eval = F}
+```{r q2a_exploreh3k4me3-check, eval = F}
 grade_result(
  pass_if(~identical(.result, length(monocytes_h3k4me3)))
  )
 ```
 
-```{r q2b_explore, exercise = T}
+```{r q2a_exploreh3k4me1, exercise = T}
 # And how many H3K4me1 peaks do you have?
 
 
 ```
 
-```{r q2b_explore-solution, eval = F}
+```{r q2a_exploreh3k4me1-solution, eval = F}
 length(monocytes_h3k4me1)
 ```
 
-```{r q2b_explore-check, eval = F}
+```{r q2a_exploreh3k4me1-check, eval = F}
 grade_result(
  pass_if(~identical(.result, length(monocytes_h3k4me1)))
  )
 ```
 
+
 ### Exercise 2b:  
 
-> *And what is the distribution of peak sizes for these marks? 
+> * And what is the distribution of peak sizes for these marks? 
 
-```{r q2c_explore, exercise = T}
+```{r q2b_widthh3k4me3, exercise = T}
 # What is the distribution of H3K4me3 peak sizes?   
-summary(...(monocytes_h3k4me3))
+summary(___(monocytes_h3k4me3))
 ```
 
-<div id="q2c_explore-hint">
+<div id="q2b_widthh3k4me3-hint">
 **Hint:** You can retrieve peak widths with the `width()` function.  
 </div>
 
-```{r q2c_explore-solution, eval = F}
+```{r q2b_widthh3k4me3-solution, eval = F}
 summary(width(monocytes_h3k4me3))
 ```
 
-```{r q2c_explore-code-check, eval = F}
+```{r q2b_widthh3k4me3-code-check, eval = F}
 grade_code(
   pass_if(~identical(.result, summary(width(monocytes_h3k4me3)))
 )
 ```
 
-```{r q2d_explore, exercise = T}
+```{r q2b_widthh3k4me1, exercise = T}
 # And what is the distribution of H3K4me1 peak sizes?   
 monocytes_h3k4me1
 ```
 
-```{r q2d_explore-solution, eval = F}
+```{r q2b_widthh3k4me1-solution, eval = F}
 summary(width(monocytes_h3k4me1))
 ```
 
-```{r q2d_explore-code-check, eval = F}
+```{r q2b_widthh3k4me1-code-check, eval = F}
 grade_code(
   pass_if(~identical(.result, summary(width(monocytes_h3k4me1)))
 )
@@ -441,11 +476,11 @@ quiz(caption = "",
 
 
 ### 2.3.2 Plotting summaries with ggplot2  
-The GRanges object structure is not compatible with ggplot2-ting. Therefore, to plot these peak sizes using ggplot2, you first have to write the metadata into a data frame using the `as.data.frame()` and `mcols()` functions.   
+You will use the ggplot2 package to plot the number of peaks for each dataset, to compare the average peak sizes and to plot the total number or fraction of bp's covered by these peaks on chromosome 19.  
+<br>
 
-> #### **Refresher**: ggplot2-ting   
-<details><summary>Very quick how-to plot with ggplot()</summary>  
-> With **ggplot2** you generally begin with the `ggplot(data = ..)` function and you add so-called layers with `geom..()` functions. Example geom functions include `geom_point()` for a scatter plot, `geom_histogram()` for a histogram, `geom_density()` for a smoothened version of the histogram, and `geom_bar()` for a barplot.  
+> #### A very brief **refresher** on ggplot2-ting:   
+> With **ggplot2** you generally begin with the `ggplot(data = ..)` function and you add so-called layers with `geom..()` functions. Example geom functions include `geom_point()` for a scatter plot, `geom_histogram()` for a histogram, `geom_density()` for a smoothened version of the histogram, and `geom_bar()` or `geo_col()` for a barplot.  
 > <br>
 > The **geom functions** take a `mapping = aes(x = ..., y = ..., ...)` argument that defines how variables in the dataset are mapped to visual properties (aes for "aesthetic mapping"). Depending on the geom function, you can map variables to the x- and y-axis, to the shape of symbols, the line type of line graphs, to the fill color of symbols and more.  
 > <br>
@@ -454,134 +489,198 @@ The GRanges object structure is not compatible with ggplot2-ting. Therefore, to 
 **Facetting** divides a plot into subplots defined by one or more discrete variables.   
 <br>
 A template code for a ggplot2 plot:  
-`ggplot(data = <DATA>)+  
-  geom_<FUNCTION>(mapping = aes(<MAPPING>))+  
-  <SCALE_FUNCTION>+  
-  <FACET_FUNCTION>`  
-> Further reading:  
-> *Ref: [R for Datascience, chapter 3 Data visualisation](https://r4ds.had.co.nz/data-visualisation.html)*  
+`ggplot(data = <DATA>)+`  
+  `geom_<FUNCTION>(mapping = aes(<MAPPING>))+`   
+  `<SCALE_FUNCTION>+`  
+  `<FACET_FUNCTION>`  
+<br>
+> **References**:  
+> *[R for Datascience, chapter 3 Data visualization](https://r4ds.had.co.nz/data-visualisation.html)*  
 > *[ggplot2 cheatsheet](https://github.com/rstudio/cheatsheets/raw/master/data-visualization-2.1.pdf)*  
-</details>  
+ 
 
 ### Exercise 3:  
+> Make a barplot showing the number of peaks per ChIP experiment.   
 
-> You will make a barplot showing the number of peaks per ChIP experiment.  
+> * All chip peaks are concatenated in the GRanges object `monocytes_all`.   
+* Print a summary of this object and identify the variable (column in metadata) that you can use for counting the number of peaks per chip (this will be the statistic used in the barplot).   
 
-- GRanges objects of each mark are concatenated in the GRangesList object `monocytes_list`.  
-- We applied the `length()` function on each object in this list.  
-- Hit "Run Code" to repeat these steps and show the output
-
-```{r peakcount, exercise = T}
-# obtain number of peaks for each element in monocytes_list:
-peak_counts <- sapply(monocytes_list, length)
-# convert output to a data.frame 
-peak_counts <- as.data.frame(peak_counts)
-# add a column for the chip target 
-peak_counts$chip <- rownames(peak_counts)
-# print the result
-peak_counts
-```
-> Plot the number of peaks per ChIP in a barplot using `ggplot()` and `geom_bar()`  
-
-```{r barplotpeakcount, exercise = T}
-# plot the number of peaks per chip
-
-
-
+```{r monocytesall, exercise = T}
+# summary of object 'monocytes_all'
+monocytes_all
 ```
 
-```{r barplotpeakcount-solution, exercise = T}
-# plot the number of peaks per chip
+<div id="monocytesall-hint">
+**Hint:** Use `print()` or `show()`
+</div>
 
-
-
+```{r monocytesall-solution, echo = F}
+# summary of object 'monocytes_all'
+print(monocytes_all)
 ```
 
 
-### Exercise 4a:   
+```{r barplotvariable}
+question("Which variable will you use for counting the number of peaks per ChIP-seq dataset?",
+         answer("score"),
+         answer("seqnames"),
+         answer("peak"), 
+         answer("chip", correct =T),
+         allow_retry = T)
+```
 
-> Finish the code below to 
->
-> 1. Extract the metadata of H3K4me3 peaks and write it into a dataframe object 'metadata_h3k4me3'
-> 2. Define 'peak_size' variable, holding the peak widths. 
+As GRanges objects are not compatible with ggplot2, you have to extract the metadata and write it in a data.frame  
 
-```{r q4_extractmetadata, exercise = T}
+> Complete the code below to extract the metadata from the object `monocytes_all`.  
+> 
+> * The function `as.data.frame()` is used to convert the resulting 'DFrame' object into a data.frame.
+
+```{r q_extractmetadata, exercise = T}
 # extract metadata 
-metadata_h3k4me3 <- as.data.frame(mcols(..))
-# add column 'peak_size' with the width of H3K4me3 peaks
-metadata_h3k4me3$peak_size <- ...(monocytes_h3k4me3)
+monocytes_metadata <- __(__)
+
+# convert to a data.frame
+monocytes_metadata <- as.data.frame(monocytes_metadata)
 ```
 
-```{r q4_extractmetadata-solution, eval = F}
+```{r q_extractmetadata-hint-1}
+monocytes_metadata <- mcols(monocytes_all)
+```
+
+```{r q_extractmetadata-solution, eval = F}
 # extract metadata 
-metadata_h3k4me3 <- as.data.frame(mcols(monocytes_h3k4me3))
-# add column 'peak_size' with the width of H3K4me3 peaks
-metadata_h3k4me3$peak_size <- width(monocytes_h3k4me3)
+monocytes_metadata <- mcols(monocytes_all)
+
+# convert to a data.frame
+monocytes_metadata <- as.data.frame(monocytes_metadata)
 ```
 
-```{r q4_extractmetadata-code-check, eval = F}
+> * Complete the code below to plot the number of peaks per ChIP in a bar chart using ggplot2 plotting.  
+
+```{r prepare-q_barplotpeakcount} 
+monocytes_all <- unlist(monocytes_list)
+monocytes_all$chip <- names(monocytes_all)
+monocytes_metadata <- as.data.frame(mcols(monocytes_all))
+```
+
+```{r q_barplotpeakcount, exercise = T, fig.width=4}
+# plot the number of peaks per chip
+__(data = __)+
+  __(mapping=aes(y=__) )+
+  geom_text(aes(label=Number), position=position_dodge(width=0.9), vjust=-0.25),
+  theme_calc()+
+  scale_fill_colorblind()+
+  theme(legend.position = "none")+
+  ggtitle("Number of peaks per ChIP, monocytes, chr19")
+```
+
+```{r q_barplotpeakcount-solution}
+# plot the number of peaks per chip
+ggplot(data = monocytes_metadata)+
+  geom_bar(mapping=aes(y=chip))+
+  theme_bw()+
+  theme(legend.position = "none")+
+  ggtitle("Number of peaks per ChIP, monocytes, chr19")
+```
+
+*For which marks do you observe the most peaks? And for which the fewest number of peaks? Are these marks associated with gene activation or gene silencing? Did they, in the genome browser, show a sharp peaks or broad domains of enrichment?*  
+<br>
+The range of peak counts can tell you whether your experiment and peak calling performed as expected. If they show extremely high or low values, it is likely something is off (something you should have already noted in the Genome Browser). It can also function as an extra control step to check that all peaks are indeed imported in R (and no strange things happened to your files along the way).   
+<br>
+In this case, the number of peaks is correct and you can continue with the analysis. 
+<br>
+
+### Exercise 4:   
+> Visualize the differences in peak width by making a boxplot showing the peak sizes per chip.    
+
+> * Finish the code below to add the 'peak_size' variable, holding the peak widths, to `monocytes_metadata`. 
+
+```{r prepare-q4_addpeaksize, echo = F}
+monocytes_all <- unlist(monocytes_list)
+monocytes_all$chip <- names(monocytes_all)
+monocytes_metadata <- as.data.frame(mcols(monocytes_all))
+```
+
+```{r q4_addpeaksize, exercise = T}
+# add column 'peak_size' to monocytes_metadata with the width of the peaks from monocytes_all 
+monocytes_metadata
+
+```
+
+```{r q4_addpeaksize-hint-1}
+width(monocytes_all)
+```
+
+```{r q4_addpeaksize-solution}
+monocytes_metadata$peak_size <- width(monocytes_all)
+```
+
+```{r q4_addpeaksize-code-check, eval = F}
 grade_code()
 ```
 
-### Exercise 4b:   
+> * Now plot the peak size distribution as a boxplot.   
 
-> Now plot the peak size distribution of H3K4me3 peaks as a histogram using `ggplot()` and `geom_histogram()`  
-
-```{r prepare-q4plotpeaksizeh3k4me3}
-# extract metadata 
-metadata_h3k4me3 <- as.data.frame(mcols(monocytes_h3k4me3))
-# add column 'peak_size' with the width of H3K4me3 peaks
-metadata_h3k4me3$peak_size <- width(monocytes_h3k4me3)
+```{r prepare-q4_plotpeaksize}
+monocytes_all <- unlist(monocytes_list)
+monocytes_all$chip <- names(monocytes_all)
+monocytes_metadata <- as.data.frame(mcols(monocytes_all))
+monocytes_metadata$peak_size <- width(monocytes_all)
 ```
 
-```{r q4plotpeaksizeh3k4me3, exercise = T}
-# plot the H3K4me3 peak_size as a histogram:  
-..(data = metadata_h3k4me3)+
-  ..(mapping = ..(x = ..), fill = "gray", col = "black", bins = 100)+
+```{r plotpeaksize, exercise = T}
+# plot the peak_size per chip as boxplot
+__(data = __)+
+  __(mapping = __(x = __, y = __), fill = "gray", col = "black", bins = 100)+
   theme_bw()
+
 ```
 
-<div id="q4plotpeaksizeh3k4me3-hint">  
+```{r plotpeaksize-hint-1}
+ggplot(data = monocytes_metadata)
+```
 
-- use ggplot() and geom_histogram()   
-- Map peak_size to the x-axis.    
-- `mapping =` is always paired with `aes()`.    
+```{r plotpeaksize-hint-2}
+ggplot(data = monocytes_metadata)+
+  geom_boxplot()
+```
 
-</div>
+```{r plotpeaksize-hint-3}
+ggplot(data = monocytes_metadata)+
+  geom_boxplot(mapping = aes(x = chip, y = peak_size))
+```
 
-```{r q4b_plot_peaksize_h3k4me3-solution, eval = F}
-# plot the H3K4me3 peak_size as a histogram:  
-ggplot(data = metadata_h3k4me3)+
-  geom_histogram(mapping = aes(x = peak_size), fill = "gray", col = "black", bins = 100)+
+```{r plotpeaksize-solution, eval = F}
+ggplot(data = monocytes_metadata)+
+  geom_boxplot(mapping = aes(x = chip, y = peak_size), fill = "gray", col = "black")+
   theme_bw()
 ```
  
+> * This doesn't look very informative, lets log-transform the y-axis:  
 
-Alternatively, you could have plotted this distribution as a boxplot:  
-```{r }
-# plot the H3K4me3 peak_size as a boxplot:  
-ggplot(data = metadata_h3k4me3)+
-  geom_histogram(mapping = aes(x = peak_size), fill = "gray", col = "black", bins = 100)+
-  theme_bw()
+```{r plotpeaksizelog, exercise = T}
+# plot the peak_size per chip as boxplot, log-transform the y-axis
+__(data = __)+
+  __(mapping = __(x = __, y = __), fill = "gray", col = "black", bins = 100)+
+  theme_bw()+
+  scale_y_continuous(trans = "log10")
 ```
 
+```{r plotpeaksizelog-solution, eval = F}
+ggplot(data = monocytes_metadata)+
+  geom_boxplot(mapping = aes(x = chip, y = peak_size), fill = "gray", col = "black")+
+  theme_bw()+
+  scale_y_continuous(trans = "log10")
+```
 
-
-Let's compare this distribution with that of H3K4me1 peaks in monocytes.  
-
-
-
-Different data types have different peak shapes. TF ChIP-seq data generally shows sharp, "narrow" peaks while ChIP-seq peaks of epigenomic data can be **narrow** or **broad**, depending on the mark or factor. Some data even show a **mixture** of narrow and broad peaks (e.g.ChIP-seq of RNA polymerase II) - **mixed** data are not part of this tutorial. Differences in peak shapes are accompanied by differences in enrichment scores: sharp, narrow peaks show higher enrichment and higher scores than broad domains.  
+Different data types have different peak shapes. TF ChIP-seq data generally shows sharp, "narrow" peaks while ChIP-seq peaks of epigenomic data can be **narrow** or **broad**, depending on the mark or factor. Some data even show a **mixture** of narrow and broad peaks (e.g.ChIP-seq of RNA polymerase II) - **mixed** data are not part of this tutorial.  
+<br>
+Differences in peak shapes are accompanied by differences in enrichment scores: sharp, narrow peaks show higher enrichment and higher scores than broad domains.  
 <br>
 ![](images/wk2_2_sims_2014_peakshapes.png){width=70%}    
 *Adapted from [Ref](https://doi.org/10.1038/nrg3642) Sims et al., 2014 Nat Rev Genet.*   
 
 <br>
-The average peak sizes of H3K4me3 and H3K27me3 are close but their maximum widths shows that H3K4me3 ChIP-seq peaks are **narrow**, while H3K4me1 spans wider, **broad** domains.   
-<br>
-
-*Figure for the following question:*  
-![](images/wk2_2_monocytes_chips_peaksizes_allchromosomes.png)
 ```{r q_broad_vs_narrow}
 question("Use the boxplot above. H3K4me3 and H3K4me1 ChIP-seq peaks are resp. **narrow**, and the **broad** peaks. Which other ChIP-seq dataset has/have broad peak shapes?",
          answer("H3K27ac"),
@@ -591,7 +690,7 @@ question("Use the boxplot above. H3K4me3 and H3K4me1 ChIP-seq peaks are resp. **
          allow_retry = TRUE)
 ```
 <br>
-You could have gotten this information from the [BLUEPRINT ChIP-Seq Analysis Pipeline description](http://dcc.blueprint-epigenome.eu/#/md/chip_seq_grch38) - remember: FAIR principles!. Under the section **Peak Calling** you can read that peak calling was performed with MACS2 and that the -broad flag was added depending on the mark in question. 
+You could have gotten this information from the [BLUEPRINT ChIP-Seq Analysis Pipeline description](http://dcc.blueprint-epigenome.eu/#/md/chip_seq_grch38) (remember: FAIR principles!). Under the section **Peak Calling** you can read that peak calling was performed with MACS2 and that the -broad flag was added depending on the mark in question. 
 
 ><details><summary>Marks with narrow and with broad peaks:</summary>  
 >  
@@ -619,7 +718,8 @@ Function | Purpose | Example on GRanges
 `summarize()` | Summarise variables, often per group | `group_by(my_gr, strand) %>% summarize(n = n(), gc = max(GC))`   
 </details>  
 
-> **Exercise 4:**  
+### Exercise 5:  
+
 > Use `plyranges::filter` and the UCSC genome browser to find the gene(s) whose promoter(s) is/are covered by the peak with the highest H3K4me3 ChIP-seq score.  
 > Here is the trackhub with monocyte data from week 1: `http://mbdata.science.ru.nl/ctoenhake/edu/trackhub_monocytes/hub.txt`   
 
@@ -652,6 +752,7 @@ question("The promoters of which gene(s) are covered by the H3K4me3 ChIP-seq pea
 
 ***
 <br>
+
 
 ## 2.4 Overlap analysis   
 ### 2.4.1 Detect overlap with GenomicRanges        
@@ -723,10 +824,10 @@ load(rdata)
 
 ```{r q8_overlap, exercise = T, exercise.setup = "overlap_exercise7"}
 # Find overlap between monocytes_h3k4me3 peaks and promoters
-overlap <- ..(query = .., subject = ..)
+overlap <- ___(query = ___, subject = ___)
 
 # print the overlap output
-show(..)
+show(___)
 ```
 
 ```{r q8_overlap-solution, eval = F}
@@ -773,7 +874,7 @@ overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters)
 
 ```{r q11a_overlap, exercise = T, exercise.setup = "q10_overlap"}
 # What is the number of unique h3k4me3 peaks reported in 'overlap'?
-length(unique(..(..))) 
+length(unique(___(___))) 
 ```
 
 ```{r q11a_overlap-solution, eval = F}
@@ -791,7 +892,7 @@ grade_code()
 
 ```{r q11b_overlap, exercise = T, exercise.setup = "q10_overlap"}
 # What is the proportion of h3k4me3 peaks that overlap?
-length(unique(..(..)))/length(..)
+length(unique(___(___)))/length(___)
 ```
 
 ```{r q11b_overlap-solution, eval = F}
@@ -808,7 +909,7 @@ grade_code()
 
 ```{r q11c_overlap, exercise = T, exercise.setup = "q10_overlap"}
 # What is the proportion of promoters that overlap?
-length(unique(..(..)))/length(..)
+length(unique(___(___)))/length(___)
 ```
 
 ```{r q11c_overlap-solution, eval = F}
@@ -877,7 +978,7 @@ Use a binomial test to test for enrichment of h3k4me3 at promoters.
 <br>
 ```{r q12_binomtest, exercise = T, exercise.setup = "q10_overlap", exercise.setup = "fraction_promoters"}
 # binomial test for enrichment of h3k4me3 peaks in promoters:  
-binom.test(length(unique(..(overlap))), length(..), prom_fraction_chr19, alternative = "greater" )
+binom.test(length(unique(___(overlap))), length(___), prom_fraction_chr19, alternative = "greater" )
 
 ```
 
@@ -922,7 +1023,7 @@ prom_fraction_chr19 <- sum(width(GenomicRanges::reduce(promoters)))/seqlengths(p
 
 ```{r q13a_h3k27ac, exercise = TRUE, exercise.setup = "overlap_exercise13" }
 # find overlap between monocytes_h3k27ac and promoters
-overlap2 <- ...
+overlap2 <- ___
 ```
 
 ```{r q13a_h3k27ac-solution, eval = F}
@@ -960,7 +1061,7 @@ question("Is H3K27ac enriched at promoters?",
 To understand the function of a ChIPped mark or factor we often want to know to which genomic features it binds.
 <br>
 
-```{r q13a_anno-setup}
+```{r prepare-q13a_anno}
 # we need the `TxDb` object and limits its active chromosomes to chromosome 19
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
