@@ -90,3 +90,119 @@ $(function() {
 
 })();
 ```
+
+In this part of the analysis, we show how to generate plots displaying the distribution of ChIP-seq signal around certain genomic positions, here a set of promoter regions. These include a heatmap representation and an average profile for H3K27ac signal at promoters overlapping a peak of H3K27ac identified by MACS. These are one of the most frequently performed analysis steps in ChIP-seq experiments.
+
+In the previous section, we have identified promoters overlaping a H3K27ac peak (the pos.TSS object). In order to get a comprehensive view of the distribution of H3K27ac around the corresponding TSS, we extend the analysed region to ±1000 bp around the TSS. We divide each of these 2000 bp regions into 20 bins of 100 bp length each and order the bins with increasing position for genes on the ’+’ strand and decreasing for genes on the ’-’ strand.
+
+Next, we tile the promoter regions with consecutive 100bp tiles. For each region, we order the tiles according to the gene orientation. We create 20 tiles per promoter region.
+
+## 2.5 Annotation of ChIP-seq peaks
+### 2.5.1 Distance to TSS   
+In this part of the analysis you will assign peaks to their closest TSS, assuming that it likely is involved in regulating the expression regulates that gene.  
+<br>
+The `GenomicRanges` package has the function `distanceToNearest(x, subject)` to help you identify the distance between intervals in `x` and the nearest neighbor in `subject`. In this case, the intervals are the peaks and the subject are the TSSs. The function outputs a `Hits` objects with distances.  
+<br>
+
+>**Exercise 15**  
+Use `distanceToNearest()` to get the distance between h3k4me3 peaks and the nearest TSS.  
+
+```{r q15_distance_tss, exercise = T}
+rdata = system.file("extdata", "week2", "prepared_rds", "txdb_annotation_chr19_genes_tx_pr_tss_granges.RData", package = "learnr.proto")
+load(rdata)
+# this chunk does not exist: exercise.setup = "overlap_exercise10"}
+
+# calculate the distances from peaks to tss
+h3k4me3_to_tss <- ..(.., ..)
+```
+
+```{r q15_distance_tss-solution,  eval = F}
+rdata = system.file("extdata", "week2", "prepared_rds", "txdb_annotation_chr19_genes_tx_pr_tss_granges.RData", package = "learnr.proto")
+load(rdata)
+# calculate the distances from peaks to tss
+h3k4me3_to_tss <- distanceToNearest(monocytes_h3k4me3, tss)
+```
+
+```{r q15_distance_tss-code-check, eval = F}
+grade_code()
+```
+<br>
+Let's look at the resulting `Hits` object.  
+<br>
+```{r look at hits, echo = T}
+rdata = system.file("extdata", "week2", "prepared_rds", "txdb_annotation_chr19_genes_tx_pr_tss_granges.RData", package = "learnr.proto")
+load(rdata)
+tss <- resize(genes, width = 1, fix = "start")
+# calculate the distances from peaks to tss
+h3k4me3_to_tss <- distanceToNearest(monocytes_h3k4me3, tss)
+
+# show object h3k4me3_to_tss
+show(h3k4me3_to_tss)
+
+# summary of distances
+summary(mcols(h3k4me3_to_tss)[,1])
+
+# plot the distribution of distances
+boxplot(mcols(h3k4me3_to_tss)[,1])
+```
+<br>  
+
+### 2.5.2 Find associating gene  
+You can use this `Hits` object to subset peaks to those that are less than 10 Kb away from the TSS. You can than use the function `subjectHits()` to get the genes associated to each peak.  
+<br>
+
+>**Exercise 16**  
+Subset the h3k4me3_to_tss for distances =< 10kb and select the associated genes from `genes` object.  
+
+```{r prepare_closegene_q16}
+rdata = system.file("extdata", "week2", "prepared_rds", "txdb_annotation_chr19_genes_tx_pr_tss_granges.RData", package = "learnr.proto")
+load(rdata)
+tss <- resize(genes, width = 1, fix = "start")
+# load("www/prepared_rds/txdb_annotation_chr19_genes_tx_pr_tss_granges.RData")  
+h3k4me3_to_tss <- distanceToNearest(monocytes_h3k4me3, tss)
+```
+
+
+```{r q16a_closegenes, eval = F, exercise = T, exercise.setup = "prepare_closegene_q16" }
+# save the distances in a vector
+distances <- mcols(h3k4me3_to_tss)[,1]
+
+# subset h3k4me3_to_tss by distance
+h3k4me3_to_tss_close <- ..[..,..]
+```
+
+```{r q16a_closegenes-solution, eval = F}
+# save the distances in a vector
+distances <- mcols(h3k4me3_to_tss)[,1]
+
+# subset h3k4me3_to_tss for distances <= 10000
+h3k4me3_to_tss_close <- h3k4me3_to_tss[distances <= 10000,]
+```
+
+```{r q16a_closegenes-code-check, eval = F}
+grade_code()
+```
+
+
+```{r 16b_closegenes, exercise = T, exercise.setup = "q16a_closegenes" }
+# obtain the genes
+monocytes_h3k4me3_genes <- unique(genes[..(..)])
+
+# look at the output
+show(monocytes_h3k4me3_genes)
+```
+ 
+```{r 16b_closegenes-solution, eval = F}
+# obtain the genes
+monocytes_h3k4me3_genes <- unique(genes[subjectHits(h3k4me3_to_tss_close)])
+
+# look at the output
+show(monocytes_h3k4me3_genes)
+```
+
+```{r q16b_closegenes-code-check, eval = F}
+grade_code()
+```
+
+<br>
+Besides the distance, we are also (very!) interested in the distribution of the ChIP-seq signal around the TSS. You will look at that next week.  
