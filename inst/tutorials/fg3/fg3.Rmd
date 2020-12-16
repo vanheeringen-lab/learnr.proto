@@ -91,14 +91,19 @@ $(function() {
 })();
 ```
 
+1. 
+
+
+
+
 In this part of the analysis, we show how to generate plots displaying the distribution of ChIP-seq signal around certain genomic positions, here a set of promoter regions. These include a heatmap representation and an average profile for H3K27ac signal at promoters overlapping a peak of H3K27ac identified by MACS. These are one of the most frequently performed analysis steps in ChIP-seq experiments.
 
-In the previous section, we have identified promoters overlaping a H3K27ac peak (the pos.TSS object). In order to get a comprehensive view of the distribution of H3K27ac around the corresponding TSS, we extend the analysed region to ±1000 bp around the TSS. We divide each of these 2000 bp regions into 20 bins of 100 bp length each and order the bins with increasing position for genes on the ’+’ strand and decreasing for genes on the ’-’ strand.
+In the previous section, we have identified promoters overlapping a H3K27ac peak (the pos.TSS object). In order to get a comprehensive view of the distribution of H3K27ac around the corresponding TSS, we extend the analysed region to ±1000 bp around the TSS. We divide each of these 2000 bp regions into 20 bins of 100 bp length each and order the bins with increasing position for genes on the ’+’ strand and decreasing for genes on the ’-’ strand.
 
 Next, we tile the promoter regions with consecutive 100bp tiles. For each region, we order the tiles according to the gene orientation. We create 20 tiles per promoter region.
 
 ## 2.5 Annotation of ChIP-seq peaks
-### 2.5.1 Distance to TSS   
+### 2.5.1 Distance to TSS --> plot in log scale    
 In this part of the analysis you will assign peaks to their closest TSS, assuming that it likely is involved in regulating the expression regulates that gene.  
 <br>
 The `GenomicRanges` package has the function `distanceToNearest(x, subject)` to help you identify the distance between intervals in `x` and the nearest neighbor in `subject`. In this case, the intervals are the peaks and the subject are the TSSs. The function outputs a `Hits` objects with distances.  
@@ -206,3 +211,15 @@ grade_code()
 
 <br>
 Besides the distance, we are also (very!) interested in the distribution of the ChIP-seq signal around the TSS. You will look at that next week.  
+
+### large daomain H3K27me3  
+- overlap met H3K4me1
+- welke genen zijn bivalent  
+
+## structure
+1. gemiddelde signaal rond TSS
+2. groepering naar genexpressielvel per qunatile voor H3K4me3
+3. Hoe zit dat bij H3K27me3 (niet bij heel hoge expressie, breed signaal, je pakt maar een stukje)
+4. Hoe zit dit er uit als we elk datapunt bekijken in dotplot/scatterplot --> het is een trend en geen harde waarheid komt (deels) door invloed van andere marks = combinatorial markings. 
+5. Heatmap van histone marks at TSS random. Dan geordend op genexpressie niveau.  
+
