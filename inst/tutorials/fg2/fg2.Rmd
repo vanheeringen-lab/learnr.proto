@@ -29,10 +29,9 @@ library(plyranges)
 library(rtracklayer)
 library(VennDiagram)
 library(GenomicFeatures)
-# library(TxDb.Hsapiens.UCSC.hg38.knownGene)
-# library(ChIPpeakAnno)
 # library(UpSetR)
 library(genomation)
+library(ChIPpeakAnno)
 library(ggthemes)
 
 # load the txdb package which holds transcript-based gene models of hg38 genome  
@@ -54,6 +53,7 @@ monocytes_all <- unlist(monocytes_list)
 monocytes_all$chip <- names(monocytes_all)
 
 chr19_windows_1bp <- tileGenome(seqinfo(txdb), tilewidth = 10, cut.last.tile.in.chrom =T)
+promoters_chr19 <- unique(promoters(txdb, upstream=2000, downstream=0, filter = list(tx_chrom = "chr19"))) 
 
 ### not used anymore 2020-12-14 ###
 # rdata <- system.file("extdata", "week2", "prepared_rds", "txdb_annotation_chr19_genes_tx_pr_tss_granges.RData", package = "learnr.proto")
@@ -65,8 +65,8 @@ chr19_windows_1bp <- tileGenome(seqinfo(txdb), tilewidth = 10, cut.last.tile.in.
 # promoters <- resize(tss, width = 1000, fix = "end")
 # promoters <- resize(promoters, width = 1200, fix = "start")
 
-#windows_1bp <- tileGenome(seqinfo(txdb), tilewidth = 10, cut.last.tile.in.chrom =T)
-#saveRDS(annotation_chr19,"~/learnr.proto/renv/library/R-3.6/x86_64-pc-linux-gnu/learnr.proto/extdata/week2/prepared_rds/genomation_chr19_background_annotation.rds")
+# windows_1bp <- tileGenome(seqinfo(txdb), tilewidth = 10, cut.last.tile.in.chrom =T)
+# saveRDS(annotation_chr19,"~/learnr.proto/renv/library/R-3.6/x86_64-pc-linux-gnu/learnr.proto/extdata/week2/prepared_rds/genomation_chr19_background_annotation.rds")
 
 #  genomation_chr19 <- system.file("extdata", "week2", "prepared_rds","genomation_chr19_background_annotation.rds", package = "learnr.proto")
 
@@ -162,7 +162,7 @@ These observations showed examples of marks associated with a particular functio
 ### Exercises
 In this tutorial you will have multiple-choice and checkbox questions like in **fg1** but also complete-the-code exercises. The latter can be evaluated on the computed outcome (e.g a computed p-value), in other cases, the code itself is checked. 
 <br>
-For short lines of code, you have to decide which function or object to use and how to write this in code. For some longer lines of codes, we left blanks as "___" that indicate where in the code you should add the function or object name.  
+For short lines of code, you have to decide which function or object to use and how to write this in code. For some longer lines of codes, we left blanks as "___" that indicate where in the code you should add a function or object name.  
 <br>
 
 - Hit `Start Over` to remove any adjustments you made and start again.   
@@ -190,7 +190,7 @@ quiz(caption = "Example questions:",
 
 **Example coding exercise:**  
 
-> * Print the head of file `monocytes_h3k4me3`.   
+> **Example exercise**: Print the head of object `monocytes_h3k4me3`.   
 
 ```{r examplecode, exercise = T}
 # print the head of `monocytes_h3k4me3`
@@ -201,32 +201,25 @@ quiz(caption = "Example questions:",
 **Hint:** You may want to use the `head(...)` function.  
 </div>
 
-```{r examplecode-solution}
+```{r examplecode-solution, eval = F}
 head(monocytes_h3k4me3)
 ```
 
-```{r examplecode-check-code}
-grade_result(
-  pass_if(
-    ~identical(.result, head(monocytes_h3k4me3))
-    )
- )
+```{r examplecode-check-code, eval = F}
+grade_code()
 ```
 
 <br>  
-
-***  
-<br> 
 
 ## 2.2 ChIP-seq peaks in R  {data-progressive=TRUE}  
 ### 2.2.1 Data formats      
 In genomics you often work with **interval** data. Think of peaks, genes, exons, ... any genomic region reported with the **genomic coordinates: chr, start, and end**. As we discussed in week 1, these often come in a tabular format with the basic information about the location and some other information.  
 <br>
-Common file formats include BED format for peak files, GFF for gene annotations, and BigWig for read depth. In practice, peak files come in two flavours, both cohering to the BED format but with small differences in columns 6-7. These are called **narrowPeak** and **broadPeak** files. This is because different data types have different peak shapes and peak-calling takes that into account. If you have narrowPeak files, this means that during peak calling, settings were used that fit ChIP-seq datasets with sharp, narrow enrichment signals. For broadPeak files, peak calling settings were used to detect broad domains of (overall lower) enrichment. We will come back to this difference shortly.      
+Common file formats include BED format for peak files and GFF for gene annotations. In practice, peak files come in two flavors, both cohering to the BED format but with small differences in columns 6-7. These are called **narrowPeak** and **broadPeak** files. This is because different data types have different peak shapes and peak-calling takes that into account. If you have narrowPeak files, this means that during peak calling, settings were used that fit ChIP-seq datasets with sharp, narrow enrichment signals. For broadPeak files, peak calling settings were used to detect broad domains of (overall lower) enrichment. We will come back to this difference shortly.      
  
 
 >#### **Background info**: File formats   
-<details><summary>What do BED, GFF, BigWig files hold and look like?</summary>   
+<details><summary>What do BED and GFF files hold and look like?</summary>   
 **Browser Extensible Data - BED format**:  
 >
 - Used for peaks, motif locations or other custom intervals.  
@@ -256,13 +249,7 @@ Common file formats include BED format for peak files, GFF for gene annotations,
 ![](images/wk1_3_file_format_gff.png){width=80%}      
 > Further reading on the gff file formats: [UCSC Genome Browser](http://genome.ucsc.edu/FAQ/FAQformat.html#format3), or [ENSEMBL](https://m.ensembl.org/info/website/upload/gff3.html).  
 > <br>
-> **Wiggle or bigWig files**:  
-- Read depth is often stored in BigWig files.  
-- BigWig files are binary versions of (mucht larger) wiggle files.  
-- BigWig files are faster to upload and use but can't be viewed by us.  
-- Wiggle files can be viewed but are slow to upload.   
-- Wiggle files report a genomic region with the data value for that region. For this practical it is not neccessary to know the details of how these files are generatd. But if you are curious, read the UCSC Genome browser documentation on [wiggle](https://genome.ucsc.edu/goldenPath/help/wiggle.html) and [bigWig](https://genome.ucsc.edu/goldenPath/help/bigWig.html) file formats.  
-</details>
+
 
 ### 2.2.2 Peaks as data.frame     
 <br>
@@ -361,7 +348,7 @@ question("Which function imports the H3K4me1 dataset into a GRanges object?",
 <br>
 Let's take a quick look at `monocytes_h3k4me3`.     
 
-### Exercise 1:  
+### Exercise 1  
 
 > **Exercise 1a**: Print the head of `monocytes_h3k4me3`.  
 
@@ -376,11 +363,11 @@ Let's take a quick look at `monocytes_h3k4me3`.
 **Hint:** Use the `head(...)` function.  
 </div>
 
-```{r q1_head_h3k4me3-solution}
+```{r q1_head_h3k4me3-solution, eval = F}
 head(monocytes_h3k4me3)
 ```
 
-```{r q1_head_h3k4me3-check-code}
+```{r q1_head_h3k4me3-check}
 grade_result(
  pass_if(~identical(.result, head(monocytes_h3k4me3)))
  )
@@ -402,7 +389,8 @@ quiz(caption = "",
 )
 ```
 
-Briefly summarizing, you have the following information in your object `monocytes_h3k4me3`:  
+### Briefly summarizing  
+You have the following information in your object `monocytes_h3k4me3`:  
 
 Column | Section in GRanges object | Variable | Description   
 -- | --- | --- | ------  
@@ -419,9 +407,8 @@ Column | Section in GRanges object | Variable | Description
 ## 2.3 Exploratory data analysis   
 ### 2.3.1 Peak counts
 A common first step in genomics data analysis is to make look at some basic characteristics of our data by making exploratory summaries and plots.  
-<br>
 
-### Exercise 2:    
+### Exercise 2a    
 
 > **Exercise 2a**: Determine the number of H3K4me3 and H3K4me1 peaks in monocytes. 
 > 
@@ -463,6 +450,8 @@ grade_result(
  )
 ```
 
+### Exercise 2b  
+
 > **Exercise 2b**: And what is the distribution of peak sizes for these marks? 
 
 ```{r q2b_widthh3k4me3, exercise = T}
@@ -474,12 +463,12 @@ summary(___(monocytes_h3k4me3))
 **Hint:** You can retrieve peak widths with the `width()` function.  
 </div>
 
-```{r q2b_widthh3k4me3-solution}
+```{r q2b_widthh3k4me3-solution, eval = F}
 summary(width(monocytes_h3k4me3))
 ```
 
-```{r q2b_widthh3k4me3-code-check}
-grade_code(
+```{r q2b_widthh3k4me3-check, eval = F}
+grade_result(
   pass_if(~identical(.result, summary(width(monocytes_h3k4me3))))
 )
 ```
@@ -489,11 +478,11 @@ grade_code(
 monocytes_h3k4me1
 ```
 
-```{r q2b_widthh3k4me1-solution}
+```{r q2b_widthh3k4me1-solution, eval = F}
 summary(width(monocytes_h3k4me1))
 ```
 
-```{r q2b_widthh3k4me1-code-check}
+```{r q2b_widthh3k4me1-check, eval = F}
 grade_code(
   pass_if(~identical(.result, summary(width(monocytes_h3k4me1))))
 )
@@ -521,7 +510,7 @@ quiz(caption = "",
              allow_retry = TRUE))
 ```
 <br>
-Notice the larger median and maximum peak size for H3K4me1 peaks compared to H3K4me3 peaks.  
+Notice the larger median and maximum peak size for H3K4me1 peaks compared to H3K4me3 peaks. This is related to these datasets having relative "broad domain" and "narrow peaks" of enrichment, respectively.  
 
 ### 2.3.2 Plotting summaries with ggplot2  
 You will use the ggplot2 package to plot the number of peaks for each dataset, to compare the average peak sizes and to plot the total number or fraction of bp's covered by these peaks on chromosome 19.  
@@ -534,23 +523,28 @@ You will use the ggplot2 package to plot the number of peaks for each dataset, t
 > <br>
 **Scales** can be customized with `scale_[]_[]` functions. These can be used to for example, change a color palette, set limits to the values included in the mapping, or log transform an axis.  
 <br>
+Modifications of the plot appearance (including background colors, thick labels, thick lines, axis labels, titles) can be achieved by combinations of several functions.  
+<br>
 A template code for a ggplot2 plot:  
 `ggplot(data = <DATA>)+`  
   `geom_<FUNCTION>(mapping = aes(<MAPPING>))+`   
-  `<SCALE_FUNCTION>`  
+  `<SCALE_FUNCTION>+`
+  `<THEME_FUNCTION>+`
+  `<GGTITLE>`  
 <br>
+
 > **References**:  
 > *[R for Datascience, chapter 3 Data visualization](https://r4ds.had.co.nz/data-visualisation.html)*  
 > *[ggplot2 cheatsheet](https://github.com/rstudio/cheatsheets/raw/master/data-visualization-2.1.pdf)*  
  
 
-### Exercise 3:  
+### Exercise 3  
 
 > Make a barplot showing the number of peaks per ChIP experiment.   
 >  
 > * All chip peaks are concatenated in the GRanges object `monocytes_all`.   
-**Exercise 3a**: Print a summary of this object using `show()` and identify the variable (column in metadata) that you can use for counting the number of peaks per chip (this will be the statistic used in the barplot).   
-* Use the "Run Code" button to ensure that the output is printed.  
+
+> **Exercise 3a**: Print a summary of `monocytes_all` using `show()` and identify the variable (column in metadata) that you can use for counting the number of peaks per chip (this will be the statistic used in the barplot).   
 
 ```{r monocytesall, exercise = T, exercise.eval = T}
 # print summary of object 'monocytes_all'
@@ -562,11 +556,11 @@ A template code for a ggplot2 plot:
 **Hint:** Use the `show()` function   
 </div>
 
-```{r monocytesall-solution}
+```{r monocytesall-solution, eval = F}
 show(monocytes_all)
 ```
 
-```{r monocytesall-code-check}
+```{r monocytesall-check, eval = F}
 grade_code(
   pass_if(~identical(.result, show(monocytes_all))))
 ```
@@ -582,11 +576,13 @@ question("Which variable will you use for counting the number of peaks per ChIP-
 
 As GRanges objects are not compatible with ggplot2, you have to extract the metadata and write into a a data.frame  
 
+### Exercise 3b  
+
 > **Exercise 3b**: Complete the code below to extract the metadata from the object `monocytes_all`.  
 > 
 > * The function `as.data.frame()` is used to convert the resulting 'DFrame' object into a 'data.frame'.
 
-```{r q_extractmetadata, message=TRUE, exercise=T, exercise.eval=F, warning=F}
+```{r q_extractmetadata, exercise=T}
 # extract metadata 
 monocytes_metadata <- __(__)
 
@@ -594,11 +590,11 @@ monocytes_metadata <- __(__)
 monocytes_metadata <- as.data.frame(monocytes_metadata)
 ```
 
-```{r q_extractmetadata-hint-1}
+```{r q_extractmetadata-hint-1, eval = F}
 monocytes_metadata <- mcols(monocytes_all)
 ```
 
-```{r q_extractmetadata-solution}
+```{r q_extractmetadata-solution, eval = F}
 # extract metadata 
 monocytes_metadata <- mcols(monocytes_all)
 
@@ -610,36 +606,38 @@ monocytes_metadata <- as.data.frame(monocytes_metadata)
 grade_code()
 ```
 
+### Exercise 3c  
+
 > **Exercise 3c**: Complete the code below to plot the number of peaks per ChIP in a bar chart using ggplot2 plotting.  
 
 ```{r prepare-barplotpeakcount} 
 monocytes_metadata <- as.data.frame(mcols(monocytes_all))
 ```
 
-```{r barplotpeakcount, exercise = T, fig.width=4, exercise.eval =F}
+```{r barplotpeakcount, exercise = T}
 # plot the number of peaks per chip
 __(data = __)+
   __(mapping=aes(y=__) )+
-  theme_calc()+
   scale_fill_colorblind()+
+  theme_calc()+
   theme(legend.position = "none")+
   ggtitle("Number of peaks per ChIP, monocytes, chr19")
 ```
 
-```{r barplotpeakcount-hint-1}
+```{r barplotpeakcount-hint-1, eval = F}
 ggplot(data = monocytes_metadata)
 ```
 
-```{r barplotpeakcount-hint-2}
+```{r barplotpeakcount-hint-2, eval = F}
 geom_bar()
 ```
 
-```{r barplotpeakcount-hint-3}
+```{r barplotpeakcount-hint-3, eval = F}
 ggplot(data = monocytes_metadata)+
   geom_bar(mapping=aes(y=chip))
 ```
 
-```{r barplotpeakcount-solution}
+```{r barplotpeakcount-solution, eval = F}
 # plot the number of peaks per chip
 ggplot(data = monocytes_metadata)+
   geom_bar(mapping=aes(y=chip))+
@@ -660,7 +658,7 @@ The range of peak counts can tell you whether your experiment and peak calling p
 In this case, the number of peaks is correct and you can continue with the analysis. 
 <br>
 
-### Exercise 4:   
+### Exercise 4   
 
 > Visualize the differences in peak size between the different marks in a boxplot.  
 >  
@@ -680,22 +678,22 @@ monocytes_metadata <- as.data.frame(mcols(monocytes_all))
 **Hint:** Use `monocytes_metadata$peak_size <- width(monocytes_all)`     
 </div>
 
-```{r addpeaksize-solution}
+```{r addpeaksize-solution, eval = F}
 monocytes_metadata$peak_size <- width(monocytes_all)
 ```
 
-```{r addpeaksize-code-check}
+```{r addpeaksize-code-check, eval = F}
 grade_code()
 ```
 
-> **Exercise 4b**: Now plot the peak size distribution as a boxplot.   
+> **Exercise 4b**: Now plot the peak size distribution as a boxplot. Make sure to hit "Run Code" to show the plot in the console.     
 
 ```{r prepare-plotpeaksize}
 monocytes_metadata <- as.data.frame(mcols(monocytes_all))
 monocytes_metadata$peak_size <- width(monocytes_all)
 ```
 
-```{r plotpeaksize, exercise = T, exercise.eval =F}
+```{r plotpeaksize, exercise = T}
 # plot the peak_size per chip as boxplot
 __(data = __)+
   __(mapping = __(x = __, y = __), fill = "gray", col = "black", bins = 100)+
@@ -715,25 +713,25 @@ __(data = __)+
 **Hint:** and y as `geom_boxplot(mapping = aes(x = chip, y = peak_size))`   
 </div>
 
-```{r plotpeaksize-solution}
+```{r plotpeaksize-solution, eval = F}
 ggplot(data = monocytes_metadata)+
   geom_boxplot(mapping = aes(x = chip, y = peak_size), fill = "gray", col = "black")+
   theme_bw()
 ```
 
-```{r plotpeaksize-code-check}
+```{r plotpeaksize-code-check, eval = F}
 grade_code()
 ```
 
 
-> **Exercise 4c**: This doesn't look very informative, let's log10-transform the y-axis:  
+> **Exercise 4c**: This doesn't look very informative, let's log10-transform the y-axis (again, hit "Run Code" to view the plot):  
 
 ```{r prepare-plotpeaksizelog}
 monocytes_metadata <- as.data.frame(mcols(monocytes_all))
 monocytes_metadata$peak_size <- width(monocytes_all)
 ```
 
-```{r plotpeaksizelog, exercise = T, exercise.eval =F}
+```{r plotpeaksizelog, exercise = T}
 # plot the peak_size per chip as boxplot, log10-transform the y-axis
 __(data = __)+
   __(mapping = __(x = __, y = __), fill = "gray", col = "black")+
@@ -745,14 +743,14 @@ __(data = __)+
 **Hint:** Specify "log10" for the `trans = ` parameter
 </div>
 
-```{r plotpeaksizelog-solution}
+```{r plotpeaksizelog-solution, eval = F}
 ggplot(data = monocytes_metadata)+
   geom_boxplot(mapping = aes(x = chip, y = peak_size), fill = "gray", col = "black")+
   theme_bw()+
   scale_y_continuous(trans = "log10")
 ```
 
-```{r plotpeaksizelog-code-check}
+```{r plotpeaksizelog-code-check, eval = F}
 grade_code()
 ```
 
@@ -806,7 +804,7 @@ Function | Purpose | Example on GRanges
 `summarize()` | Summarise variables, often per group | `group_by(my_gr, strand) %>% summarize(n = n(), gc = max(GC))`   
 </details>  
 
-### Exercise 5a:  
+### Exercise 5a  
 
 > To plot the fraction of bps covered by each chip-seq peak dataset first calculate this fraction.  
 
@@ -852,17 +850,18 @@ monocytes_metadata %>% group_by(chip) %>%
 grade_code()
 ```
 
-### Exercise 5b:  
+### Exercise 5b  
 
 > **Exercise 5b**: To plot the `fraction_chr19` as bar chart, pipe the output of the code below into ggplot.  
-> We instruct the bar function to plot the actual values with: `stat = "identity"`  
+> We instruct the bar function to plot the actual values with: `stat = "identity"`.  
+> Hit "Run Code" to plot the plot in the console.  
 
 ```{r prepare-plotsummarizewidth, message = F}
 monocytes_metadata <- as.data.frame(mcols(monocytes_all))
 monocytes_metadata$peak_size <- width(monocytes_all)
 ```
 
-```{r plotsummarizewidth, exercise = T, message = F, exercise.eval = F}
+```{r plotsummarizewidth, exercise = T}
 # plot the fraction covered in a bar chart
 monocytes_metadata %>%  group_by(chip) %>% 
   summarise(total_bps = sum(peak_size),  
@@ -873,7 +872,7 @@ monocytes_metadata %>%  group_by(chip) %>%
   theme(legend.position = "none")
 ```
 
-```{r plotsummarizewidth-hint-1, echo = F, include = F}
+```{r plotsummarizewidth-hint-1, eval = F}
 monocytes_metadata %>%  group_by(chip) %>% 
   summarise(total_bps = sum(peak_size),  
             fraction_chr19 = sum(peak_size) /58617616) %>% 
@@ -881,7 +880,7 @@ ggplot(.)+
   geom_bar(mapping = aes(x = chip ))
 ```
 
-```{r plotsummarizewidth-hint-2, include = F}
+```{r plotsummarizewidth-hint-2, eval = F}
 monocytes_metadata %>%  group_by(chip) %>% 
   summarise(total_bps = sum(peak_size),  
             fraction_chr19 = sum(peak_size) /58617616) %>% 
@@ -889,7 +888,7 @@ ggplot(.)+
   geom_bar(mapping = aes(x = chip ))
 ```
 
-```{r plotsummarizewidth-solution}
+```{r plotsummarizewidth-solution, eval = F}
 monocytes_metadata %>%  group_by(chip) %>% 
   summarise(total_bps = sum(peak_size),  
             fraction_chr19 = sum(peak_size) /58617616) %>% 
@@ -970,7 +969,7 @@ promoters_chr19 <- unique(promoters(txdb, upstream=2000, downstream=0, filter = 
 length(promoters_chr19)
 ```
 
-```{r q6a_proms-check, eval = F}
+```{r q6a_proms-check}
 grade_result(
  pass_if(~identical(.result, length(promoters_chr19)))
  )
@@ -997,7 +996,7 @@ grade_result(
 **Hint:** `unique(width(promoters_chr19))`   
 </div>
 
-```{r q6b_proms-check, eval = F}
+```{r q6b_proms-check}
 grade_result(
  pass_if(~identical(.result, 2000))
  )
@@ -1030,7 +1029,7 @@ overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters_chr19)
 show(overlap)
 ```
 
-```{r q6c_overlap-code-check, eval = F}
+```{r q6c_overlap-code-check}
 grade_code()
 ```
 <br>
@@ -1102,7 +1101,7 @@ question_text(
 
 ```
 
-```{r q6d_overlap_enterfraction-solution}
+```{r q6d_overlap_enterfraction-solution, eval = F}
 round(0.5760879,3)
 ```
 
@@ -1194,14 +1193,14 @@ promoters_metadata <- as.data.frame(mcols(promoters_chr19_reduced))
 
 > **Exercise 7a**: Finish the code below to define the "promoter_size" variable and calculate the fraction of bps covered by `promoters_chr19_reduced` in chromosome 19 (chr19 =58617616 bp).  
 
-```{r prepare_exercise7 }
+```{r q7a_promfraction-setup}
 promoters_chr19_reduced <- reduce(promoters_chr19)
 # convert to a data.frame
 promoters_metadata <- as.data.frame(mcols(promoters_chr19_reduced))
 ```
 
-```{r q7a_promfraction, exercise = T, message = F, exercise.setup = "prepare_exercise7"}
-# add variable 'promoter_size' variable  
+```{r q7a_promfraction, exercise = T, message = F}
+# define the variable 'promoter_size'  
 promoters_metadata$promoter_size <- ___(promoters_chr19_reduced)
 
 # calculate the  fraction of bps covered 'promoters_chr19_reduced`
@@ -1214,8 +1213,8 @@ promoters_metadata %>%
 **Hint:** Look back at exercise 5a.  
 </div>
 
-```{r q7a_promfraction-solution}
-# add variable 'promoter_size' variable  
+```{r q7a_promfraction-solution, eval = F}
+# define the variable 'promoter_size'  
 promoters_metadata$promoter_size <- width(promoters_chr19_reduced)
 
 # calculate the  fraction of bps covered 'promoters_chr19_reduced`
@@ -1262,7 +1261,7 @@ overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters_chr19)
 ```
 
 <br>
-```{r q7b_binomtest-solution}
+```{r q7b_binomtest, exercise = T}
 # Use the indexes from the overlap object to identify promoters with H3K4me3 peak  
 promoters_with_h3k4me3 <- promoters_chr19[ unique(___(overlap)) ] 
 
@@ -1285,7 +1284,7 @@ binomtest_result <- binom.test(x = x_test_prom_with_h3k4me3,p = p_test_prom_with
 binomtest_result
 ```
 
-```{r q7b_binomtest-solution}
+```{r q7b_binomtest-solution, eval = F}
 # Use the indexes from the overlap object to identify promoters with H3K4me3 peak  
 promoters_with_h3k4me3 <- promoters_chr19[ unique(subjectHits(overlap)) ] 
 
@@ -1387,23 +1386,22 @@ data.frame(h3k4me3_features$percentage) %>%
 - add `coord_flip()` which makes the labels readable  
 </div>
 
-```{r q8b_anno_h3k4me3_plot-solution}
+```{r q8b_anno_h3k4me3_plot-solution, eval = F}
 data.frame(h3k4me3_features$percentage) %>% 
   ggplot(.)+
   geom_bar(mapping = aes(x = subjectHits, y = Freq), stat = "identity")+
-  coord_flip()#+
-  # labs(title = "Distribution H3K4me3 across chr19")+
+  coord_flip()+
+  labs(title = "Distribution H3K4me3 across chr19")
   # theme_bw()+
-  # theme(legend.position = "none") 
 ```
 
 
-```{r q_anno_h3k4me3_prep}
+```{r q_anno_h3k4me3}
 question("Based on this plot, in which of these regions is H3K4me3 enriched?",
          answer("None."), 
          answer("All."),
          answer("Promoters."),
-         answer("You can't say."), correct = T, message = "Indeed, to say something about enrichment, you need to compare this distribution to the background distribution.",
+         answer("You can't say.", correct = T, message = "Indeed, to say something about enrichment, you need to compare this distribution to the background distribution."),
          allow_retry = T)
 ```
 
@@ -1426,11 +1424,11 @@ as.data.frame(annotation_bckgrn) %>%
   ylim(0,60)+
   labs(title = "Distribution across chr19")+
   theme_bw()+
-  coord_flip()+ theme(legend.position = "none") 
+  coord_flip()
 ```
 
 
-```{r q_anno_h3k4me3_prep}
+```{r q_anno_h3k4me3_bckgrnd}
 question("Based on this plot, in which of these regions is H3K4me3 enriched?",
          answer("None."), 
          answer("All."),
@@ -1439,7 +1437,7 @@ question("Based on this plot, in which of these regions is H3K4me3 enriched?",
          allow_retry = T)
 ```
 
-Sidenote: The background percentage of promoters is slightly lower compared to the output of exercise 7a. This is likely a trade-off has to be made when two or more feature overlap.  
+Sidenote: The background percentage of promoters is slightly lower compared to the output of exercise 7a. This is likely because a trade-off has to be made when two or more features overlap.  
 
 ### Exercise 8d
 
@@ -1462,7 +1460,7 @@ Look at the code of exercise 8a
 ```{r q8d_anno_h3k27ac-solution, echo = T}
 # calculate the overlap of H3K27ac peaks with features 
 # the object monocytes_h3k27ac has already been loaded for you
-h3k27ac_features <- assignChromosomeRegion(h3k27ac_features, proximal.promoter.cutoff=2000, TxDb=txdb, precedence=c("Promoters", "immediateDownstream","fiveUTRs", "threeUTRs", "Exons", "Introns"))
+h3k27ac_features <- assignChromosomeRegion(monocytes_h3k27ac, proximal.promoter.cutoff=2000, TxDb=txdb, precedence=c("Promoters", "immediateDownstream","fiveUTRs", "threeUTRs", "Exons", "Introns"))
 
 # print the output to the console
 h3k27ac_features
@@ -1481,6 +1479,10 @@ grade_result(
 > - Access the percent values in `h3k27ac_features` using the $ operator.  
 > - For plotting use `ggplot()` and `geom_bar()`.   
 
+```{r q8e_anno_h3k27ac_plot-setup}
+h3k27ac_features <- assignChromosomeRegion(monocytes_h3k27ac, proximal.promoter.cutoff=2000, TxDb=txdb, precedence=c("Promoters", "immediateDownstream","fiveUTRs", "threeUTRs", "Exons", "Introns"))
+```
+
 ```{r q8e_anno_h3k27ac_plot, exercise = T}
 # visualize the results in a bar chart
 data.frame(h3k27ac_features$percentage) %>% 
@@ -1495,14 +1497,23 @@ data.frame(h3k27ac_features$percentage) %>%
 Look at exercise 8b    
 </div>
 
-```{r q8b_anno_h3k4me3_plot-solution}
+```{r q8e_anno_h3k27ac_plot-solution, eval = F}
 data.frame(h3k27ac_features$percentage) %>% 
   ggplot(.)+
   geom_bar(mapping = aes(x = subjectHits, y = Freq), stat = "identity")+
-  coord_flip()#+
-  # labs(title = "Distribution H3K4me3 across chr19")+
+  coord_flip()+
+  labs(title = "Distribution H3K27ac across chr19")
   # theme_bw()+
-  # theme(legend.position = "none") 
 ```
 
-## Summary and introducing next week's topic  
+
+So far you have examined the transcript-centered distribution of ChIP-seq peaks and for H3K4me3 and H3K27ac these distribution looked rather similar. Next week you will analyze the ChIP-seq signal around the coding body further by examining differences in the ChIP-seq *signal intensity* around the TSS and across the coding body.  
+<br>
+Chromatin states, re-occuring combinatorial and spatial patterns of marks.  What may be more interesting is the co-localization of histone marks that can be used to define 
+
+### 2.4.5 Overlap with 
+
+### Exercise 9  
+
+## Summary and introducing next week's topic   
+
