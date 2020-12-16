@@ -148,6 +148,13 @@
       "Source": "Bioconductor",
       "Hash": "148fe882b25f679b03afc45da15e760c"
     },
+    "KernSmooth": {
+      "Package": "KernSmooth",
+      "Version": "2.23-17",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "bbff70c8c0357b5b88238c83f680fcd3"
+    },
     "MASS": {
       "Package": "MASS",
       "Version": "7.3-53",
@@ -202,6 +209,13 @@
       "Repository": "CRAN",
       "Hash": "66fe0e309e72a1d0f9cceed5c01fab94"
     },
+    "RUnit": {
+      "Package": "RUnit",
+      "Version": "0.4.32",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "11af2a900964b790c6d775e0c9e8025f"
+    },
     "Rcpp": {
       "Package": "Rcpp",
       "Version": "1.0.5",
@@ -232,12 +246,6 @@
       "Version": "1.16.1",
       "Source": "Bioconductor",
       "Hash": "1f4c0859b8f338bd9f8c0b7967e719a3"
-    },
-    "TxDb.Hsapiens.UCSC.hg19.knownGene": {
-      "Package": "TxDb.Hsapiens.UCSC.hg19.knownGene",
-      "Version": "3.2.2",
-      "Source": "Bioconductor",
-      "Hash": "5d19899944856d66d65ae635c4be688d"
     },
     "TxDb.Hsapiens.UCSC.hg38.knownGene": {
       "Package": "TxDb.Hsapiens.UCSC.hg38.knownGene",
@@ -439,6 +447,13 @@
       "Repository": "CRAN",
       "Hash": "2b7d10581cc730804e9ed178c8374bd6"
     },
+    "data.table": {
+      "Package": "data.table",
+      "Version": "1.13.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "626afb25b020646f53105e6485e695c6"
+    },
     "dbplyr": {
       "Package": "dbplyr",
       "Version": "2.0.0",
@@ -564,12 +579,25 @@
       "Repository": "CRAN",
       "Hash": "4d243a9c10b00589889fe32314ffd902"
     },
+    "genomation": {
+      "Package": "genomation",
+      "Version": "1.18.0",
+      "Source": "Bioconductor",
+      "Hash": "2f6583b812a8ba57c50fadddacc774e5"
+    },
     "ggplot2": {
       "Package": "ggplot2",
       "Version": "3.3.2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "4ded8b439797f7b1693bd3d238d0106b"
+    },
+    "ggthemes": {
+      "Package": "ggthemes",
+      "Version": "4.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "dfa67ccc3fb199f102a34d557ec1ff45"
     },
     "gh": {
       "Package": "gh",
@@ -603,8 +631,8 @@
       "Package": "gradethis",
       "Version": "0.1.0.9004",
       "Source": "GitHub",
-      "Remotes": "rstudio/learnr",
       "RemoteType": "github",
+      "Remotes": "rstudio/learnr",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "gradethis",
       "RemoteUsername": "rstudio-education",
@@ -617,6 +645,13 @@
       "Version": "1.64.0",
       "Source": "Bioconductor",
       "Hash": "b133290bd94320ed101d32cf556f78d8"
+    },
+    "gridBase": {
+      "Package": "gridBase",
+      "Version": "0.4-7",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "c6b1256546a22b4b9f4fae3ba5117b97"
     },
     "gtable": {
       "Package": "gtable",
@@ -652,11 +687,11 @@
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
-      "RemoteRepo": "htmltools",
       "RemoteUsername": "rstudio",
-      "RemoteRef": "HEAD",
+      "RemoteRepo": "htmltools",
+      "RemoteRef": "master",
       "RemoteSha": "d18bd8e404fb3e7d25dd448b1f8300f16a44add8",
-      "Hash": "624938244a70d1610a4f72a7cd7f93df"
+      "Hash": "2c4efca72b50b4dde3699acf9d055f22"
     },
     "htmlwidgets": {
       "Package": "htmlwidgets",
@@ -685,6 +720,12 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "1b921bad69922e7868b19de814e7a9ce"
+    },
+    "impute": {
+      "Package": "impute",
+      "Version": "1.60.0",
+      "Source": "Bioconductor",
+      "Hash": "550453c22b742d30e741640febc321ec"
     },
     "ini": {
       "Package": "ini",
@@ -753,8 +794,8 @@
       "Package": "learnr",
       "Version": "0.10.1.9006",
       "Source": "GitHub",
-      "Remotes": "rstudio/htmltools, rstudio/shinytest",
       "RemoteType": "github",
+      "Remotes": "rstudio/htmltools, rstudio/shinytest",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "learnr",
       "RemoteUsername": "rstudio",
@@ -912,6 +953,20 @@
       "Repository": "CRAN",
       "Hash": "09eb987710984fc2905c7129c7d85e65"
     },
+    "plotrix": {
+      "Package": "plotrix",
+      "Version": "3.7-8",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "319dd991725c17e1d7ccdb4f2d93f9d0"
+    },
+    "plyr": {
+      "Package": "plyr",
+      "Version": "1.8.6",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "ec0e5ab4e5f851f6ef32cd1d1984957f"
+    },
     "plyranges": {
       "Package": "plyranges",
       "Version": "1.6.10",
@@ -1041,6 +1096,13 @@
       "Repository": "CRAN",
       "Hash": "b06bfb3504cc8a4579fd5567646f745b"
     },
+    "reshape2": {
+      "Package": "reshape2",
+      "Version": "1.4.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "bb5996d0bd962d214a11140d77589917"
+    },
     "rex": {
       "Package": "rex",
       "Version": "1.2.0",
@@ -1123,6 +1185,12 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "3838071b66e0c566d55cc26bd6e27bf4"
+    },
+    "seqPattern": {
+      "Package": "seqPattern",
+      "Version": "1.18.0",
+      "Source": "Bioconductor",
+      "Hash": "ed29027218769beb0124a638cd40346e"
     },
     "seqinr": {
       "Package": "seqinr",
