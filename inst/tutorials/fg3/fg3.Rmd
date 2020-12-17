@@ -102,20 +102,81 @@ In the previous section, we have identified promoters overlapping a H3K27ac peak
 
 Next, we tile the promoter regions with consecutive 100bp tiles. For each region, we order the tiles according to the gene orientation. We create 20 tiles per promoter region.
 
+
+### large daomain H3K27me3  
+- overlap met H3K4me1
+- welke genen zijn bivalent  
+
+## structure
+1. gemiddelde signaal rond TSS
+2. groepering naar genexpressielevel per quantile voor H3K4me3
+3. Hoe zit dat bij H3K27me3 (niet bij heel hoge expressie, breed signaal, je pakt maar een stukje)
+4. Hoe zit dit er uit als we elk datapunt bekijken in dotplot/scatterplot --> het is een trend en geen harde waarheid komt (deels) door invloed van andere marks = combinatorial markings. 
+5. Heatmap van histone marks at TSS random. Dan geordend op genexpressie niveau.  
+
+<br>
+Chromatin states - re-occurring, co-localization of histone marks and factors - mapping of epigenomic marks, such as histone modifications, histone variants, regions of open chromatin, and related marks, has emerged as a powerful means to annotate genomes, to identify putative regulatory elements, and to study their changing activity across different cell types and in human disease1,2,3,4. Individual marks can be studied in isolation, either through aggregation of their genome-wide signal tracks relative to a set of predetermined annotations5, such as transcription start sites or exon boundaries, or by discovery of narrow peaks or broader domains in which the mark is present in greater frequency than that of the surrounding regions6. However, additional information can be gained by studying combinations of multiple marks in their spatial context. Such patterns, termed 'chromatin states', often capture known classes of genomic elements, such as promoters, enhancers, and transcribed, repressed, and repetitive regions7, and can also capture novel classes or subclasses of elements. (https://www.nature.com/articles/nprot.2017.124)
+### Exercise 9  
+```{r}
+library(genomation)
+library(pheatmap)
+library(RColorBrewer)
+chromhmm_file <- system.file("extdata", "week2", "blueprint", "chromhmm", "C000S5H1_12_12_Blueprint_release_201608_dense_chr19.bed", package = "learnr.proto")
+chromhmm <- rtracklayer::import(chromhmm_file)
+# 12 states - which is what?  
+table(chromhmm$name)  
+chromhmm_list <- split(chromhmm, chromhmm$name,drop=TRUE)
+
+mono_list <- GRangesList(monocytes_list, compress = F)
+
+chrommhmm_anno_list <- annotateWithFeatures(mono_list,chromhmm_list)
+heatTargetAnnotation(chrommhmm_anno_list)+
+  coord_flip()+
+  scale_fill_gradient(low = "white", high = "blue")
+  
+mat=heatTargetAnnotation(chrommhmm_anno_list,plot=FALSE)
+
+
+
+pheatmap(mat = mat, 
+         color = c("white", brewer.pal("Reds", n =9)),
+         cluster_cols = F)
+
+      
+#BiocManager::install("pheatmap")
+
+```
+State1.- Repressed Polycomb High signal H3K27me3 -A 
+State2.- Repressed Polycomb Low signal H3K27me3 - A
+state3.- Low signal
+State4.- Heterochromatin High Signal H3K9me3 - B
+State5.- Transcription High signal H3K36me3 - C 
+State6.- Transcription Low signal H3K36me3 -C
+State7.- Genic Enhancer High Signal H3K4me1 & H3K36me3
+State8.- Enhancer High Signal H3K4me1
+State9.- Active Enhancer High Signal H3K4me1 & H3K27Ac - D
+State10.- Distal Active Promoter (2Kb) High Signal H3K4me3 & H3K27Ac & H3K4me1 - D
+State11.- Active TSS High Signal H3K4me3 & H3K4me1 - E 
+state12.- Active TSS High Signal H3K4me3 & H3K27Ac - E
+
 ## 2.5 Annotation of ChIP-seq peaks
-### 2.5.1 Distance to TSS --> plot in log scale    
-In this part of the analysis you will assign peaks to their closest TSS, assuming that it likely is involved in regulating the expression regulates that gene.  
+### 2.5.1 Distance to TSS     
+In this part of the analysis you will assign peaks to the closest TSS.  
 <br>
-The `GenomicRanges` package has the function `distanceToNearest(x, subject)` to help you identify the distance between intervals in `x` and the nearest neighbor in `subject`. In this case, the intervals are the peaks and the subject are the TSSs. The function outputs a `Hits` objects with distances.  
+The `nearest(x, subject)` function from the `GenomicRanges` package finds the nearest regions to `x` within the set of regions reported in `subject`. For each region in `x` it reports the index of the nearest neigbor range in `subject`.  
+<br>
+The `distanceToNearest(x, subject)` function also reports the distance between intervals in `x` and the nearest neighbor in `subject`. The function outputs a `Hits` objects with absolute distances.  
+<br>
+In this case, `x` are the peaks and the TSSs are the `subject`. 
 <br>
 
->**Exercise 15**  
-Use `distanceToNearest()` to get the distance between h3k4me3 peaks and the nearest TSS.  
+### Exercise 9  
+You will identify the nearest TSS for H3K4me3 and H3K27ac peaks, plot the distances as a histogram and identify the number of regions TSSs that overlap.  
 
-```{r q15_distance_tss, exercise = T}
-rdata = system.file("extdata", "week2", "prepared_rds", "txdb_annotation_chr19_genes_tx_pr_tss_granges.RData", package = "learnr.proto")
-load(rdata)
-# this chunk does not exist: exercise.setup = "overlap_exercise10"}
+> **Exercise 9a** Use `distanceToNearest()` to obtain the distance between h3k4me3 peaks and the nearest TSS.  
+
+```{r q15_distance_tss, exercise = TRUE, exercise.eval = F, error = T}
+### TSS locations are stored in object 'tss_chr19' 
 
 # calculate the distances from peaks to tss
 h3k4me3_to_tss <- ..(.., ..)
@@ -124,6 +185,13 @@ h3k4me3_to_tss <- ..(.., ..)
 ```{r q15_distance_tss-solution,  eval = F}
 rdata = system.file("extdata", "week2", "prepared_rds", "txdb_annotation_chr19_genes_tx_pr_tss_granges.RData", package = "learnr.proto")
 load(rdata)
+
+rdsfile = system.file("extdata", "week2", "prepared_rds", "txdb_annotation_chr19_grangeslist.rds", package = "learnr.proto") 
+annotation_chr19_gr <- readRDS(rdsfile)
+
+mat_annotation_chr19_gr <- make_comb_mat(annotation_chr19_gr)
+UpSet(mat_annotation_chr19_gr)
+
 # calculate the distances from peaks to tss
 h3k4me3_to_tss <- distanceToNearest(monocytes_h3k4me3, tss)
 ```
@@ -211,15 +279,10 @@ grade_code()
 
 <br>
 Besides the distance, we are also (very!) interested in the distribution of the ChIP-seq signal around the TSS. You will look at that next week.  
+Next week you will analyze the ChIP-seq signal around the coding body further by examining differences in the ChIP-seq *signal intensity* around the TSS and across the coding body.  
+### 2.5 Identify the nearest TSS  
 
-### large daomain H3K27me3  
-- overlap met H3K4me1
-- welke genen zijn bivalent  
 
-## structure
-1. gemiddelde signaal rond TSS
-2. groepering naar genexpressielvel per qunatile voor H3K4me3
-3. Hoe zit dat bij H3K27me3 (niet bij heel hoge expressie, breed signaal, je pakt maar een stukje)
-4. Hoe zit dit er uit als we elk datapunt bekijken in dotplot/scatterplot --> het is een trend en geen harde waarheid komt (deels) door invloed van andere marks = combinatorial markings. 
-5. Heatmap van histone marks at TSS random. Dan geordend op genexpressie niveau.  
+
+## Summary and introducing next week's topic   
 
