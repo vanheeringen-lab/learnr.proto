@@ -121,8 +121,14 @@ $(function() {
 
 ## 3.1 Introduction   
 <br>
-In week 1 we discussed the major steps involved in obtaining genomics data, from experiment to raw data to normalized signal and peaks. In week 2 we summarized the overlap between histone peaks and promoters in numbers and in plots. However, peak presence or absence is a very limited measure and we have been ignoring the ChIP-seq signal intensities altogether. This week you will therefore include these intensities in your analyses and focus on answering common questions including:** "*What is the signal of the mark around a particular element of interest like the TSS?*", "*What is the relationship between histone ChIP-seq signal intensity and gene expression?*", and "*How we can refine this relationship by taking multiple histone marks into account."* **.     
+In week 1 we discussed the major steps involved in obtaining genomics data, from experiment to raw data to normalized signal and peaks. In week 2 we summarized the overlap between histone peaks and promoters in numbers and in plots. However, peak presence or absence is a very limited measure and we have been ignoring the ChIP-seq signal intensities altogether. This week you will therefore include these intensities in your analyses and focus on answering common questions including: **"*What is the signal of the mark around a particular element of interest like the TSS?*", "*What is the relationship between histone ChIP-seq signal intensity and gene expression?*", and "*How we can refine this relationship by taking multiple histone marks into account.*"**.   
 <br>
+To do so you will need to visualize the data and generate plots displaying the distribution of ChIP-seq signal around certain genomic positions, here a set of promoter regions. These include an average signal profile, also called density plot, and a heatmap representation. Using these plots you will investigate the relationship between histone PTMs and gene expression further. These are one of the most frequently performed analysis steps in ChIP-seq experiments.  
+<br>
+You will start by identifying promoters overlapping a H3K4me3 peak and plot the ChIP-seq signal in these regions. This signal can be obtained from .bam files or from .bigwig files. Remember from week 1, .bam files contain records of read alignments with 1 line per read. The .bigwig files do not store individual reads but the coverage across the genome, often normalized per million mapped reads.   
+<br>
+Let's get started! 
+
 
 ### 3.1.1 Learning Objectives  
 
@@ -139,13 +145,6 @@ In week 1 we discussed the major steps involved in obtaining genomics data, from
 9. Cluster the heatmap of (7) based on ChIP-seq signals of different marks.  
 10. Optionally, back-analyze chromHmm output, in other words, heatmap summary of signal intensities of the different marks in chromHMM defined regions. Regions are labelled 1-12, can you, using the sig
   
-<br>
-In this part of the analysis, you will generate plots displaying the distribution of ChIP-seq signal around certain genomic positions, here a set of promoter regions. These include an average signal profile, also called density plot, and a heatmap representation. Using these plots you will investigate the relationship between histone PTMs and gene expression further. These are one of the most frequently performed analysis steps in ChIP-seq experiments.
-<br>
-You will start by identifying promoters overlapping a H3K4me3 peak and plot the ChIP-seq signal in these regions. This signal can be obtained from .bam files or from .bigwig files. Remember from week 1, .bam files contain records of read alignments with 1 line per read. The .bigwig files do not store individual reads but the coverage across the genome, often normalized per million mapped reads.    
-<br>
-Let's get started!  
-
 <!-- ### large domain H3K27me3   -->
 <!-- - overlap met H3K4me1 -->
 <!-- - welke genen zijn bivalent   -->
@@ -163,17 +162,17 @@ Let's get started!
 
 ## 3.1 Annoation of ChIP-seq peaks 
 ### 3.1.1 Distance to TSS     
-In this part of the analysis you will assign ChIP-seq peaks to the closest TSS.  
+First, you will assign ChIP-seq peaks to the closest TSS.  
 <br>
-The `nearest(x, subject)` function from the `GenomicRanges` package finds the nearest regions for `x` within the set of regions reported in `subject`. For each region in `x` it reports the index of the nearest neighbor range in `subject`.  
+The `nearest(x, subject)` function from the `GenomicRanges` package detects for each interval in `x` the nearest interval within the set of regions reported in `subject`. This function outputs a vector of integers reporting for each region in `x` the index of the nearest neighbor range in `subject`.  
 <br>
-The `distanceToNearest(x, subject)` function also reports the distance between intervals in `x` and the nearest neighbor in `subject`. The function outputs a `Hits` objects as you observed before with the `findOverlaps()`, with the absolute distances as a column in the metadata slot of the object.  
+The `distanceToNearest(x, subject)` function also reports the distance between intervals in `x` and the nearest neighbor in `subject`. The function outputs a `Hits` objects similar to the output of `findOverlaps()`, with the absolute distances as a column in the metadata slot of the object.  
 <br>
-In this case, `x` are the peaks and the TSSs are the `subject`. 
+In your case, `x` are the peaks and the TSSs are the `subject`. 
 <br>
 
 ### Exercise 1  
-Identify the nearest TSS for each H3K4me3 peak in monocytes   
+Identify the nearest TSS for each H3K4me3 peak in monocytes.   
 
 > **Exercise 1a**: Which of the commands below imports the peaks table into a GRanges object?  
 
@@ -195,7 +194,7 @@ question("Recap, which function imports the H3K4me3 peaks into a GRanges object?
 ### H3K4me3 peaks in monocytes are stored in `monocytes`h3k4me3`
 
 # calculate the distances from peaks to tss
-h3k4me3_to_tss <- ..(.., ..)
+h3k4me3_to_tss <- __(__, __)
 ```
 
 ```{r q1_distancetss-solution,  eval = F}
@@ -225,123 +224,207 @@ show(h3k4me3_to_tss)
 grade_result()
 ```
 
-### Exercise 2  
-Summarize the data from the Hits object.  
-
-> **Exercise 2a:** How many peak-to-tss matches are stored in `h3k4me3_to_tss`?     
-
-```{r q2_matches, exercise = TRUE, exercise.eval = F, error = T}
-# Print the number of matches in h3k4me3_to_tss
-
-```
-
-<div id="q2_matches-hint">
-Use the `length()` function.  
-</div>
-
-```{r q2_matches-check}
-grade_result(
- pass_if(~identical(.result, length(h3k4me3_to_tss)))
- )
-```
-
-
-> **Exercise 2b:** How many unique TSSs are have a H3K4me3 peak assigned to them?  
-
-```{r q2_uniquetss, exercise = TRUE, exercise.eval = F, error = T}
-# Print the number of unique TSSs in h3k4me3_to_tss
-
-```
-
-```{r q2_uniquetss-hint-1, eval = F}
-# You may want to use: 
-__(__(subjectHits(h3k4me3_to_tss)))
-```
-
-```{r q2_uniquetss-hint-2, eval = F}
-# in combination with 
-unique()
-```
-
-```{r q2_uniquetss-hint-2, eval = F}
-# and .. 
-length()
-```
-
-```{r q2_uniquetss-check}
-grade_result(
- pass_if(~identical(.result, length(unique(subjectHits(h3k4me3_to_tss)))))
- )
-```
+The `Hits` object contains 2838 matches between intervals in `monocytes_h3k4me3` and `tss_chr19`, in other words, for each H3K4me3 peak a nearest TSS is reported. In total `r length(unique(subjectHits(distanceToNearest(monocytes_h3k4me3, tss_chr19))))` different TSSs are reported, meaning that some peaks are assigned to the same TSS.   
 
 ### 3.1.2 Visualize distances  
-
-
-```{r plot}
-h3k4me3_to_tss <- distanceToNearest(monocytes_h3k4me3, tss_chr19)
-# summary of distances
-summary(mcols(h3k4me3_to_tss)[,1])
-
-# plot the distribution of distances
-boxplot(mcols(h3k4me3_to_tss)[,1]+1, log = "y")
-```
-<br>  
-### 3.1.3 Filter distances  
-
-### 3.1.4 Find associating gene  
-You can use this `Hits` object to subset peaks to those that are less than 10 kb away from the TSS. You can than use the function `subjectHits()` to get the genes associated to each peak.  
+Let's plot the distribution of absolute distances between peaks and TSSs. "Absolute" in this context means that distances are reported irrespective of whether the corresponding TSS is located upstream or downstream the H3K4me3 peak.  
 <br>
+You will plot the distances as a histogram and as a density plot. 
 
->**Exercise 16**  
-Subset the h3k4me3_to_tss for distances =< 10kb and select the associated genes from `genes` object.  
+>#### **Refresher**: histograms and density plots  
+<details><summary>What do histograms and density plots visualize and why is the bin width or bandwidth important?</summary>   
+**Histograms** visualize the distribution of a single variable. Events are grouped into bins with comparable values and the number of events per bin is counted and these counts are visualized.  
+<br>
+Because histograms are made by binning the data, the bin width is a critical parameter that will affect the appearance of the graph. Choosing a bin width that is too small will result in a overly busy and peaky histogram making it difficult to discern the main trends. If the bin width is too large, then smaller features of the distribution may dissapear.  
+<br>
+In practice, if you generate a histogram, always explore multiple bin widths besides the default settings.   
+<br>
+In geom_histogram(), the bin width can be set by:  
+> 
+- Specify the parameter "binwidth", eg `binwidth = 5`   
+- Specify the parameter "breaks", eg `breaks=seq(20, 50, by=2)` or `breaks=c(0,100,200)`  
+<br>
+> 
+**Density plots** visualize the estimated, underlying probability distribution by drawing an appropriate continous curve. The most commonly used method for to estimate this curve is called the *kernel density estimation*. In kernel density estimation, we draw a continuous curve (the kernel) with a small width (controlled by a parameter called bandwidth) at the location of each data point, and then we add up all these curves to obtain the final density estimate.  
+<br>
+Just as is the case with histograms, the exact visual appearance of a density plot depends on the kernel and bandwidth choices. The bandwidth is related to the binwidth in histograms. The choice of kernel affects the shape of the density curve (eg. gaussian like for Gaussian kernel but stepwise with a rectangular kernel).  
+<br>
+In general, the more data points there are in the data set, the less the choice of the kernel matters. Therefore, density plots tend to be quite reliable and informative for large data sets but can be misleading for data sets of only a few points.
+<br>
+Density curvuse are usually scaled such that the area under the curve equals 1.  
+<br>
+Kernel density estimates have one major pitfall: they have the tendency to extrapolate the curve towards regions that are non-existing (eg. into negative age when one plots a kernal density distribution of ages within a country).   
+<br>
+See for a more extended discussion on histograms and density plots Chapter 7 of Fundamentals of Data Visualization by Claus O. Wilke [ref](https://clauswilke.com/dataviz/histograms-density-plots.html).  
 
-```{r prepare_closegene_q16}
-h3k4me3_to_tss <- distanceToNearest(monocytes_h3k4me3, tss)
+### Exercise 2
+Plot the distances between H3K4me3 peaks and their nearest TSS as a histogram.  
+
+> **Exercise 2a:** To do so, first assign the metadata from `h3k4me3_to_tss` to a data.frame object called `h3k4me3_to_tss_metadata` (remember: this step is required for plotting with ggplot2).   
+
+```{r prepare_q2a, echo = F}
+h3k4me3_to_tss <- distanceToNearest(monocytes_h3k4me3, tss_chr19)
 ```
 
+```{r q2a_metadata, exercise = TRUE, exercise.eval = F, error = T, exercise.setup = "prepare_q2a"}
+# Assign the metadata to a data.frame object   
+h3k4me3_to_tss_metadata <- ___
 
-```{r q16a_closegenes, eval = F, exercise = T, exercise.setup = "prepare_closegene_q16" }
-# save the distances in a vector
-distances <- mcols(h3k4me3_to_tss)[,1]
+# Print the head of the resulting object
+head(h3k4me3_to_tss_metadata)
+```
 
-# subset h3k4me3_to_tss by distance
-h3k4me3_to_tss_close <- ..[..,..]
+```{r q2a_metadata-hint-1, eval = F}
+# You may want to use:
+as.data.frame()
+```
+
+```{r q2a_metadata-hint-2, eval = F}
+# in combination with
+mcols() 
+# or
+elementMetadata()
+```
+
+```{r q2a_metadata-hint-3, eval = F}
+# this would be a strategy, check whether you had the same or something different. 'Submit Answer' will evaluate whether the object you generated is the same as ours. 
+as.data.frame(mcols(h3k4me3_to_tss))
+```
+
+```{r q2a_metadata-check}
+grade_result(
+ pass_if(~identical(.result, head(h3k4me3_to_tss_metadata)))
+ )
+```
+
+> **Exercise 2b:** Next, print a summary of the distances reported in `h3k4me3_to_tss_metadata` 
+
+```{r prepare_q2b, echo = F}
+h3k4me3_to_tss <- distanceToNearest(monocytes_h3k4me3, tss_chr19)
+h3k4me3_to_tss_metadata <- as.data.frame(mcols(h3k4me3_to_tss))
+```
+
+```{r q2b_summ, exercise = TRUE, exercise.eval = F, error = T, exercise.setup = "prepare_q2b"}
+# print a summary of the distances to the console
+
+```
+
+```{r q2b_summ-solution, eval = F}
+summary(h3k4me3_to_tss_metadata$distance)
+```
+
+```{r q2b_summ-code-check}
+grade_code()
+```
+
+From this summary we can gather that this is a right skewed distribution with a large tail at the right and a mean that is larger than the median. <!-- To prevent the outliers to dominate the plot, you should log transform the distance measure when you visualize it  -->
+
+> **Exercise 2c:** Use ggplot() and geom_histogram() to plot these distances with default binwidth and default plot settings  
+
+```{r q2c_plot, exercise = TRUE, exercise.eval = F, error = T, exercise.setup = "prepare_q2b"}
+# plot a histogram of distances in h3k4me3_to_tss_metadata using ggplot2 and geom_histogram
+
+```
+
+```{r q2c_plot-solution, eval = F}
+ggplot(h3k4me3_to_tss_metadata)+
+  geom_histogram(mapping = aes(x = distance+1))
+```
+
+```{r q2c_plot-code-check}
+grade_code()
+```
+
+Observe the extremely right skewed distribution. The further a peak is located from the TSS, the less confident we are that - without additional data - this peak's mark can be associated with the corresponding gene.  
+
+### 3.1.3 Filter on distances  
+Most distances are within 10kb.  
+
+### Exercise 3  
+Filter h3k4me3_to_tss for matches that are within 10kb distance.  
+
+- Use the distances from `h3k4me3_to_tss_metadata`  
+
+```{r q3_filter, exercise = TRUE, exercise.eval = F, error = T, exercise.setup = "prepare_q2b"}
+# filter h3k4me3_to_tss for distances <= 10000
+h3k4me3_to_tss <- __[__<= 10000,]
+```
+
+```{r q3_filter-hint-1, eval = F}
+# use as condition  
+h3k4me3_to_tss_metadata$distance <= 10000
 ```
 
 ```{r q16a_closegenes-solution, eval = F}
-# save the distances in a vector
-distances <- mcols(h3k4me3_to_tss)[,1]
-
-# subset h3k4me3_to_tss for distances <= 10000
-h3k4me3_to_tss_close <- h3k4me3_to_tss[distances <= 10000,]
+h3k4me3_to_tss_close <- h3k4me3_to_tss[h3k4me3_to_tss_metadata$distance <= 10000,]
 ```
 
-```{r q16a_closegenes-code-check, eval = F}
+```{r q16a_closegenes-code-check}
 grade_code()
 ```
 
+### 3.1.4 Find associating gene  
+Use `h3k4me3_to_tss_close` to subset peaks to those that are less than 10 kb away from the TSS. You can than use the function `subjectHits()` to get the genes associated to each peak.  
+<br>
 
-```{r 16b_closegenes, exercise = T, exercise.setup = "q16a_closegenes" }
-# obtain the genes
-monocytes_h3k4me3_genes <- unique(genes[..(..)])
+### Exercise 4   
+Use `h3k4me3_to_tss_close` to select the associated TSSs from `tss_chr19` object.  
 
-# look at the output
-show(monocytes_h3k4me3_genes)
+```{r prepare_q4, echo = F}
+h3k4me3_to_tss <- distanceToNearest(monocytes_h3k4me3, tss_chr19)
+h3k4me3_to_tss_metadata <- as.data.frame(mcols(h3k4me3_to_tss))
+h3k4me3_to_tss_close <- h3k4me3_to_tss[h3k4me3_to_tss_metadata$distance <= 10000,]
+```
+
+```{r q4_closegenes, exercise = TRUE, exercise.eval = F, error = T, exercise.setup = "prepare_4"}
+# 1. print the unique indexes of the TSSs from h3k4me3_to_tss_close in a new (temporary) object
+interesting_TSSs <- ___
+
+# 2. obtain the TSSs from tss_chr19 with an index reported in "interesting_TSSs"
+tss_with_h3k4me3 <- ____
+
+# 3. look at the output
+show(tss_with_h3k4me3)
 ```
  
-```{r 16b_closegenes-solution, eval = F}
-# obtain the genes
-monocytes_h3k4me3_genes <- unique(genes[subjectHits(h3k4me3_to_tss_close)])
-
-# look at the output
-show(monocytes_h3k4me3_genes)
+```{r q4_closegenes-hint-1, eval = F}
+# For (1), use  
+unique()
+# in combiation with 
+subjectHits()
+```
+ 
+```{r q4_closegenes-hint-2, eval = F}
+# on the Hits object:
+h3k4me3_to_tss_close
 ```
 
-```{r q16b_closegenes-code-check, eval = F}
-grade_code()
+```{r q4_closegenes-hint-3, eval = F}
+# for(2), subset tss_chr19 using 
+[interesting_TSSs] 
 ```
 
+```{r q4_closegenes-hint-4, eval = F}
+# eg: 
+tss_chr19[interesting_TSSs] 
+```
+
+
+```{r q4_closegenes-hing-5, eval = F}
+# this would be a strategy, check whether you had the same or something different. 'Submit Answer' will evaluate whether the object you generated is the same as ours.
+interesting_TSSs <- unique(subjectHits(h3k4me3_to_tss_close))
+tss_with_h3k4me3 <- tss_chr19[interesting_TSSs]
+show(tss_with_h3k4me3)
+```
+
+```{r q4_closegenes-check}
+grade_result(
+ pass_if(~identical(.result, show(tss_with_h3k4me3)))
+ )
+```
 <br>
+
+`r colorize("optional: the distance2NearestFeature  from genomation outputs a dataframe and gives + and - values for distance to TSS. This visualizes more intuitively plot", col = "red")`
 
 ## 3.2 Visualize signal intensity   
 ### 3.2.1 Density plot  
