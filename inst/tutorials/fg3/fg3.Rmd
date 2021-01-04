@@ -497,7 +497,7 @@ state12.- Active TSS High Signal H3K4me3 & H3K27Ac - E
 library(genomation)
 #library(pheatmap)
 library(RColorBrewer)
-chromhmm_file <- system.file("extdata", "week2", "blueprint", "chromhmm", "C000S5H1_12_12_Blueprint_release_201608_dense_chr19.bed", package = "learnr.proto")
+chromhmm_file <- system.file("extdata", "week3",  "C000S5H1_12_12_Blueprint_release_201608_dense_chr19.bed", package = "learnr.proto")
 chromhmm <- rtracklayer::import(chromhmm_file)
 # 12 states - which is what?  
 table(chromhmm$name)  
