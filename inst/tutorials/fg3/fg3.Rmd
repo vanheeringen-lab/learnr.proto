@@ -121,9 +121,9 @@ $(function() {
 
 ## 3.1 Introduction   
 <br>
-In week 1 we discussed the major steps involved in obtaining genomics data, from experiment to raw data to normalized signal and peaks. In week 2 we summarized the overlap between histone peaks and promoters in numbers and in plots. However, peak presence or absence is a very limited measure and we have been ignoring the ChIP-seq signal intensities altogether. This week you will therefore include these intensities in your analyses and focus on answering common questions including: **"*What is the signal of the mark around a particular element of interest like the TSS?*", "*What is the relationship between histone ChIP-seq signal intensity and gene expression?*", and "*How we can refine this relationship by taking multiple histone marks into account.*"**.   
+In week 1 we discussed the major steps involved in obtaining genomics data, from experiment to raw data to normalized signal and peaks. In week 2 we summarized the overlap between histone peaks and promoters in numbers and in plots. However, peak presence or absence is a very limited measure and we have been ignoring the ChIP-seq signal intensities altogether. This week you will therefore include the signal intensity in your analyses and focus on answering common questions including: **"*What is the signal of the mark around a particular element of interest like the TSS?*", "*What is the relationship between histone ChIP-seq signal intensity and gene expression?*", and "*How we can refine this relationship by taking multiple histone marks into account.*"**.   
 <br>
-To do so you will need to visualize the data and generate plots displaying the distribution of ChIP-seq signal around certain genomic positions, here a set of promoter regions. These include an average signal profile, also called density plot, and a heatmap representation. Using these plots you will investigate the relationship between histone PTMs and gene expression further. These are one of the most frequently performed analysis steps in ChIP-seq experiments.  
+To do so you will need to visualize the data and generate plots displaying the distribution of ChIP-seq signal around certain genomic positions, here a set of promoter regions. These include an average signal profile, also called density plot, and a heatmap representation. There are several tools, in and outside r, that perform this task. You will use [genomation/chippeakanno/chipseeeker] for the purpose because (a) it is compatible with the file types that we have available, (b) shorter running time compared to the other two, and (c) relative straightforward functions it provides. Using these plots you will investigate the relationship between histone PTMs and gene expression further. These are one of the most frequently performed analysis steps in ChIP-seq experiments.  
 <br>
 You will start by identifying promoters overlapping a H3K4me3 peak and plot the ChIP-seq signal in these regions. This signal can be obtained from .bam files or from .bigwig files. Remember from week 1, .bam files contain records of read alignments with 1 line per read. The .bigwig files do not store individual reads but the coverage across the genome, often normalized per million mapped reads.   
 <br>
@@ -160,8 +160,8 @@ Let's get started!
 <!-- <br> -->
 
 
-## 3.1 Annoation of ChIP-seq peaks 
-### 3.1.1 Distance to TSS     
+## 3.2 Annoation of ChIP-seq peaks 
+### 3.2.1 Distance to TSS     
 First, you will assign ChIP-seq peaks to the closest TSS.  
 <br>
 The `nearest(x, subject)` function from the `GenomicRanges` package detects for each interval in `x` the nearest interval within the set of regions reported in `subject`. This function outputs a vector of integers reporting for each region in `x` the index of the nearest neighbor range in `subject`.  
@@ -337,7 +337,7 @@ grade_code()
 
 Observe the extremely right skewed distribution. The further a peak is located from the TSS, the less confident we are that - without additional data - this peak's mark can be associated with the corresponding gene.  
 
-### 3.1.3 Filter on distances  
+### 3.2.3 Filter on distances  
 Most distances are within 10kb.  
 
 ### Exercise 3  
@@ -363,7 +363,7 @@ h3k4me3_to_tss_close <- h3k4me3_to_tss[h3k4me3_to_tss_metadata$distance <= 10000
 grade_code()
 ```
 
-### 3.1.4 Find associating gene  
+### 3.2.4 Find associating gene  
 Use `h3k4me3_to_tss_close` to subset peaks to those that are less than 10 kb away from the TSS. You can than use the function `subjectHits()` to get the genes associated to each peak.  
 <br>
 
@@ -376,7 +376,7 @@ h3k4me3_to_tss_metadata <- as.data.frame(mcols(h3k4me3_to_tss))
 h3k4me3_to_tss_close <- h3k4me3_to_tss[h3k4me3_to_tss_metadata$distance <= 10000,]
 ```
 
-```{r q4_closegenes, exercise = TRUE, exercise.eval = F, error = T, exercise.setup = "prepare_4"}
+```{r q4_closegenes, exercise = TRUE, exercise.eval = F, error = T, exercise.setup = "prepare_q4"}
 # 1. print the unique indexes of the TSSs from h3k4me3_to_tss_close in a new (temporary) object
 interesting_TSSs <- ___
 
@@ -423,40 +423,58 @@ grade_result(
  )
 ```
 <br>
+These TSS have a H3K4me3 peak nearby. The corresponding geneID is stored in the metadata. It currently is a Entrez gene ID which in contrast to gene symbols are not easy to read. We will keep it this way for now and focus on the signal around the TSS instead of the function of the genes.  
 
+<br>
 `r colorize("optional: the distance2NearestFeature  from genomation outputs a dataframe and gives + and - values for distance to TSS. This visualizes more intuitively plot", col = "red")`
 
-## 3.2 Visualize signal intensity   
-### 3.2.1 Density plot  
+## 3.3 Visualize signal intensity   
+
+
+### 3.3.1 ChIP-seq signal intensity  
+The ChIP-seq signal can be obtained from the data stored in .bam  files or from .bigwig files.  Remember from week 1, .bam files contain records of read alignments with 1 line per read. The .bigwig files do not store individual reads but the coverage across the genome, often normalized per million mapped reads.   
+<br>
+Not all packages and functions are compatible with both file types and the resulting plots may look differ in resolution in part because .bam files - as they store read information -  give you more freedom to define how coverage is calculated. However, as BLUEPRINT only provides the .bigwig files we will use those today and not the .bam files.   
+<br>
+
+REF: https://www.bioconductor.org/packages/release/bioc/vignettes/genomation/inst/doc/GenomationManual.html#4_Extraction_and_visualization_of_genomic_data  
+
+### 3.3.2 Density plot  
 Plot the average histone ChIP-seq signal around the TSS in a density plot  
 What is happening at pos 1? 
-### 3.2.2 H3K4me3 signal vs gene expression  
+
+```{r densityplot tryout}
+
+```
+
+
+### 3.3.2 H3K4me3 signal vs gene expression  
 Plot the relationship between ChIP-seq signal at the TSS and gene expression per gene expression quantile.  
 
-### 3.2.3 Scatter visualization of this relationship  
+### 3.3.3 Scatter visualization of this relationship  
 For each TSS we have a ChIP-seq signal and gene expression signal. Plot in scatter plot.  
 
-### 3.2.4 What about H3K27me3 signal vs. gene experession?  
+### 3.3.4 What about H3K27me3 signal vs. gene experession?  
 
 
-## 3.3 Heatmaps  
-### 3.3.1 Heatmap of 1 mark  
+## 3.4 Heatmaps  
+### 3.4.1 Heatmap of 1 mark  
 Summarize H3K4me3 ChIP-seq signal at all TSSs in a heatmap.  
 
-### 3.3.2 Ordering a heatmap  
+### 3.4.2 Ordering a heatmap  
 By gene expression of corresponding gene  
 
-### 3.3.3 Clustering a heatmap  
+### 3.4.3 Clustering a heatmap  
 By k-means or hierarchical clustering. 
 Perhaps add background info section on clustering (?)  
 
-### 3.3.4 Heatmap of all available histone marks  
+### 3.4.4 Heatmap of all available histone marks  
 Heatmap of all marks at the TSSs.   
 
-### 3.3.5
+### 3.4.5
 Heatmap of all marks at DNaseI summits.   
 
-## 3.4 ChromHMM  
+## 3.5 ChromHMM  
 Back-analyze chromHmm output, in other words, heatmap summary of signal intensities of the different marks in chromHMM defined regions. Regions are labelled 1-12, can you, using the sig
 
 Chromatin states - re-occurring, co-localization of histone marks and factors - mapping of epigenomic marks, such as histone modifications, histone variants, regions of open chromatin, and related marks, has emerged as a powerful means to annotate genomes, to identify putative regulatory elements, and to study their changing activity across different cell types and in human disease1,2,3,4. Individual marks can be studied in isolation, either through aggregation of their genome-wide signal tracks relative to a set of predetermined annotations5, such as transcription start sites or exon boundaries, or by discovery of narrow peaks or broader domains in which the mark is present in greater frequency than that of the surrounding regions6. However, additional information can be gained by studying combinations of multiple marks in their spatial context. Such patterns, termed 'chromatin states', often capture known classes of genomic elements, such as promoters, enhancers, and transcribed, repressed, and repetitive regions7, and can also capture novel classes or subclasses of elements. (https://www.nature.com/articles/nprot.2017.124)
