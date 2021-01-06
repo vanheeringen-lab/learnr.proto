@@ -28,7 +28,7 @@ library(GenomicRanges)
 library(plyranges)
 library(rtracklayer)
 library(GenomicFeatures)
-#library(genomation)
+library(genomation)
 #library(ChIPpeakAnno)
 library(ggthemes)
 library(org.Hs.eg.db)
@@ -123,7 +123,7 @@ $(function() {
 <br>
 In week 1 we discussed the major steps involved in obtaining genomics data, from experiment to raw data to normalized signal and peaks. In week 2 we summarized the overlap between histone peaks and promoters in numbers and in plots. However, peak presence or absence is a very limited measure and we have been ignoring the ChIP-seq signal intensities altogether. This week you will therefore include the signal intensity in your analyses and focus on answering common questions including: **"*What is the signal of the mark around a particular element of interest like the TSS?*", "*What is the relationship between histone ChIP-seq signal intensity and gene expression?*", and "*How we can refine this relationship by taking multiple histone marks into account.*"**.   
 <br>
-To do so you will need to visualize the data and generate plots displaying the distribution of ChIP-seq signal around certain genomic positions, here a set of promoter regions. These include an average signal profile, also called density plot, and a heatmap representation. There are several tools, in and outside r, that perform this task. You will use [genomation/chippeakanno/chipseeeker] for the purpose because (a) it is compatible with the file types that we have available, (b) shorter running time compared to the other two, and (c) relative straightforward functions it provides. Using these plots you will investigate the relationship between histone PTMs and gene expression further. These are one of the most frequently performed analysis steps in ChIP-seq experiments.  
+To do so you will need to visualize the data and generate plots displaying the distribution of ChIP-seq signal around certain genomic positions, here a set of promoter regions. These include an average signal profile, also called density plot, and a heatmap representation. You could use dplyr-related functions and ggplot-ting to achieve this but it is much more convenient to use dedicated tools for these tasks. You will use [genomation/chippeakanno/chipseeeker] for the purpose because (a) it is compatible with the file types that we have available, (b) shorter running time compared to the other two, and (c) relative straightforward functions it provides. Using these plots you will investigate the relationship between histone PTMs and gene expression further. These are one of the most frequently performed analysis steps in ChIP-seq experiments.  
 <br>
 You will start by identifying promoters overlapping a H3K4me3 peak and plot the ChIP-seq signal in these regions. This signal can be obtained from .bam files or from .bigwig files. Remember from week 1, .bam files contain records of read alignments with 1 line per read. The .bigwig files do not store individual reads but the coverage across the genome, often normalized per million mapped reads.   
 <br>
@@ -229,9 +229,9 @@ The `Hits` object contains 2838 matches between intervals in `monocytes_h3k4me3`
 ### 3.1.2 Visualize distances  
 Let's plot the distribution of absolute distances between peaks and TSSs. "Absolute" in this context means that distances are reported irrespective of whether the corresponding TSS is located upstream or downstream the H3K4me3 peak.  
 <br>
-You will plot the distances as a histogram and as a density plot. 
+You will plot the distances as a histogram. 
 
->#### **Refresher**: histograms and density plots  
+>#### **Refresher**: histograms   
 <details><summary>What do histograms and density plots visualize and why is the bin width or bandwidth important?</summary>   
 **Histograms** visualize the distribution of a single variable. Events are grouped into bins with comparable values and the number of events per bin is counted and these counts are visualized.  
 <br>
@@ -243,19 +243,7 @@ In geom_histogram(), the bin width can be set by:
 > 
 - Specify the parameter "binwidth", eg `binwidth = 5`   
 - Specify the parameter "breaks", eg `breaks=seq(20, 50, by=2)` or `breaks=c(0,100,200)`  
-<br>
-> 
-**Density plots** visualize the estimated, underlying probability distribution by drawing an appropriate continous curve. The most commonly used method for to estimate this curve is called the *kernel density estimation*. In kernel density estimation, we draw a continuous curve (the kernel) with a small width (controlled by a parameter called bandwidth) at the location of each data point, and then we add up all these curves to obtain the final density estimate.  
-<br>
-Just as is the case with histograms, the exact visual appearance of a density plot depends on the kernel and bandwidth choices. The bandwidth is related to the binwidth in histograms. The choice of kernel affects the shape of the density curve (eg. gaussian like for Gaussian kernel but stepwise with a rectangular kernel).  
-<br>
-In general, the more data points there are in the data set, the less the choice of the kernel matters. Therefore, density plots tend to be quite reliable and informative for large data sets but can be misleading for data sets of only a few points.
-<br>
-Density curvuse are usually scaled such that the area under the curve equals 1.  
-<br>
-Kernel density estimates have one major pitfall: they have the tendency to extrapolate the curve towards regions that are non-existing (eg. into negative age when one plots a kernal density distribution of ages within a country).   
-<br>
-See for a more extended discussion on histograms and density plots Chapter 7 of Fundamentals of Data Visualization by Claus O. Wilke [ref](https://clauswilke.com/dataviz/histograms-density-plots.html).  
+</details>  
 
 ### Exercise 2
 Plot the distances between H3K4me3 peaks and their nearest TSS as a histogram.  
@@ -356,7 +344,7 @@ h3k4me3_to_tss_metadata$distance <= 10000
 ```
 
 ```{r q16a_closegenes-solution, eval = F}
-h3k4me3_to_tss_close <- h3k4me3_to_tss[h3k4me3_to_tss_metadata$distance <= 10000,]
+h3k4me3_to_tss <- h3k4me3_to_tss[h3k4me3_to_tss_metadata$distance <= 10000,]
 ```
 
 ```{r q16a_closegenes-code-check}
@@ -364,7 +352,7 @@ grade_code()
 ```
 
 ### 3.2.4 Find associating gene  
-Use `h3k4me3_to_tss_close` to subset peaks to those that are less than 10 kb away from the TSS. You can than use the function `subjectHits()` to get the genes associated to each peak.  
+Use `h3k4me3_to_tss` to subset peaks to those that are less than 10 kb away from the TSS. You can than use the function `subjectHits()` to get the genes associated to each peak.  
 <br>
 
 ### Exercise 4   
@@ -373,7 +361,7 @@ Use `h3k4me3_to_tss_close` to select the associated TSSs from `tss_chr19` object
 ```{r prepare_q4, echo = F}
 h3k4me3_to_tss <- distanceToNearest(monocytes_h3k4me3, tss_chr19)
 h3k4me3_to_tss_metadata <- as.data.frame(mcols(h3k4me3_to_tss))
-h3k4me3_to_tss_close <- h3k4me3_to_tss[h3k4me3_to_tss_metadata$distance <= 10000,]
+h3k4me3_to_tss <- h3k4me3_to_tss[h3k4me3_to_tss_metadata$distance <= 10000,]
 ```
 
 ```{r q4_closegenes, exercise = TRUE, exercise.eval = F, error = T, exercise.setup = "prepare_q4"}
@@ -410,9 +398,9 @@ tss_chr19[interesting_TSSs]
 ```
 
 
-```{r q4_closegenes-hing-5, eval = F}
+```{r q4_closegenes-hint-5, eval = F}
 # this would be a strategy, check whether you had the same or something different. 'Submit Answer' will evaluate whether the object you generated is the same as ours.
-interesting_TSSs <- unique(subjectHits(h3k4me3_to_tss_close))
+interesting_TSSs <- unique(subjectHits(h3k4me3_to_tss))
 tss_with_h3k4me3 <- tss_chr19[interesting_TSSs]
 show(tss_with_h3k4me3)
 ```
@@ -424,13 +412,10 @@ grade_result(
 ```
 <br>
 These TSS have a H3K4me3 peak nearby. The corresponding geneID is stored in the metadata. It currently is a Entrez gene ID which in contrast to gene symbols are not easy to read. We will keep it this way for now and focus on the signal around the TSS instead of the function of the genes.  
-
 <br>
 `r colorize("optional: the distance2NearestFeature  from genomation outputs a dataframe and gives + and - values for distance to TSS. This visualizes more intuitively plot", col = "red")`
 
 ## 3.3 Visualize signal intensity   
-
-
 ### 3.3.1 ChIP-seq signal intensity  
 The ChIP-seq signal can be obtained from the data stored in .bam  files or from .bigwig files.  Remember from week 1, .bam files contain records of read alignments with 1 line per read. The .bigwig files do not store individual reads but the coverage across the genome, often normalized per million mapped reads.   
 <br>
@@ -439,13 +424,115 @@ Not all packages and functions are compatible with both file types and the resul
 
 REF: https://www.bioconductor.org/packages/release/bioc/vignettes/genomation/inst/doc/GenomationManual.html#4_Extraction_and_visualization_of_genomic_data  
 
-### 3.3.2 Density plot  
-Plot the average histone ChIP-seq signal around the TSS in a density plot  
-What is happening at pos 1? 
+### 3.3.2 Store signal intensity in a matrix  
+You will plot the H3K4me3 ChIP-seq signal intensity around the TSS in a density plot, averaged for all TSSs with a H3K4me3 peak (the ones selected above). Thus, the signal around these TSSs will be averaged out into one density profile. 
 
-```{r densityplot tryout}
+>#### **Background info**: Density plots  
+<details><summary>What is a density plot?</summary>   
+**Density plots** visualize the estimated, underlying probability distribution by drawing an appropriate continous curve. The most commonly used method for to estimate this curve is called the *kernel density estimation*. In kernel density estimation, we draw a continuous curve (the kernel) with a small width (controlled by a parameter called bandwidth) at the location of each data point, and then we add up all these curves to obtain the final density estimate.  
+<br>
+Just as is the case with histograms, the exact visual appearance of a density plot depends on the kernel and bandwidth choices. The bandwidth is related to the binwidth in histograms. The choice of kernel affects the shape of the density curve (eg. gaussian like for Gaussian kernel but stepwise with a rectangular kernel).  
+<br>
+In general, the more data points there are in the data set, the less the choice of the kernel matters. Therefore, density plots tend to be quite reliable and informative for large data sets but can be misleading for data sets of only a few points.
+<br>
+Density curvuse are usually scaled such that the area under the curve equals 1.  
+<br>
+Kernel density estimates have one major pitfall: they have the tendency to extrapolate the curve towards regions that are non-existing (eg. into negative age when one plots a kernal density distribution of ages within a country).   
+<br>
+See for a more extended discussion on histograms and density plots Chapter 7 of Fundamentals of Data Visualization by Claus O. Wilke [ref](https://clauswilke.com/dataviz/histograms-density-plots.html).  
+</details>  
 
+You will use the r package [genomation](https://github.com/BIMSBbioinfo/genomation) to do this. We have installed and loaded this package for you with the following code:  
+```{r installing genomation, echo = T, eval = F}
+BiocManager::install("genomation")
+library(genomation)
 ```
+<br>
+A trick that prevents loading complete bigWig files in your environment is to load only the the regions of interest; in this a window around the TSS. You load the signal in a "ScoreMatrix" object using the function:  
+
+`ScoreMatrix(target = [path to bigwig file], windows = [regions of interest], type = "bigWig")`   
+
+- Every row in the ScoreMatrix object corresponds to a window of the [regions of interest].  
+- Every column in the ScoreMatrix object is a bp within that window.  
+
+Currently, the window of the TSS intervals in `tss_chr19` is 1bp while we want to plot the signal *around* the TSS. We can use the function `resize()` to resize these 1bp intervals to the size that we are interested in.  
+<br>
+In the example below we obtain the H3K4me3 signal in a 1kb window around the TSSs that have a H3K4me3 peak (see above). 
+```{r prepare_examplescores, echo = F}
+h3k4me3_to_tss <- distanceToNearest(monocytes_h3k4me3, tss_chr19)
+h3k4me3_to_tss_metadata <- as.data.frame(mcols(h3k4me3_to_tss))
+h3k4me3_to_tss <- h3k4me3_to_tss[h3k4me3_to_tss_metadata$distance <= 10000,]
+interesting_TSSs <- unique(subjectHits(h3k4me3_to_tss))
+tss_with_h3k4me3 <- tss_chr19[interesting_TSSs]
+```
+
+```{r example_scores, exercise = TRUE, exercise.setup = "prepare_examplescores"}
+# define the windows:  
+window <- 1000
+
+# resize the tss interval to this window
+tss_with_h3k4me3_windows <- resize(tss_with_h3k4me3, width = window, fix = "center")
+
+# path to bigwig file (in this case stored in the library "learnr.proto" which contains data specific to this tutorial)
+bw_h3k4me3 <- system.file("extdata", "week3",  "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19.bw", package = "learnr.proto")
+  
+# create H3K4me3 ScoreMatrix for these intervals
+scores_h3k4me3 <- ScoreMatrix(target = bw_h3k4me3, windows = tss_with_h3k4me3_windows, type = 'bigWig')  
+
+# what strucure is scores_h3k4me3? Hit "Run code" to view the result. 
+str(scores_h3k4me3)
+```
+<br>
+The object `scores_h3k4me3` is of formal class ScoreMatrix, which is related to a basic matrix but more formal. In other words, it has special functions to retrieve and set the data. We won't go into the details of these differences and dependencies but focus on how we can use this result.  
+
+### 3.3.3 Generate a density plot of the intensity values  
+We can use this ScoreMatrix to plot the average H3K4me3 signal in these windows. To do so, we use the function:  
+`plotMeta(mat = [score matrix object])`
+<br>
+```{r prepare_exampledensity, echo = F}
+h3k4me3_to_tss <- distanceToNearest(monocytes_h3k4me3, tss_chr19)
+h3k4me3_to_tss_metadata <- as.data.frame(mcols(h3k4me3_to_tss))
+h3k4me3_to_tss <- h3k4me3_to_tss[h3k4me3_to_tss_metadata$distance <= 10000,]
+interesting_TSSs <- unique(subjectHits(h3k4me3_to_tss))
+tss_with_h3k4me3 <- tss_chr19[interesting_TSSs]
+window <- 1000
+tss_with_h3k4me3_windows <- resize(tss_with_h3k4me3, width = window, fix = "center")
+bw_h3k4me3 <- system.file("extdata", "week3",  "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19.bw", package = "learnr.proto")
+scores_h3k4me3 <- ScoreMatrix(target = bw_h3k4me3, windows = tss_with_h3k4me3_windows, type = 'bigWig')  
+```
+
+```{r example_scores, exercise = TRUE, exercise.setup = "prepare_exampledensity"}
+# plot density plot
+plotMeta(scores_h3k4me3, xcoord = c(-500, 500))
+```
+
+? Equal signal before and after the TSS. Look in the GB at several TSSs, is this indeed the case?
+
+```{r mc_strandawareness}
+question("Is H3K4me3 signal equally strong before and after the TSS or is there a difference?",
+         answer("H3K4me3 signal is in most cases equal before and after the TSS"),
+         answer("H3K4me3 signal is generally lower downstream the TSS compared to upstream  "),
+         answer("H3K4me3 signal is generally higher after the TSS", correct = T, message = "H3K4me3 signal is generally higher downstream the TSS. Therefore we should take the strand of the TSS window into accout when plotting."),
+         allow_retry = T,
+         random_answer_order = T)
+```
+
+### Exercise ....  
+Redo the above plot but include strand awareness with `strand.aware = T`. 
+```{r q_prepare}
+# monocyte H3K4me3 bigwig file 
+...
+# define 100 bp +/- around tss with resize()
+
+# calculate score matrix
+scores_h3k4me3 <- ScoreMatrix(target = bw_h3k4me3, windows = tss_windows, type = 'bigWig')
+```
+
+```{r q}
+# plot density plot
+plotMeta(scores_h3k4me3, xcoord = c(-1000, 1000))
+```
+
 
 
 ### 3.3.2 H3K4me3 signal vs gene expression  
