@@ -1139,7 +1139,7 @@
       "RemoteHost": "api.github.com",
       "RemoteRepo": "renv",
       "RemoteUsername": "rstudio",
-      "RemoteRef": "HEAD",
+      "RemoteRef": "2ddbb4d",
       "RemoteSha": "2ddbb4d8d628260b965cfd7656fdd269dcaf4792",
       "Hash": "91ff0bed8241b9964f21a5bf0da72e84"
     },
