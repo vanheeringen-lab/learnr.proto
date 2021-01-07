@@ -326,7 +326,7 @@ grade_code()
 Observe the extremely right skewed distribution. The further a peak is located from the TSS, the less confident we are that - without additional data - this peak's mark can be associated with the corresponding gene.  
 
 ### 3.2.3 Filter on distances  
-Most distances are within 10kb.  
+Most "distances" are within 10kb and we will filter for matches within that distance.  
 
 ### Exercise 3  
 Filter h3k4me3_to_tss for matches that are within 10kb distance.  
@@ -501,7 +501,7 @@ bw_h3k4me3 <- system.file("extdata", "week3",  "C000S5H2.ERX547984.H3K4me3.bwa.G
 scores_h3k4me3 <- ScoreMatrix(target = bw_h3k4me3, windows = tss_with_h3k4me3_windows, type = 'bigWig')  
 ```
 
-```{r example_scores, exercise = TRUE, exercise.setup = "prepare_exampledensity"}
+```{r example_densityplot, exercise = TRUE, exercise.setup = "prepare_exampledensity"}
 # plot density plot
 plotMeta(scores_h3k4me3, xcoord = c(-500, 500))
 ```
@@ -519,7 +519,7 @@ question("Is H3K4me3 signal equally strong before and after the TSS or is there 
 
 ### Exercise ....  
 Redo the above plot but include strand awareness with `strand.aware = T`. 
-```{r q_prepare}
+```{r q_prepare, eval = F}
 # monocyte H3K4me3 bigwig file 
 ...
 # define 100 bp +/- around tss with resize()
@@ -528,7 +528,7 @@ Redo the above plot but include strand awareness with `strand.aware = T`.
 scores_h3k4me3 <- ScoreMatrix(target = bw_h3k4me3, windows = tss_windows, type = 'bigWig')
 ```
 
-```{r q}
+```{r q, eval = F}
 # plot density plot
 plotMeta(scores_h3k4me3, xcoord = c(-1000, 1000))
 ```
@@ -580,8 +580,7 @@ State11.- Active TSS High Signal H3K4me3 & H3K4me1 - E
 state12.- Active TSS High Signal H3K4me3 & H3K27Ac - E
 
 ### Exercise chromhmm    
-```{r}
-library(genomation)
+```{r chromhmm, eval = F}
 #library(pheatmap)
 library(RColorBrewer)
 chromhmm_file <- system.file("extdata", "week3",  "C000S5H1_12_12_Blueprint_release_201608_dense_chr19.bed", package = "learnr.proto")
