@@ -8,7 +8,7 @@ output:
     fig_caption: no
     progressive: true
     allow_skip: true
-    css: css/custom.css
+    css: ["css/custom.css", "css/print2pdf.css"]
 runtime: shiny_prerendered
 description: >
   Multi line text can be put here
@@ -151,7 +151,7 @@ $(function() {
 ```
 
 
-## 2.1 Introduction   
+## 2.1 Introduction
 <br>
 In week 1 we discussed the major steps involved in obtaining genomics data, from experiment to raw data to normalized signal and peaks. You examined histone PTM ChIP-, DNaseI-, and RNA-seq data of monocytes in the UCSC genome browser and searched for regions with increased signal, *peaks*. You looked at the position of these peaks in the chromosome and with respect to genes as well as the co-occurrence of different marks.   
 <br>
@@ -1914,3 +1914,15 @@ UpSet(monocytes_combmatrix_filt,
 So far we have examined peak locations, overlap with features and the association between the absence or presence of a mark and gene expression. This binary approach is a very simplistic model and we have been ignoring the signal strength altogether. As in, *Are high and lowly expressed genes associated with equal levels of H3K4me3 at their promoter or not? And what about H3K36me3 across the gene body?*. The measure of strength is also taken along in the definition of different chromatin states, see for example this paper on the [chromHMM tool](https://doi.org/10.1038/nmeth.1906). Positional and signal information are combined to learn these states. Next week you will examine the relationship between signal strength and gene expression. 
 
 But what also should be said, you have come very far already. Very well done, keep up the good work!!    
+
+```{js print2pdf1, context="server"}
+$(document).on('shiny:inputchanged', function(event) {
+  if (event.name === 'print2pdf') {
+    window.print();
+  }
+});
+```
+
+```{r print2pdf2}
+actionButton("print2pdf", "Print page", style="opacity: .7; color: #000;")
+```

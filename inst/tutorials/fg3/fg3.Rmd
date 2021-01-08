@@ -8,7 +8,7 @@ output:
     fig_caption: no
     progressive: true
     allow_skip: true
-    css: css/custom.css
+    css: ["css/custom.css", "css/print2pdf.css"]
 runtime: shiny_prerendered
 description: >
   Multi line text can be put here
@@ -608,4 +608,16 @@ mat=heatTargetAnnotation(chrommhmm_anno_list,plot=FALSE)
       
 #BiocManager::install("pheatmap")
 
+```
+
+```{js print2pdf1, context="server"}
+$(document).on('shiny:inputchanged', function(event) {
+  if (event.name === 'print2pdf') {
+    window.print();
+  }
+});
+```
+
+```{r print2pdf2}
+actionButton("print2pdf", "Print page", style="opacity: .7; color: #000;")
 ```
