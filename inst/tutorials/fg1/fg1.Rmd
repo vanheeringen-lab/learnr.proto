@@ -130,7 +130,7 @@ Global learning objectives #8-11.
 
 - You will run a different tutorial for each week.    
 - Answers will be saved for each of your sessions.  
-- Exercises vary from multiple choice, to selecting correct statements, completing the code to calculating a particular value.  
+- Exercises for the current tutorial vary from multiple choice, to selecting correct statements.    
 - To reserve server space to *active* running tutorials, and stop those that aren't actively used anymore, we set a time-out at 15 minutes. Meaning that if your tutorial has been idle for over 15 minutes, you will see the following warning "Tutorial stopped due to inactivity. Restart to continue where you left off!". When you see this warning, you should close the browser with the tutorial and restart the tutorial. Progress will be saved and once you restart the tutorial you can continue where you left.   
 - Refreshers, background information, tips, hints and optional checks are often formatted in gray boxes and are not obligatory. In most cases you should collapse the box before you can read it's content. This is an example:    
 
@@ -141,7 +141,25 @@ Global learning objectives #8-11.
 <br>
 <iframe src="https://giphy.com/embed/srg19CG0cKMuI" width="480" height="270" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/applause-clapping-oscars-srg19CG0cKMuI">via GIPHY</a></p>  
 <br>
-</details>  
+</details>   
+
+**Example exercise:**  
+```{r exemplemc}
+quiz(caption = "Example questions:",
+     question("What number is the letter A in the English alphabet?",
+        answer("8"),
+        answer("14"),
+        answer("1", correct=TRUE),
+        answer("23")
+     ),
+     question("Where are you right now? (select ALL that apply)",
+          answer("Planet Earth", correct=TRUE),
+          answer("Pluto"),
+          answer("At a computing device", correct=TRUE),
+          answer("In the Milky Way", correct=TRUE),
+          incorrect = "Incorrect. You're on Earth, in the Milky Way, at a computer.")
+)
+```
 
 #### Need help?  
 Use the virtual classroom space in Brightspace/Zoom meeting when you need advice. A lecturer will be present there during practical hours.  
