@@ -131,6 +131,7 @@ Global learning objectives #8-11.
 - You will run a different tutorial for each week.    
 - Answers will be saved for each of your sessions.  
 - Exercises vary from multiple choice, to selecting correct statements, completing the code to calculating a particular value.  
+- To reserve server space to *active* running tutorials, and stop those that aren't actively used anymore, we set a time-out at 15 minutes. Meaning that if your tutorial has been idle for over 15 minutes, you will see the following warning "Tutorial stopped due to inactivity. Restart to continue where you left off!". When you see this warning, you should close the browser with the tutorial and restart the tutorial. Progress will be saved and once you restart the tutorial you can continue where you left.   
 - Refreshers, background information, tips, hints and optional checks are often formatted in gray boxes and are not obligatory. In most cases you should collapse the box before you can read it's content. This is an example:    
 
 > #### Optional check:  
