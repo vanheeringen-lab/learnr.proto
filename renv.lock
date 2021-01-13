@@ -672,8 +672,8 @@
       "Package": "gradethis",
       "Version": "0.1.0.9004",
       "Source": "GitHub",
-      "Remotes": "rstudio/learnr",
       "RemoteType": "github",
+      "Remotes": "rstudio/learnr",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "gradethis",
       "RemoteUsername": "rstudio-education",
@@ -724,15 +724,15 @@
     },
     "htmltools": {
       "Package": "htmltools",
-      "Version": "0.5.0.9003",
+      "Version": "0.5.1.9000",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteUsername": "rstudio",
       "RemoteRepo": "htmltools",
       "RemoteRef": "master",
-      "RemoteSha": "d18bd8e404fb3e7d25dd448b1f8300f16a44add8",
-      "Hash": "2c4efca72b50b4dde3699acf9d055f22"
+      "RemoteSha": "11cfbf3b331387922c0144203cf6e947c8bdaee9",
+      "Hash": "a5eb46169b514a62c170275299e8f8e1"
     },
     "htmlwidgets": {
       "Package": "htmlwidgets",
@@ -835,8 +835,8 @@
       "Package": "learnr",
       "Version": "0.10.1.9006",
       "Source": "GitHub",
-      "Remotes": "rstudio/htmltools, rstudio/shinytest",
       "RemoteType": "github",
+      "Remotes": "rstudio/htmltools, rstudio/shinytest",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "learnr",
       "RemoteUsername": "rstudio",
