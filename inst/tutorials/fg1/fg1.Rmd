@@ -8,7 +8,7 @@ output:
     fig_caption: true
     progressive: true
     allow_skip: true
-    css: css/custom.css
+    css: ["css/custom.css", "css/print2pdf.css"]
 runtime: shiny_prerendered
 description: >
   Multi line text can be put here
@@ -1072,3 +1072,15 @@ question("The gene body of a transcribed gene (eg *ACTB* or *CD14* gene in  mono
 - fastqc
 - [Quality control in sequencing experiments v2019-11, Simon Andrews, Babraham Bioinformatics](https://www.bioinformatics.babraham.ac.uk/training.html#sequenceqc)
 - [The Open Science Training Handbook](https://book.fosteropenscience.eu/en/)  
+
+```{js print2pdf1, context="server"}
+$(document).on('shiny:inputchanged', function(event) {
+  if (event.name === 'print2pdf') {
+    window.print();
+  }
+});
+```
+
+```{r print2pdf2}
+actionButton("print2pdf", "Print page", style="opacity: .7; color: #000;")
+```

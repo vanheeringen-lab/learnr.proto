@@ -9,6 +9,7 @@ output:
     fig_caption: no
     progressive: true
     allow_skip: true
+    css: ["css/custom.css", "css/print2pdf.css"]
 runtime: shiny_prerendered
 description: >
   Multi line text can be put here
@@ -32,7 +33,7 @@ knitr::opts_chunk$set(echo = FALSE)
 gradethis::gradethis_setup()
 ```
 
-```{r, context="server"}
+```{r timeout1, context="server"}
 isolate({
   # obtain the session id
   # source 1: https://shiny.rstudio.com/reference/shiny/latest/session.html
@@ -53,7 +54,7 @@ observeEvent(input[[session_id]], ignoreNULL=T, {
 })
 ```
 
-```{js}
+```{js timeout2}
 // This chunk stops the tutorial if it has been idle for too long
 
 // Situation: We need to stop inactive tutorials to prevent the server from grinding to a halt.
@@ -92,6 +93,97 @@ $(function() {
 ```
 
 ## Embedding
+
+<!-- ```{r, context="server"} -->
+<!-- # source: https://community.rstudio.com/t/is-there-a-way-to-use-a-javascript-package-in-r/52857 -->
+
+<!-- js <- " -->
+<!--   $('#printPdf').click(function () { -->
+<!--     alert('called'); -->
+<!--   }); -->
+<!-- " -->
+<!-- tags$script(src = js) #"js/print2pdf.js") -->
+<!-- ``` -->
+
+<!-- ```{r, context="render"} -->
+<!-- actionButton("printPdf", "1") -->
+<!-- ``` -->
+
+<!-- ```{js, context="server"} -->
+<!-- $(document).on('shiny:inputchanged', function(event) { -->
+<!--   if (event.name === 'printPdf') { -->
+<!--     alert('JavaScript called!'); -->
+
+<!--     var doc = new jsPDF(); -->
+<!--     var specialElementHandlers = { -->
+<!--         '#editor': function (element, renderer) { -->
+<!--             return true; -->
+<!--         } -->
+<!--     }; -->
+
+<!--     alert('Save starting...'); -->
+
+<!--     doc.fromHTML($('#content').html(), 15, 15, { -->
+<!--       'width': 170, -->
+<!--       'elementHandlers': specialElementHandlers -->
+<!--     }); -->
+<!--     doc.save('sample-file.pdf'); -->
+
+<!--     alert('Save done!'); -->
+<!--   } -->
+<!-- }); -->
+<!-- ``` -->
+
+<!-- ```{r, context="render"} -->
+<!-- actionButton("printPdf", "print to PDF") -->
+<!-- ``` -->
+
+<!-- ```{r save_as_pdf1, context="server"} -->
+<!-- jsCode <- " -->
+<!-- shinyjs.helloworld = function() { -->
+<!--   alert('JavaScript called!'); -->
+<!-- } -->
+<!-- " -->
+
+<!-- observeEvent(input$printPdf, { -->
+<!--     js$helloworld() -->
+<!--     output$Server_Hello = renderText("Hello world from server side") -->
+<!-- }) -->
+<!-- ``` -->
+
+<!-- ```{r save_as_pdf2, context="render"} -->
+<!-- # source: https://riptutorial.com/shiny/example/22770/simple-app -->
+<!-- actionButton("printPdf", "3") -->
+
+<!-- textOutput("Server_Hello") -->
+<!-- ``` -->
+
+<!-- ```{js} -->
+<!-- $(document).on('shiny:inputchanged', function(event) { -->
+<!--   if (event.name === 'printPdf') { -->
+<!--     alert('JavaScript called!'); -->
+
+<!--     function addScript(url) { -->
+<!--       var script = document.createElement('script'); -->
+<!--       script.type = 'application/javascript'; -->
+<!--       script.src = url; -->
+<!--       document.head.appendChild(script); -->
+<!--     } -->
+<!--     addScript('https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js'); -->
+
+<!--     html2pdf(document.body)  -->
+<!--     // html2pdf(document.body).save('test.pdf') -->
+<!--     //var worker = html2pdf().from(document.body).save('test.pdf'); -->
+
+<!--     alert('done'); -->
+<!--   } -->
+<!-- }); -->
+<!-- ``` -->
+
+<!-- ```{r save_as_pdf2, context="render"} -->
+<!-- # source: https://stackoverflow.com/questions/6896592/is-it-possible-to-save-html-page-as-pdf-using-javascript-or-jquery?noredirect=1&lq=1 -->
+<!-- actionButton("printPdf", "4") -->
+<!-- ``` -->
 
 ### local image:
 
@@ -269,4 +361,16 @@ output$hist <- renderPlot({
       title = "Distribution of MPG"
     )
 })
+```
+
+```{js print2pdf1, context="server"}
+$(document).on('shiny:inputchanged', function(event) {
+  if (event.name === 'print2pdf') {
+    window.print();
+  }
+});
+```
+
+```{r print2pdf2}
+actionButton("print2pdf", "Print page", style="opacity: .7; color: #000;")
 ```
