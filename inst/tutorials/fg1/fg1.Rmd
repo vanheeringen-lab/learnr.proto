@@ -64,7 +64,7 @@ observeEvent(input[[session_id]], ignoreNULL=T, {
 // source1: https://community.rstudio.com/t/keeping-track-of-idle-time-during-app-usage/1735
 // source2: https://bookdown.org/yihui/rmarkdown/language-engines.html#javascript-and-css
 $(function() {
-  var timeoutSec = 10*60;
+  var timeoutSec = 15*60;
   var idleTimer;
 
   // receive this session's ID
@@ -940,7 +940,7 @@ Silencing does not necessarily have to be mediated by H3K9me3.
 <details><summary> Table with genomic locations of these genes:</summary>   
 >
 gene | genomic location | product  
-:--:|:---:|:----:   
+:--|:---|:----   
 *ACTA1* | chr1:229,431,245-229,434,094 | skeletal muscle actin   
 *EED* | chr11:86,244,753-86,278,810 | part of PRC2 complex    
 *GATA3* | chr10:8,054,810-8,074,890 | TF in various cell types (e.g. mammary gland maturation, T cells and keratinocytes)    
