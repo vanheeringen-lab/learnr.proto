@@ -468,7 +468,7 @@ grade_result(
 
 > **Exercise 2b**: And what is the distribution of peak sizes for these marks? 
 
-```{r q2b_widthh3k4me3, exercise = T}
+```{r q2b_widthh3k4me3, exercise=TRUE, exercise.eval = F, error = T}
 # What is the distribution of H3K4me3 peak sizes?   
 summary(___(monocytes_h3k4me3))
 ```
@@ -487,7 +487,7 @@ grade_result(
 )
 ```
 
-```{r q2b_widthh3k4me1, exercise = T}
+```{r q2b_widthh3k4me1, exercise=TRUE, exercise.eval = F, error = T}
 # And what is the distribution of H3K4me1 peak sizes?   
 monocytes_h3k4me1
 ```
@@ -560,7 +560,7 @@ A template code for a ggplot2 plot:
 
 > **Exercise 3a**: Print a summary of `monocytes_all` using `show()` and identify the variable (column in metadata) that you can use for counting the number of peaks per chip (this will be the statistic used in the barplot).   
 
-```{r monocytesall, exercise = T, exercise.eval = T}
+```{r monocytesall, exercise=TRUE, exercise.eval = F, error = T}
 # print summary of object 'monocytes_all'
 
 
@@ -628,7 +628,7 @@ grade_code()
 monocytes_metadata <- as.data.frame(mcols(monocytes_all))
 ```
 
-```{r barplotpeakcount, exercise = T}
+```{r barplotpeakcount, exercise=TRUE, exercise.eval = F, error = T}
 # plot the number of peaks per chip
 __(data = __)+
   __(mapping=aes(y=__) )+
@@ -707,7 +707,7 @@ monocytes_metadata <- as.data.frame(mcols(monocytes_all))
 monocytes_metadata$peak_size <- width(monocytes_all)
 ```
 
-```{r plotpeaksize, exercise = T}
+```{r plotpeaksize, exercise=TRUE, exercise.eval = F, error = T}
 # plot the peak_size per chip as boxplot
 __(data = __)+
   __(mapping = __(x = __, y = __), fill = "gray", col = "black", bins = 100)+
@@ -745,7 +745,7 @@ monocytes_metadata <- as.data.frame(mcols(monocytes_all))
 monocytes_metadata$peak_size <- width(monocytes_all)
 ```
 
-```{r plotpeaksizelog, exercise = T}
+```{r plotpeaksizelog, exercise=TRUE, exercise.eval = F, error = T}
 # plot the peak_size per chip as boxplot, log10-transform the y-axis
 __(data = __)+
   __(mapping = __(x = __, y = __), fill = "gray", col = "black")+
@@ -836,7 +836,7 @@ monocytes_metadata <- as.data.frame(mcols(monocytes_all))
 monocytes_metadata$peak_size <- width(monocytes_all)
 ```
 
-```{r summarizewidth, exercise = T, message = F, exercise.eval = F}
+```{r summarizewidth, exercise=TRUE, exercise.eval = F, error = T}
 # calculate the total number of bps covered by each chipseq dataset
 # and as a fraction of total bps in chromosome 19
 monocytes_metadata %>% 
@@ -878,7 +878,7 @@ monocytes_metadata <- as.data.frame(mcols(monocytes_all))
 monocytes_metadata$peak_size <- width(monocytes_all)
 ```
 
-```{r plotsummarizewidth, exercise = T}
+```{r plotsummarizewidth, exercise=TRUE, exercise.eval = F, error = T}
 # plot the fraction covered in a bar chart
 monocytes_metadata %>%  group_by(chip) %>% 
   summarise(total_bps = sum(peak_size),  
@@ -975,7 +975,7 @@ promoters_chr19 <- unique(promoters(genes(txdb), upstream=2000, downstream=200))
 
 > **Exercise 6a:** How many promoter are stored in `promoters_chr19`?     
 
-```{r q6a_proms, exercise = T}
+```{r q6a_proms, exercise = T, exercise.lines = 3}
 #  How many regions do you have are stored in `promoters_chr19`? 
 
 ```
@@ -998,7 +998,7 @@ grade_result(
 
 > **Exercise 6b:** Use code to identify the width of the promoter windows. The output of this code should be one integer value.  
 
-```{r q6b_proms, exercise = T}
+```{r q6b_proms, exercise = T, exercise.lines = 3}
 # determine the promoter width
 
 ```
@@ -1031,7 +1031,7 @@ grade_result(
 > * You need to hit "Run Code" to be able to see the output of `show()`   
 
 
-```{r q6c_overlap, exercise = T}
+```{r q6c_overlap, exercise=TRUE, exercise.eval = F, error = T}
 #exercise.setup = "prepare_exercise6"}
 # Find overlap between monocytes_h3k4me3 peaks and promoters
 overlap <- ___(query = ___, subject = ___)
@@ -1064,7 +1064,7 @@ The Hits object "overlap" reports the indexes of `monocytes_h3k4me3` and `promot
 overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters_chr19)
 ```
 
-```{r q6d_overlap, exercise = T, exercise.setup = "prepare_exercise6"}
+```{r q6d_overlap, exercise=TRUE, exercise.eval = F, error = T, exercise.setup = "prepare_exercise6"}
 # Extract the unique promoter indexes
 unique_promoters <- unique(___(overlap))
 
@@ -1120,7 +1120,7 @@ unique_promoters <- unique(subjectHits(overlap))
 unique_promoters_count <- length(unique_promoters)
 ```
 
-```{r q6d_overlap_enterfraction, exercise = T, exercise.setup = "prepare_exercise6d"}
+```{r q6d_overlap_enterfraction, exercise = T, exerecise.lines = 2, exercise.setup = "prepare_exercise6d"}
 # enter the fraction of promoters that are part of the overlap, round to 3 decimal places:  
 
 
@@ -1140,7 +1140,7 @@ grade_result(
 
 > **Exercise 6e:** And what fraction of the h3k4me3 peaks are part of the overlap?  
 
-```{r q6e_overlap, exercise = T, exercise.setup = "prepare_exercise6"}
+```{r q6e_overlap, exercise=TRUE, exercise.eval = F, error = T, exercise.setup = "prepare_exercise6"}
 # Extract the unique peaks
 unique_peaks <- unique(___(overlap))
 
@@ -1184,7 +1184,7 @@ unique_peaks <- unique(queryHits(overlap))
 unique_peaks_count <- length(unique_peaks)
 ```
 
-```{r q6e_overlap_enterfraction, exercise = T, exercise.setup =  "prepare_exercise6e"}
+```{r q6e_overlap_enterfraction, exercise=TRUE, exercise.eval = F, error = T, exercise.setup =  "prepare_exercise6e"}
 # enter the fraction of promoters that are part of the overlap, round to 3 decimal places:  
 
 
@@ -1295,7 +1295,7 @@ promoters_chr19_reduced <- reduce(promoters_chr19)
 promoters_metadata <- as.data.frame(mcols(promoters_chr19_reduced))
 ```
 
-```{r q7a_promfraction, exercise = T, message = F}
+```{r q7a_promfraction, exercise=TRUE, exercise.eval = F, error = T}
 # define the variable 'promoter_size'
 promoters_metadata$promoter_size <- ___(promoters_chr19_reduced)
 
@@ -1357,7 +1357,7 @@ overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters_chr19)
 ```
 
 <br>
-```{r q7b_binomtest, exercise = T, exercise.eval = F, error = T}
+```{r q7b_binomtest, exercise=TRUE, exercise.eval = F, error = T}
 # Use the indexes from the overlap object to identify promoters with H3K4me3 peak
 promoters_with_h3k4me3 <- promoters_chr19[ unique(___(overlap)) ]
 
@@ -1406,7 +1406,7 @@ binomtest_result
 ### Exercise 7c
 > **Exercise 7c** Based on this test, do you conclude that H3K4me3 is enriched in promoter regions?
 
-```{r q7c_enrichmenttest, exercise = T, echo = T}
+```{r q7c_enrichmenttest}
 question("Is H3K4me3 enriched promoters?",
          answer("*Yes*", correct = T, message = "The binomial test shows a p-value < 2.2e-16 and a confidence interval that excludes the expected 0.062 We therefore reject the H0 of no enrichment."),
          answer("*No*", message = "Incorrect. Look at the p-value of the previous test.")
@@ -1424,7 +1424,7 @@ To find the genes associated with the promoters, we use the indexes from the ove
 overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters_chr19)
 ```
 
-```{r q8a_genesids_overlap, exercise = T, exercise.eval = F, error = T, exercise.setup = "prepare_exercise8"}
+```{r q8a_genesids_overlap, exercise=TRUE, exercise.eval = F, error = T, exercise.setup = "prepare_exercise8"}
 # the objects `overlap` and `promoters_chr19` are loaded for you 
 # subset for promoters that are part of the overlap with H3K4me3 in monocytes 
 promoters_with_h3k4me3  <- 
@@ -1486,7 +1486,7 @@ overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters_chr19)
 promoters_with_h3k4me3 <- promoters_chr19[subjectHits(overlap)]
 ```
 
-```{r q9a_geneexpression, exercise = T, exercise.eval = F, error = T, exercise.setup = "prepare_exercise9a"}
+```{r q9a_geneexpression, exercise=TRUE, exercise.eval = F, error = T, exercise.setup = "prepare_exercise9a"}
 # The object quantification_chr19 holds the RNA-seq quantification for genes on chromosome 19. 
 # View the structure to identify the variable you will use in mutate. 
 str(quantification_chr19)
@@ -1503,7 +1503,7 @@ str(quantification_chr19)
 
 # Define a new variable that identifies if a gene is present in the overlap or not.  
 quantification_chr19_new <- quantification_chr19 %>% 
-  mutate(h3k4me3_promoter = entrez_id %in% promoters_with_h3k4me3$gene_id )
+  mutate(h3k4me3_promoter = entrezgene_id %in% promoters_with_h3k4me3$gene_id )
 ```
 
 ```{r q9a_geneexpression-code-check}
@@ -1516,10 +1516,10 @@ grade_code()
 overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters_chr19)
 promoters_with_h3k4me3 <- promoters_chr19[subjectHits(overlap)]
 quantification_chr19_new <- quantification_chr19 %>% 
-  mutate(h3k4me3_promoter = entrez_id %in% promoters_with_h3k4me3$gene_id )
+  mutate(h3k4me3_promoter = entrezgene_id %in% promoters_with_h3k4me3$gene_id )
 ```
 
-```{r q9b_plot_genequant, exercise =  T , exercise.eval = F, error = T, exercise.setup = "prepare_exercise9b"}
+```{r q9b_plot_genequant, exercise=TRUE, exercise.eval = F, error = T, exercise.setup = "prepare_exercise9b"}
 # Use ggplot() and geom_boxplot() to visualize the FPKM per gene group in the dataset `quantification_chr19_new`   
 ggplot(___)+
   geom_boxplot(mapping = aes(x = __, y = __))+
@@ -1543,7 +1543,7 @@ This doesn't look very informative. RNA-seq quantification has a high range. We 
 > - add 1 to all FPKM values to prevent log10(0).  
 > - also add another 'layer', visualizing the same data but as jitter (points).  
 
-```{r q9c_plot_genequant, exercise =  T , exercise.eval = F, error = T, exercise.setup = "prepare_exercise9b"}
+```{r q9c_plot_genequant, exercise=TRUE, exercise.eval = F, error = T, exercise.setup = "prepare_exercise9b"}
 # Repeat the plot of 9b but lgo10-transform the y-axis    
 ggplot(quantification_chr19_new)+
   geom_boxplot(mapping = aes(x = h3k4me3_promoter, y = (FPKM+1)))+
@@ -1606,7 +1606,7 @@ promoters_with_h3k27me3 <- promoters_chr19[subjectHits(overlap_h3k27me3_promoter
 
 # 3. define a "h3k27me3_promoter" in `quantification_chr19`, pipe the output in your ggplot command  
 quantification_chr19 %>%  
-  mutate(h3k27me3_promoter = entrez_id %in% promoters_with_h3k27me3$gene_id) %>% 
+  mutate(h3k27me3_promoter = entrezgene_id %in% promoters_with_h3k27me3$gene_id) %>% 
   ggplot(.) +
   geom_boxplot(mapping = aes(x = h3k27me3_promoter, y = (FPKM+1)))+
   geom_jitter(mapping = aes(x = h3k27me3_promoter, y = (FPKM+1)), alpha = 0.8, size = 0.5)+
@@ -1640,10 +1640,10 @@ promoters_with_h3k27me3 <- promoters_chr19[subjectHits(overlap_h3k27me3_promoter
 # define the level name between the ""-signs.  
 quantification_chr19_new <- quantification_chr19 %>% mutate(
   promoter_mark = case_when(
-    entrez_id %in% promoters_with_h3k4me3$gene_id & entrez_id %in% promoters_with_h3k27me3$gene_id ~ "____",  # promoters with both marks
-    entrez_id %in% promoters_with_h3k4me3$gene_id & !(entrez_id %in% promoters_with_h3k27me3$gene_id) ~ "____", # promoters with only h3k4me3
-    !(entrez_id %in% promoters_with_h3k4me3$gene_id) & entrez_id %in% promoters_with_h3k27me3$gene_id ~ "____", # and so forth... 
-    !(entrez_id %in% promoters_with_h3k4me3$gene_id | entrez_id %in% promoters_with_h3k27me3$gene_id) ~ "____") ) 
+    entrezgene_id %in% promoters_with_h3k4me3$gene_id & entrezgene_id %in% promoters_with_h3k27me3$gene_id ~ "____",  # promoters with both marks
+    entrezgene_id %in% promoters_with_h3k4me3$gene_id & !(entrezgene_id %in% promoters_with_h3k27me3$gene_id) ~ "____", # promoters with only h3k4me3
+    !(entrezgene_id %in% promoters_with_h3k4me3$gene_id) & entrezgene_id %in% promoters_with_h3k27me3$gene_id ~ "____", # and so forth... 
+    !(entrezgene_id %in% promoters_with_h3k4me3$gene_id | entrezgene_id %in% promoters_with_h3k27me3$gene_id) ~ "____") ) 
 
 # print a table with the number of promoters per promoter mark
 
@@ -1652,18 +1652,18 @@ quantification_chr19_new <- quantification_chr19 %>% mutate(
 <div id="q11_bivalent_prom-hint">
 An example of level names would be:  
 `quantification_chr19 %>%  mutate(promoter_mark = case_when(`
-    `entrez_id %in% promoters_with_h3k4me3$gene_id & entrez_id %in% promoters_with_h3k27me3$gene_id ~ "bivalent",` 
-    `entrez_id %in% promoters_with_h3k4me3$gene_id & !(entrez_id %in% promoters_with_h3k27me3$gene_id) ~ "H3K4me3_only", `
-    `!(entrez_id %in% promoters_with_h3k4me3$gene_id) & entrez_id %in% promoters_with_h3k27me3$gene_id ~ "H3K27me3_only",` 
-    `!(entrez_id %in% promoters_with_h3k4me3$gene_id | entrez_id %in% promoters_with_h3k27me3$gene_id) ~ "no_mark") )`
+    `entrezgene_id %in% promoters_with_h3k4me3$gene_id & entrezgene_id %in% promoters_with_h3k27me3$gene_id ~ "bivalent",` 
+    `entrezgene_id %in% promoters_with_h3k4me3$gene_id & !(entrezgene_id %in% promoters_with_h3k27me3$gene_id) ~ "H3K4me3_only", `
+    `!(entrezgene_id %in% promoters_with_h3k4me3$gene_id) & entrezgene_id %in% promoters_with_h3k27me3$gene_id ~ "H3K27me3_only",` 
+    `!(entrezgene_id %in% promoters_with_h3k4me3$gene_id | entrezgene_id %in% promoters_with_h3k27me3$gene_id) ~ "no_mark") )`
 </div>
 
 ```{r q11a_bivalent_prom-solution, eval = F}
 quantification_chr19_new <- quantification_chr19 %>%  mutate(promoter_mark = case_when(
-    entrez_id %in% promoters_with_h3k4me3$gene_id & entrez_id %in% promoters_with_h3k27me3$gene_id ~ "bivalent", 
-    entrez_id %in% promoters_with_h3k4me3$gene_id & !(entrez_id %in% promoters_with_h3k27me3$gene_id) ~ "H3K4me3_only", 
-    !(entrez_id %in% promoters_with_h3k4me3$gene_id) & entrez_id %in% promoters_with_h3k27me3$gene_id ~ "H3K27me3_only", 
-    !(entrez_id %in% promoters_with_h3k4me3$gene_id | entrez_id %in% promoters_with_h3k27me3$gene_id) ~ "no_mark") ) 
+    entrezgene_id %in% promoters_with_h3k4me3$gene_id & entrezgene_id %in% promoters_with_h3k27me3$gene_id ~ "bivalent", 
+    entrezgene_id %in% promoters_with_h3k4me3$gene_id & !(entrezgene_id %in% promoters_with_h3k27me3$gene_id) ~ "H3K4me3_only", 
+    !(entrezgene_id %in% promoters_with_h3k4me3$gene_id) & entrezgene_id %in% promoters_with_h3k27me3$gene_id ~ "H3K27me3_only", 
+    !(entrezgene_id %in% promoters_with_h3k4me3$gene_id | entrezgene_id %in% promoters_with_h3k27me3$gene_id) ~ "no_mark") ) 
 
 table(quantification_chr19_new$promoter_mark)
 
@@ -1686,10 +1686,10 @@ overlap_h3k27me3_promoters <- findOverlaps(query = monocytes_h3k27me3, subject =
 promoters_with_h3k27me3 <- promoters_chr19[subjectHits(overlap_h3k27me3_promoters)]
 
 quantification_chr19_new <- quantification_chr19 %>%  mutate(promoter_mark = case_when(
-    entrez_id %in% promoters_with_h3k4me3$gene_id & entrez_id %in% promoters_with_h3k27me3$gene_id ~ "bivalent", 
-    entrez_id %in% promoters_with_h3k4me3$gene_id & !(entrez_id %in% promoters_with_h3k27me3$gene_id) ~ "H3K4me3_only", 
-    !(entrez_id %in% promoters_with_h3k4me3$gene_id) & entrez_id %in% promoters_with_h3k27me3$gene_id ~ "H3K27me3_only", 
-    !(entrez_id %in% promoters_with_h3k4me3$gene_id | entrez_id %in% promoters_with_h3k27me3$gene_id) ~ "no_mark") ) 
+    entrezgene_id %in% promoters_with_h3k4me3$gene_id & entrezgene_id %in% promoters_with_h3k27me3$gene_id ~ "bivalent", 
+    entrezgene_id %in% promoters_with_h3k4me3$gene_id & !(entrezgene_id %in% promoters_with_h3k27me3$gene_id) ~ "H3K4me3_only", 
+    !(entrezgene_id %in% promoters_with_h3k4me3$gene_id) & entrezgene_id %in% promoters_with_h3k27me3$gene_id ~ "H3K27me3_only", 
+    !(entrezgene_id %in% promoters_with_h3k4me3$gene_id | entrezgene_id %in% promoters_with_h3k27me3$gene_id) ~ "no_mark") ) 
 ```
 
 
@@ -1740,22 +1740,44 @@ You will make an UpSet plot, which is an elegant alternative to the VennDiagram,
 ![](images/wk2_4_complexheatmap_modes.png)/  
 [Ref](https://jokergoo.github.io/ComplexHeatmap-reference/book/upset-plot.html#input-data): *Zuguang Gu, ComplexHeatmap Complete Reference, last revised on 2020-10-27*  
 <br>
-The `make_comb_mat([list_of_grangesobjects])` is used to find overlapping marks. It returns a "combination matrix" object. Special functions can be used to view it's information and filter the reported combinations.   
 <br>
+The `make_comb_mat([list_of_grangesobjects])` is used to detect overlapping marks:   
+```{r makecombexample, eval = F, echo = T}
+monocytes_combinationmatrix <- make_comb_mat(monocytes_list) # takes a while! 
+```
+`make_comb_mat()` returns a "combination matrix" object. Special functions can be used to view its information and filter the reported combinations:   
+
+- set_name() prints the names of the objects from the original list  
+- set_size() prints the total number of bps covered by the intervals in each object  
+- comb_size() reports the total number of bps covered by the respective combination of intervals.  
+    + The combinations are encoded in a binary fashion of 0s and 1s.  
+    + A 1 means the mark in question is present in the combination.  
+    + These 0s and 1s follow the order given by set_name().   
+
 
 ### Exericse 12a    
 
-> **Exercise 12a**: Run the code below, which calculates the combination matrix of the different ChIP-seq peak sets.   
-> 
-> - set_name() prints the names of the objects from the original list  
-> - set_size() prints the total number of bps covered by the intervals in each object  
-> - comb_size() reports the total number of bps covered by the respective combination of intervals.  
-    + The combinations are encoded in a binary fashion of 0s and 1s.  
-    + A 1 means the mark in question is present in the combination.  
-    + These 0s and 1s follow the order given by set_name().  
+> **Exercise 12a**: Examine the `monocytes_combinationmatrix` object with the obove mentioned functions.     
 
-```{r q12a_upsetrplot_mark_overlap, exercise = T}
-monocytes_combinationmatrix <- make_comb_mat(monocytes_list) # takes a while! 
+```{r prepare_exercise12a, echo = F}
+# import correct output 
+### rdsfile <- system.file("extdata", "week2", "prepared_rds", "blueprint_monocyte_chr19_complexheatmap_combmatrix.rds", package = "learnr.proto")
+rdsfile <- paste("data", "prepared_rds", "blueprint_monocyte_chr19_complexheatmap_combmatrix.rds", sep = "/")
+monocytes_combinationmatrix <- readRDS(rdsfile)
+```
+
+```{r q12a_upsetrplot_mark_overlap, exercise = TRUE, error = T, exercise.eval = F, exercise.setup =  "prepare_exercise12a"}
+# What are the names of the sets?
+__(monocytes_combinationmatrix)
+
+# What are the sizes of the sets? (in million bps)
+___(monocytes_combinationmatrix)/1e-6
+
+# What are the sizes of the detected set combinations? (in million bps)
+___(monocytes_combinationmatrix)/1e-6
+```
+
+```{r q12a_upsetrplot_mark_overlap-solution, eval = F}
 # What are the names of the sets?
 set_name(monocytes_combinationmatrix)
 
@@ -1763,9 +1785,8 @@ set_name(monocytes_combinationmatrix)
 set_size(monocytes_combinationmatrix)/1e-6
 
 # What are the sizes of the detected set combinations?  
-comb_size(monocytes_combinationmatrix)
+comb_size(monocytes_combinationmatrix)/1e-6
 ```
-
 
 ```{r q12_bivalent_mc}
 quiz(caption ="", 
@@ -1793,14 +1814,8 @@ The combination H3K4me1 and H3K4me3 is the 3rd most widespread combination. This
 
 > **Exercise 12a**: Filter `monocytes_combinationmatrix` for combinations of 100kb and more. And plot the filtered combination matrix with `UpSet()`.   
 
-```{r prepare_exercise12b, echo = F}
-# import correct output 
-rdsfile <- system.file("extdata", "week2", "prepared_rds", "blueprint_monocyte_chr19_complexheatmap_combmatrix.rds", package = "learnr.proto")
-monocytes_combinationmatrix <- readRDS(rdsfile)
-```
 
-
-```{r q12b_upsetrplot, exercise = T, exercise.setup = "prepare_exercise12b", exercise.eval = F, error = T}
+```{r q12b_upsetrplot, exercise = T, exercise.setup = "prepare_exercise12a", exercise.eval = F, error = T}
 # filter monocytes_combinationmatrix for combinations covering at least 100kb
 monocytes_combmatrix_filt <- monocytes_combinationmatrix[comb_size(monocytes_combinationmatrix) > ___ ]
 
@@ -1811,7 +1826,7 @@ ___(monocytes_combmatrix_filt)
 ```
 
 ```{r q12b_upsetrplot-solution, eval = F}
-# filter monocytes_combinationmatrix for combinations covering at least 200kb
+# filter monocytes_combinationmatrix for combinations covering at least 100kb
 monocytes_combmatrix_filt <- monocytes_combinationmatrix[comb_size(monocytes_combinationmatrix) > 100000]
 
 # plot the result in an upset plot:  
@@ -1826,8 +1841,8 @@ grade_code()
 
 > **Exercise 12c**: Run the code below, which changes the labels at the top and rightside.   
 
-```{r q12c_niceupset, exercise = T, exercise.setup = "prepare_exercise12b"}
-# filter monocytes_combinationmatrix for combinations covering at least 200kb
+```{r q12c_niceupset, exercise = T, exercise.setup = "prepare_exercise12a"}
+# filter monocytes_combinationmatrix for combinations covering at least 100kb
 monocytes_combmatrix_filt <- monocytes_combinationmatrix[comb_size(monocytes_combinationmatrix) > 100000]
 
 # plot with nice axis labels
@@ -1854,7 +1869,7 @@ This makes the plot a bit better readable. You can also add additional plots to 
 
 First we filter the original combination matrix and then extract all the matrices into a GRanges object. The `lapply()` command returns a list of these GRanges objects.  
 
-```{r add_distance_to_tss, echo = T, eval = F}
+```{r add_distance_to_tss, echo = T}
 # filter monocytes_combinationmatrix for combinations covering at least 200kb
 monocytes_combmatrix_filt <- monocytes_combinationmatrix[comb_size(monocytes_combinationmatrix) > 100000]
 
