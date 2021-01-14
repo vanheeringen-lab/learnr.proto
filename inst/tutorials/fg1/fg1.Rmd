@@ -165,9 +165,9 @@ quiz(caption = "Example questions:",
 Use the virtual classroom space in Brightspace/Zoom meeting when you need advice. A lecturer will be present there during practical hours.  
 
 ## 1.1 Learning Objectives  
-<br>
-**This week's focus will be on how sequencing data is processed and acquint ourselves with the UCSC Genome browser as a tool to visually inspect epigenomics data.**   
-<br>
+
+**This week's focus will be on how sequencing data is processed and acquaint ourselves with the UCSC Genome browser as a tool to visually inspect epigenomics data.**   
+
 
 > At the end of week 1 you are able to  
 >  
