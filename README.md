@@ -1,49 +1,26 @@
 # learnr.proto
+Learnr tutorials for the Functional Genomics course.
 
-## Developing tutorial
+## Development install
 
-### Quick and dirty
-The following steps download the learnr tutorial and allows you to work on them without version control.
-
-1) optional: `cd` into a directory where you want to store these files.
-
-2) Download this repo.
-
+Install R 3.6.3, for instance with conda:
 ```
-wget https://github.com/vanheeringen-lab/learnr.proto/archive/master.zip
+conda create -n R_3.6 -c conda-forge conda-forge::r-base=3.6.3 r-boot r-class r-cluster r-codetools r-foreign r-KernSmooth r-lattice r-MASS r-Matrix r-mgcv r-nlme r-nnet r-rpart r-spatial r-survival --yes;
 
-unzip master.zip
-
-rm -rf master.zip
+conda activate R_3.6;
 ```
+Install Rstudio.
 
-2) Using conda, create a suitable environment. 
+In Rstudio, create a "New Project..." > select "Version Control" > "Git" > Repository URL: https://github.com/vanheeringen-lab/learnr.proto
 
-```
-conda env create -n learnr -f learnr.proto-master/inst/conda/environment.yaml
-```
+Install all packages with `renv::restore()`. On windows you will need to install Rtool35 from https://cran.r-project.org/bin/windows/Rtools/Rtools35.exe
 
-3) Activate the conda environment, and start Rstudio
+## Notes & Troubleshooting
+- To run a tutorial as Markdown (quick, but may differ from tutorials), open the .Rmd file and press "Run document"
 
-```
-conda activate learnr
-
-rstudio
-```
-
-4) In Rstudio, check that your conda environment is loaded and check that the environment is working by loading learnr
-
-```
-.libPaths()  # should return a path containing the environment name
-library(learnr)
-```
-
-5) Open the tutorial file `learnr.proto-master/ins/tutorials/test/test.Rmd`
-
-6) To visualize the tutorial, press "Run Document" (green arrow symbol, located in the top bar).
-
-### Notes & Troubleshooting
 - The settings menu (gear wheel symbol) can be used to change the display method of the tutorial. 
+
+- To run a tutorial as Tutorial (slow, but as intended), install the package with devtools and run `learnr.dashboard::start_tutorial("fg1")
 
 - To add a new tutorial to the repo, add a folder to `inst/tutorials` containing a Rmarkdown file with the same name (example: `inst/tutorials/test/test.Rmd`).
 
