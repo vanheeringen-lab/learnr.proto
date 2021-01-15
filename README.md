@@ -41,9 +41,9 @@ Install all packages with `renv::restore()`. On windows you will need to install
 
 - The settings menu (gear wheel symbol) can be used to change the display method of the tutorial. 
 
-- To add a new tutorial to the repo, add a folder to `inst/tutorials` containing a Rmarkdown file with the same name (example: `inst/tutorials/test/test.Rmd`).
+- To add a new tutorial to the repo, add a folder to `inst/tutorials` containing a Rmarkdown file with the same name (example: `inst/tutorials/fg1/fg1.Rmd`). Keep these names simple and short.
 
-- If there are no boxes to input code, close the tutorial. Next, in the top bar, click `Session`, then `Restart R`.
+- If there are no boxes to input code, try restarting R with `.rs.restartR()`.
 
 - If you pressed "Run document" and got an error mentioning "file exists", run `rm("learnr.proto-master/ins/tutorials/test/test.html")` and try again.
 
@@ -57,4 +57,4 @@ $ chmod -R 755 ~/.local/share/renv/cache
 $ chmod -R 755 /path/to/learnr.proto/renv/library/R-3.6/x86_64-pc-linux-gnu
 ```
 
-(Re)generate the .html files for each tutorial (only the owner of the renv library can). Delete old .html files in the tutorial folders, and run each For instance by running each (`learnr.dashboard::start_tutorial('fg1')`). Finally, install these .html files with `learnr.dashboard:::.setup_dev_proto("/path/to/learnr.proto/renv/library/R-3.6/x86_64-pc-linux-gnu")`
+(Re)generate the .html files for each tutorial (only the owner of the renv library can). Delete old .html files in the renv library tutorial folders and run each, for instance by running (`learnr.dashboard::start_tutorial('fg1')`). 
