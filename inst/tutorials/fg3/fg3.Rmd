@@ -662,40 +662,83 @@ In this section you will plot the relationship between H3K4me3 signal at the TSS
 ### 3.4.1 Summarize signal scores   
 First, we will calculate the average H3K4me3 signal in 10kb around *all TSSs*. We can do this quickly with a modified version of the 'ScoreMatrix' function we used above: `ScoreMatrixBin()`.  
 <br>
-As the name suggests, this function does not calculate the signal for each bp in the given windows, but for each bin. If we set the `bin.num` parameter to `1`, it will output the average signal over the whole window. Note that this function is also useful when working with windows of varying size like complete genes.  
+As the name suggests, this function does not calculate the signal for each bp in the given windows, but for each bin. If we set the `bin.num` parameter to `1`, it will output the average signal per window. Note that this function is also useful when working with windows of varying size like complete genes, in those cases we set `bin.num` to 50 or 100.    
 
-> **Exercise 6**: Calcualte the average H3K4me3 signal in a window of +/- 5kb around the TSS. Do this for *all* TSSs, irrespective of their overlap of distance to a H3K4me3 peak.   
+> **Exercise 6**: Calculate the average H3K4me3 signal in a window of +/- 5kb around the TSS. Do this for *all* TSSs, irrespective of their overlap of distance to a H3K4me3 peak.   
 
 ```{r q6_prepare}
 
 
 ```
 
-```{q}
+```{r}
+window <- 5000
+tss_window <- resize(tss_chr19, width = window, fix = "center")
+average_score_h3k4me3_tss <- ScoreMatrixBin(target = bw_h3k4me3, windows = tss_window, type = 'bigWig', bin.num = 1, strand.aware = TRUE)  # gives the average score over the complete window. And not the sum of 1bp bin windows. 
+scores_as_matrix <- as(average_score_h3k4me3_tss, "matrix")
+scores_as_df <- as.data.frame(scores_as_matrix)
+scores_as_df$gene_id <- tss_window$gene_id
+h3K4me3_and_rnaquant <- merge(scores_as_df, quantification_chr19, by.x = "gene_id", by.y = "entrezgene_id")
+h3K4me3_and_rnaquant %>% 
+  mutate(expression_group = ntile(FPKM, 4)) %>% 
+  ggplot(.)+ 
+  geom_boxplot(mapping=aes(x = as.factor(expression_group), y = V1))
+h3K4me3_and_rnaquant %>% 
+  mutate(expression_group = ntile(FPKM, 4)) %>% 
+  ggplot(.)+ 
+  geom_point(mapping=aes(col = as.factor(expression_group), x = log2(FPKM+1) ,y = V1)) 
+
 window <- 10000
 tss_window <- resize(tss_chr19, width = window, fix = "center")
-scores_h3k4me3_tss_all <- ScoreMatrixBin(target = bw_h3k4me3, windows = tss_window, type = 'bigWig', bin.num = 1, strand.aware = TRUE)  # gives the average score over the complete window. And not the sum of 1bp bin windows. 
-scores_as_matrix <- as(scores_h3k4me3_tss_all, "matrix")
-scores_as_df <- as.data.frame(scores_h3k4me3_tss_all)
+average_score_h3k4me3_tss <- ScoreMatrixBin(target = bw_h3k4me3, windows = tss_window, type = 'bigWig', bin.num = 1, strand.aware = TRUE)  # gives the average score over the complete window. And not the sum of 1bp bin windows. 
+scores_as_matrix <- as(average_score_h3k4me3_tss, "matrix")
+scores_as_df <- as.data.frame(scores_as_matrix)
 scores_as_df$gene_id <- tss_window$gene_id
-head(scores_as_df) 
+h3K4me3_and_rnaquant <- merge(scores_as_df, quantification_chr19, by.x = "gene_id", by.y = "entrezgene_id")
+h3K4me3_and_rnaquant %>% 
+  mutate(expression_group = ntile(FPKM, 4)) %>% 
+  ggplot(.)+ 
+  geom_boxplot(mapping=aes(x = as.factor(expression_group), y = V1))
+h3K4me3_and_rnaquant %>% 
+  mutate(expression_group = ntile(FPKM, 4)) %>% 
+  ggplot(.)+ 
+  geom_point(mapping=aes(col = as.factor(expression_group), x = log2(FPKM+1) ,y = V1))
 
-scores_and_quant <- merge(scores_as_df, quantification_chr19, by.x = "gene_id", by.y = "entrezgene_id")
-plot(log10(scores_and_quant$FPKM), scores_and_quant$V1)
 
-scores_h3k4me3_tss_10kb <- ScoreMatrix(target = bw_h3k4me3, windows = tss_window, type = 'bigWig',strand.aware = TRUE) 
-scores_as_df_10kb <- as.data.frame(tss_window$gene_id)
-colnames(scores_as_df_10kb) <- "gene_id"
-scores_as_df_10kb$mean_h3k4me3 <- apply(as(scores_h3k4me3_tss_10kb, "matrix"), 1, mean)
-scores_as_df_10kb$sum_h3k4me3 <- apply(as(scores_h3k4me3_tss_10kb, "matrix"), 1, sum)
-scores10kb_and_quant <- merge(scores_as_df_10kb, quantification_chr19, by.x = "gene_id", by.y = "entrezgene_id")
-cor(log10(scores10kb_and_quant$FPKM+1), scores10kb_and_quant$sum_h3k4me3)
-cor(log10(scores10kb_and_quant$FPKM+1), scores10kb_and_quant$mean_h3k4me3)
+window <- 20000
+tss_window <- resize(tss_chr19, width = window, fix = "center")
+average_score_h3k4me3_tss <- ScoreMatrixBin(target = bw_h3k4me3, windows = tss_window, type = 'bigWig', bin.num = 1, strand.aware = TRUE)  # gives the average score over the complete window. And not the sum of 1bp bin windows. 
+scores_as_matrix <- as(average_score_h3k4me3_tss, "matrix")
+scores_as_df <- as.data.frame(scores_as_matrix)
+scores_as_df$gene_id <- tss_window$gene_id
+h3K4me3_and_rnaquant <- merge(scores_as_df, quantification_chr19, by.x = "gene_id", by.y = "entrezgene_id")
+h3K4me3_and_rnaquant %>% 
+  mutate(expression_group = ntile(FPKM, 4)) %>% 
+  ggplot(.)+ 
+  geom_boxplot(mapping=aes(x = as.factor(expression_group), y = V1)) 
+h3K4me3_and_rnaquant %>% 
+  mutate(expression_group = ntile(FPKM, 4)) %>% 
+  ggplot(.)+ 
+  geom_point(mapping=aes(col = as.factor(expression_group), x = log2(FPKM+1) ,y = V1))
 
-head(scores_as_df_10kb)
 
-# add gene expression 
+# h3K4me3_and_rnaquant <- merge(scores_as_df, quantification_chr19, by.x = "gene_id", by.y = "entrezgene_id")
+# h3K4me3_and_rnaquant %>% 
+#   mutate(expression_group = ntile(FPKM, 4)) %>% 
+#   ggplot(.)+ 
+#   geom_boxplot(mapping=aes(x = as.factor(expression_group), y = V1))
 
+
+# scores_h3k4me3_tss_10kb <- ScoreMatrix(target = bw_h3k4me3, windows = tss_window, type = 'bigWig',strand.aware = TRUE) 
+# scores_as_df_10kb <- as.data.frame(tss_window$gene_id)
+# colnames(scores_as_df_10kb) <- "gene_id"
+# scores_as_df_10kb$mean_h3k4me3 <- apply(as(scores_h3k4me3_tss_10kb, "matrix"), 1, mean)
+# scores_as_df_10kb$sum_h3k4me3 <- apply(as(scores_h3k4me3_tss_10kb, "matrix"), 1, sum)
+# scores10kb_and_quant <- merge(scores_as_df_10kb, quantification_chr19, by.x = "gene_id", by.y = "entrezgene_id")
+# cor(log10(scores10kb_and_quant$FPKM+1), scores10kb_and_quant$sum_h3k4me3)
+# cor(log10(scores10kb_and_quant$FPKM+1), scores10kb_and_quant$mean_h3k4me3)
+# 
+# head(scores_as_df_10kb)
 ```
 
 ### 3.4.1 H3K4me3 signal vs gene expression  
