@@ -672,8 +672,8 @@
       "Package": "gradethis",
       "Version": "0.1.0.9004",
       "Source": "GitHub",
-      "RemoteType": "github",
       "Remotes": "rstudio/learnr",
+      "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "gradethis",
       "RemoteUsername": "rstudio-education",
@@ -835,8 +835,8 @@
       "Package": "learnr",
       "Version": "0.10.1.9006",
       "Source": "GitHub",
-      "RemoteType": "github",
       "Remotes": "rstudio/htmltools, rstudio/shinytest",
+      "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "learnr",
       "RemoteUsername": "rstudio",
@@ -846,15 +846,15 @@
     },
     "learnr.dashboard": {
       "Package": "learnr.dashboard",
-      "Version": "0.1.1",
+      "Version": "0.2",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteUsername": "vanheeringen-lab",
       "RemoteRepo": "learnr.dashboard",
       "RemoteRef": "master",
-      "RemoteSha": "6fca268f371163d22a839fafb7eaf435ab443e8d",
-      "Hash": "016453eae23f7440e9210b318cdbb020"
+      "RemoteSha": "8a6d77e4d6c03d6481d7fc1275d0562fb679e5cc",
+      "Hash": "7b3927461c9403cf8878ceb94322b03a"
     },
     "lifecycle": {
       "Package": "lifecycle",
