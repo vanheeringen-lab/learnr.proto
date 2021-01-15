@@ -29,9 +29,8 @@ library(plyranges)
 library(rtracklayer)
 library(VennDiagram)
 library(GenomicFeatures)
-library(ComplexHeatmap)
+library(ComplexHeatmap) # for upset plot with GRanges, may be unloaded for fg3
 library(genomation)
-library(ChIPpeakAnno)
 library(ggthemes)
 library(org.Hs.eg.db)
 
@@ -40,13 +39,6 @@ library(org.Hs.eg.db)
 library(TxDb.Hsapiens.UCSC.hg38.knownGene)
 txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene 
 seqlevels(txdb) <- "chr19"
-
-## installing additional packages by:
-# BiocManager::install('genomation')
-# BiocManager::install("ggthemes")
-# BiocManager::install("ComplexHeatmap")  # for upset plot with GRanges
-# BiocManager::install("org.Hs.eg.db")
-
 
 # configuration
 knitr::opts_chunk$set(echo=FALSE, message=F)
@@ -62,6 +54,7 @@ monocytes_list <- GRangesList(monocytes_list, compress=F)
 # chr19_windows_1bp <- tileGenome(seqinfo(txdb), tilewidth = 10, cut.last.tile.in.chrom =T)
 tss_chr19 <- unique(promoters(genes(txdb), upstream=100, downstream=0)) 
 tss_chr19  <- resize(tss_chr19, width = 1, fix = "end")
+tss_chr19$name <- tss_chr19$gene_id
 promoters_chr19 <- unique(promoters(genes(txdb), upstream=2000, downstream=200)) 
 genes_chr19 <- unique(genes(txdb))
 
@@ -181,7 +174,6 @@ Although we ask for specific answers or completion of specific code, you are enc
 
 <!-- <br> -->
 
-
 ## 3.2 Identify nearby TSSs  
 ### 3.2.1 Identify the nearest TSS   
 Instead of looking for overlap between H3K4me3 peaks and promoters of a defined width, this time you will identify the nearest TSS. For this, you will use the r package [genomation](https://github.com/BIMSBbioinfo/genomation), which we used briefly in fg2 as well. This package contains a number of functions to help you analyze epigenomics data. (Side note: there are a number of other packages to analyze ChIP-seq data we well. Incl. ChIPpeakAnno and ChIPseeker.)   
@@ -211,7 +203,7 @@ question("Which function imports the H3K4me3 peaks into a GRanges object?",
 To identify the nearest TSS, you use the function:  
 `distance2NearestFeature(g.idh = [GRanges object withe peaks], tss = [GRanges object with TSSs])`  
 
-The output is a data.frame reporting for each range in the `g.idh` object:  
+The output is a data.frame reporting for each range in the `g.idh` object:
 
 - its nearest TSS  
 - the name of the corresponding peak and TSS  
@@ -265,6 +257,28 @@ grade_result(
 ```
 
 The `dist_h3k4me3_to_tss` reports for each H3K4me3 peak a nearest TSS. In total `r length(unique(distance2NearestFeature(monocytes_h3k4me3, tss_chr19)$feature.name))` different TSSs are reported, meaning that some peaks are assigned to the same TSS. *Which variable reports the distance between the peak and its nearest TSS?*       
+<br>
+
+>#### **Optional check**:  
+<details><summary>Curious to check the matches in the genome browser?:</summary>   
+<br>
+You may want to check some of the matches. For example to check that positive distances are indeed peaks that are located *downstream* the TSS. To do so...  
+1. View a part of the output of `dist_h3k4me3_to_tss`. For example, peaks with `dist.to.feature` above 1kb, sorted by distance, showing only the top 5 of the output by running: `dist_h3k4me3_to_tss %>% filter(dist.to.feature >= 1000) %>% arrange(dist.to.feature) %>% slice_head(n=5)`   
+2. The first row reports:     
+  `r distance2NearestFeature(monocytes_h3k4me3, tss_chr19) %>% filter(dist.to.feature >= 1000) %>% arrange(dist.to.feature) %>% slice_head(n=2) %>% slice_tail(n=1)`  
+3. You can either look up the gene id ('feature.name' variable) in the [ncbi gene database](https://www.ncbi.nlm.nih.gov/gene/) and use the gene symbol to navigate to the right location in the UCSC genome browser.  
+3. Or subset `monocytes_h3k4me3` with the given index in the 'target.index' column (805): `monocytes_h3k4me3[805]`.  
+4. Go to the UCSC Genome Browser.  
+5. Upload the monocytes trackhub (same as fg1): `http://mbdata.science.ru.nl/ctoenhake/edu/trackhub_monocytes/hub.txt`.    
+  + Go to the tab "My Data" in the top menu.  
+  + Select "Track Hubs".   
+  + In the "My hubs" tab you can paste the above URL.  
+  + You need to change the visibility of the tracks with "monocyte_H3K4me3_peaks" from "hide" to "pack". This can be done below the browser view. Remember to hit `Refresh`.  
+6. Navigate to the gene from step 3 or the genomic region of step 4.  
+  + In this example: `chr19:11577771-11577970`.    
+7. Zoom out and observe or measure the location of the peak in relation to the TSS of the gene given in step 3. The name of the peak is given in the output of step 4.   
+8. This confirms that **positive dist.to.feature values indicate that the H3K4me3 peaks is located *downstream* the TSS**.  
+</details>  
 
 ### 3.2.2 Visualize distances  
 Having identified the nearest TSS for each H3K4me3 peak, we want to summarize the distances between H3K4me3 peaks and TSSs.  
@@ -297,7 +311,7 @@ grade_result(
 
 ### Exercise 2b  
 
-> **Exercise 2b:** Plot the distances from `dist_h3k4me3_to_tss` using ggplot() and geom_histogram().     
+> **Exercise 2b:** Plot the distances from `dist_h3k4me3_to_tss` using ggplot() and geom_histogram() and answer the multiple-choice question below.     
 >
 > * With the summary of exercise 2a in mind, play around with the `binwidth  =` parameter in `geom_histogram()`. 
 
@@ -343,7 +357,7 @@ ggplot(dist_h3k4me3_to_tss)+
 
 ```{r q2b_plotdistances_mc}
 question("Which of the following statments are correct?",
-         answer("Over 50% of the datapoints fall within 10kb up- or downstream the TSS", correct = T, message = "Indeed, over 50% of H3K4me3 peaks are within 10kb of the TSS. But also notice the  outliers we are having: peaks are assigned to TSSs that are over 100kb away! These might be peaks in enhancers that are due to cross-reactivity of the antibody or chromosomal looping."),
+         answer("Over 50% of the datapoints fall within 10kb up- or downstream the TSS", correct = T, message = "Indeed, over 50% of H3K4me3 peaks are within +/- 10kb of the TSS. But also notice the  outliers we are having: peaks are assigned to TSSs that are over 100kb away! These might be peaks in enhancers that are due to cross-reactivity of the antibody or chromosomal looping."),
          answer("Less than 50% of the datapoints fall within 10kb up- or downstream the TSS", message= "Review the output of question 2a. Take a carefull look at the 1st and 3rd Quartile values."),
          answer("A binwidth of 100kb, givs us the nicest histogram with sufficient detail but not too peaky.", message = "Try again, 100kb is a bit too large in this case."),
          answer("A binwidth of 10kb, givs us the nicest histogram with sufficient detail but not too peaky.", correct=T),
@@ -351,12 +365,10 @@ question("Which of the following statments are correct?",
          )
 ```
 
-
-### 3.2.3 Filter on distances  
 As we want to plot the ChIP signal around the TSS, we will select only TSS that are near a H3K4me3 peak and not distort our signal plot with TSS without a H3K4me3 peak nearby. As >50% of "distances" are within 10kb, we will filter for matches within that distance. 
 
-### Exercise 3  
-Use dplyr::filter filter `dist_h3k4me3_to_tss` for matches that are within 10kb distance.    
+### 3.2.3 Filter on distances  
+In this exercise you will use the filter function from dplyr to filter `dist_h3k4me3_to_tss` for matches that are within +/-10kb distance.    
 
 >#### **Refresher**: dplyr     
 <details><summary>Click here for a short list of common dplyr-functions and logical operators used to filter our data.</summary>   
@@ -383,15 +395,40 @@ Operator | Effect
 >= | Greater than or equal to  
 </details>  
 
+> **Exercise 3:** Filter `dist_h3k4me3_to_tss` for matches that are within +/-10kb distance.      
+
 ```{r q3_filter, exercise = TRUE, exercise.eval = F, error = T, exercise.setup = "prepare_q2a"}
-# filter dist_h3k4me3_to_tss for distances <= 10000
+# filter dist_h3k4me3_to_tss for distances within 10kb 
 dist_h3k4me3_to_tss <- dist_h3k4me3_to_tss %>% 
-  filter(dist.to.feature >= -10000 & dist.to.feature <= 10000)
+  filter(___)
 ```
 
 ```{r q3_filter-hint-1}
-# use as condition  
-dist.to.feature <= 10000 
+# You need to use two conditions in your `filter()` function, one to select all peaks that are upstream (negative distances) the TSS and one for peaks that are downstream (positive distances) the TSS. 
+```
+
+```{r q3_filter-hint-2}
+# Combine the conditions with & 
+```
+
+
+```{r q3_filter-hint-3}
+# Eg if we would select for peaks within 5kb upstream the TSS we would use:
+filter(dist.to.feature >= -5000)  
+```
+
+```{r q3_filter-hint-4}
+# Eg if we would select for peaks within 5kb downstream the TSS we would use:
+filter(dist.to.feature <= 5000)  
+```
+
+```{r q3_filter-hint-5}
+# And for peaks that are 5kb downstream or 5kb usptream the TSS we would use:
+filter(dist.to.feature >= -5000 & dist.to.feature <= 5000 )  
+```
+
+```{r q3_filter-hint-6}
+# Warning, the next hint contains the solution! 
 ```
 
 ```{r q3_filter-solution}
@@ -404,81 +441,19 @@ dist_h3k4me3_to_tss <- dist_h3k4me3_to_tss %>%
 grade_code()
 ```
 
-### 3.2.4 Find associating gene  
-Use `h3k4me3_to_tss` to subset peaks to those that are less than 10 kb away from the TSS. You can than use the function `subjectHits()` to get the genes associated to each peak.  
-<br>
-
-### Exercise 4   
-Use `h3k4me3_to_tss_close` to select the associated TSSs from `tss_chr19` object.  
-
-```{r prepare_q4, echo = F}
-tss_near_h3k4me3 <- distanceToNearest(monocytes_h3k4me3, tss_chr19)
-metadata <- as.data.frame(mcols(tss_near_h3k4me3))
-tss_near_h3k4me3 <- tss_near_h3k4me3[metadata$distance <= 10000,]
-```
-
-```{r q4_closegenes, exercise = TRUE, exercise.eval = F, error = T, exercise.setup = "prepare_q4"}
-# 1. print the unique indexes of the TSSs from h3k4me3_to_tss_close in a new (temporary) object
-interesting_TSSs <- ___
-
-# 2. obtain the TSSs from tss_chr19 with an index reported in "interesting_TSSs"
-tss_with_h3k4me3 <- ____
-
-# 3. look at the output
-show(tss_with_h3k4me3)
-```
- 
-```{r q4_closegenes-hint-1, eval = F}
-# For (1), use  
-unique()
-# in combiation with 
-subjectHits()
-```
- 
-```{r q4_closegenes-hint-2, eval = F}
-# on the Hits object:
-h3k4me3_to_tss_close
-```
-
-```{r q4_closegenes-hint-3, eval = F}
-# for(2), subset tss_chr19 using 
-[interesting_TSSs] 
-```
-
-```{r q4_closegenes-hint-4, eval = F}
-# eg: 
-tss_chr19[interesting_TSSs] 
-```
-
-
-```{r q4_closegenes-hint-5, eval = F}
-# this would be a strategy, check whether you had the same or something different. 'Submit Answer' will evaluate whether the object you generated is the same as ours.
-interesting_TSSs <- unique(subjectHits(h3k4me3_to_tss))
-tss_with_h3k4me3 <- tss_chr19[interesting_TSSs]
-show(tss_with_h3k4me3)
-```
-
-```{r q4_closegenes-check}
-grade_result(
- pass_if(~identical(.result, show(tss_with_h3k4me3)))
- )
-```
-<br>
-These TSS have a H3K4me3 peak nearby. The corresponding geneID is stored in the metadata. It currently is a Entrez gene ID which in contrast to gene symbols are not easy to read. We will keep it this way for now and focus on the signal around the TSS instead of the function of the genes.  
-<br>
-`r colorize("optional: the distance2NearestFeature  from genomation outputs a dataframe and gives + and - values for distance to TSS. This visualizes more intuitively plot", col = "red")`
+Having filtered `dist_h3k4me3_to_tss` you will continue to plot the H3K4me3 signal around these TSSs.    
 
 ## 3.3 Visualize signal intensity   
-### 3.3.1 ChIP-seq signal intensity  
-The ChIP-seq signal can be obtained from the data stored in .bam  files or from .bigwig files.  Remember from week 1, .bam files contain records of read alignments with 1 line per read. The .bigwig files do not store individual reads but the coverage across the genome, often normalized per million mapped reads.   
+The TSS with a 'nearby H3K4me3' peak can be obtained from `dist_h3k4me3_to_tss$feature.name`. This holds the Entrez gene ID which we can use to filter our `tss_chr19` object with.  
+
+### 3.3.1 ChIP-seq signal intensity   
+The ChIP-seq signal can be obtained from the data stored in .bam files or from .bigwig files. Remember from week 1, .bam files contain records of read alignments with 1 line per read. The .bigwig files do not store individual reads but the coverage across the genome, often normalized per million mapped reads.   
 <br>
 Not all packages and functions are compatible with both file types and the resulting plots may look differ in resolution in part because .bam files - as they store read information -  give you more freedom to define how coverage is calculated. However, as BLUEPRINT only provides the .bigwig files we will use those today and not the .bam files.   
-<br>
-
-REF: https://www.bioconductor.org/packages/release/bioc/vignettes/genomation/inst/doc/GenomationManual.html#4_Extraction_and_visualization_of_genomic_data  
+<!-- REF: https://www.bioconductor.org/packages/release/bioc/vignettes/genomation/inst/doc/GenomationManual.html#4_Extraction_and_visualization_of_genomic_data   -->
 
 ### 3.3.2 Store signal intensity in a matrix  
-You will plot the H3K4me3 ChIP-seq signal intensity around the TSS in a density plot, averaged for all TSSs with a H3K4me3 peak (the ones selected above). Thus, the signal around these TSSs will be averaged out into one density profile. 
+You will plot the H3K4me3 ChIP-seq signal intensity around TSSs in a density plot, averaged for all TSSs with a H3K4me3 peak (the ones selected above).  
 
 >#### **Background info**: Density plots  
 <details><summary>What is a density plot?</summary>   
@@ -495,104 +470,272 @@ Kernel density estimates have one major pitfall: they have the tendency to extra
 See for a more extended discussion on histograms and density plots Chapter 7 of Fundamentals of Data Visualization by Claus O. Wilke [ref](https://clauswilke.com/dataviz/histograms-density-plots.html).  
 </details>  
 
-A trick that prevents loading complete bigWig files in your environment is to load only the the regions of interest; in this a window around the TSS. You load the signal in a "ScoreMatrix" object using the function:  
+A trick that prevents loading complete bigWig files in your environment is to load only the the regions of interest; in this a window around the TSS. You load the signal in a "ScoreMatrix" object using the following function from the genomation package:  
 
-`ScoreMatrix(target = [path to bigwig file], windows = [regions of interest], type = "bigWig")`   
+`ScoreMatrix(target = [path to bigwig file], windows = [regions of interest], type = "bigWig", strand.aware = [TRUE/FALSE])`   
 
-- Every row in the ScoreMatrix object corresponds to a window of the [regions of interest].  
-- Every column in the ScoreMatrix object is a bp within that window.  
+* To take into account the strand of the TSS, we set `strand.aware` to TRUE.   
+* Every row in the resulting ScoreMatrix object corresponds to a window of the [regions of interest].  
+* Every column in the resulting ScoreMatrix object is a bp within that window.   
 
-Currently, the window of the TSS intervals in `tss_chr19` is 1bp while we want to plot the signal *around* the TSS. We can use the function `resize(x = [GRanges object], width = [desired width], fix = ["start", "end" or "center"])` to resize these 1bp intervals to the size that we are interested. As we want to have a window *around* the TSS we will set the `fix =` parameter to "center".    
+![ScoreMatrix visual](images/genomation_scorematrix.png){width=50%}\  
 <br>
-In the example below we obtain the H3K4me3 signal in a 1kb window around the TSSs that have a H3K4me3 peak (see above).  
+The window of the TSS intervals in `tss_chr19` is currently 1bp. But we want to plot the signal *around* the TSS!  
+<br>
+We can resize these 1bp intervals to the size that we are interested with the function:  
+`resize(x = [GRanges object], width = [desired width], fix = ["start", "end" or "center"])`.   
+As we want to have a window *around* the TSS we will set the `fix =` parameter to "center".    
+<br>
+In the example below we obtain the H3K4me3 signal in a +/-10kb window around the TSSs that have a H3K4me3 peak (see above). Hit "Run Code" to view the structure of the resulting ScoreMatrix object.   
 
-```{r prepare_examplescores, echo = F}
-h3k4me3_to_tss <- distanceToNearest(monocytes_h3k4me3, tss_chr19)
-h3k4me3_to_tss_metadata <- as.data.frame(mcols(h3k4me3_to_tss))
-h3k4me3_to_tss <- h3k4me3_to_tss[h3k4me3_to_tss_metadata$distance <= 10000,]
-interesting_TSSs <- unique(subjectHits(h3k4me3_to_tss))
-tss_with_h3k4me3 <- tss_chr19[interesting_TSSs]
-```
-
-```{r example_scores, exercise = TRUE, exercise.setup = "prepare_examplescores"}
+```{r h3k4me3_scores, exercise=TRUE, exercise.eval=F, error=T, exercise.setup="prepare_q2a"}
 # define the windows:  
-window <- 1000
+window <- 20000
 
-# resize the tss interval to this window
-tss_with_h3k4me3_windows <- resize(tss_with_h3k4me3, width = window, fix = "center")
+# resize the tss interval to this window.
+tss_window <- resize(tss_chr19, width = window, fix = "center")
 
-# path to bigwig file (in this case stored in the library "learnr.proto" which contains data specific to this tutorial)
+# filter for TSSs with H3K4me3 peak nearby: 
+tss_window_with_h3k4me3 <- tss_window %>% filter(name %in% dist_h3k4me3_to_tss$feature.name)
+
+# path to bigwig file (in this case stored in the folder "extdata" of the library "learnr.proto" which contains data specific to this tutorial)
 bw_h3k4me3 <- system.file("extdata", "week3",  "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19.bw", package = "learnr.proto")
-  
-# create H3K4me3 ScoreMatrix for these intervals
-scores_h3k4me3 <- ScoreMatrix(target = bw_h3k4me3, windows = tss_with_h3k4me3_windows, type = 'bigWig')  
 
-# what strucure is scores_h3k4me3? Hit "Run code" to view the result. 
-str(scores_h3k4me3)
+# create H3K4me3 ScoreMatrix for these intervals.
+# strand.aware = TRUE takes into account the strand of the TSS. 
+scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3, windows = tss_window_with_h3k4me3, type = 'bigWig', strand.aware = TRUE)  
+
+# what structure is scores_h3k4me3? Hit "Run code" to view the result. 
+str(scores_h3k4me3_tss)
 ```
 <br>
-The object `scores_h3k4me3` is of formal class ScoreMatrix, which is related to a basic matrix but more formal. In other words, it has special functions to retrieve and set the data. We won't go into the details of these differences and dependencies but focus on how we can use this result.  
+The object `scores_h3k4me3_tss` is of formal class ScoreMatrix, which is related to a basic matrix but - as it says - "more formal". In other words, it has special functions to retrieve and set the data. We won't go into the details of these differences with basic matrices but focus on how we can use this result.  
 
-### 3.3.3 Generate a density plot of the intensity values  
-We can use this ScoreMatrix to plot the average H3K4me3 signal in these windows. To do so, we use the function:  
-`plotMeta(mat = [score matrix object])`
-<br>
-```{r prepare_exampledensity, echo = F}
-h3k4me3_to_tss <- distanceToNearest(monocytes_h3k4me3, tss_chr19)
-h3k4me3_to_tss_metadata <- as.data.frame(mcols(h3k4me3_to_tss))
-h3k4me3_to_tss <- h3k4me3_to_tss[h3k4me3_to_tss_metadata$distance <= 10000,]
-interesting_TSSs <- unique(subjectHits(h3k4me3_to_tss))
-tss_with_h3k4me3 <- tss_chr19[interesting_TSSs]
-window <- 1000
-tss_with_h3k4me3_windows <- resize(tss_with_h3k4me3, width = window, fix = "center")
-bw_h3k4me3 <- system.file("extdata", "week3",  "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19.bw", package = "learnr.proto")
-scores_h3k4me3 <- ScoreMatrix(target = bw_h3k4me3, windows = tss_with_h3k4me3_windows, type = 'bigWig')  
-```
+### 3.3.3 Density plot of H3K4me3 signal around the TSS  
+Using this ScoreMatrix we can plot the average H3K4me3 signal in these windows. To do so, we use the function:   
+`plotMeta(mat = [score matrix object])`.  
 
-```{r example_densityplot, exercise = TRUE, exercise.setup = "prepare_exampledensity"}
+* Run the code below to view the resulting plot.  
+* We define the x-coordinates with the `xcoord = ` parameter to set the TSS at 0. If you remove them you will see that the x-axis is labeled from 0 to 20000.  
+
+```{r example_densityplot, exercise = TRUE, exercise.eval=F, error=T, exercise.setup = "h3k4me3_scores"}
 # plot density plot
-plotMeta(scores_h3k4me3, xcoord = c(-500, 500))
+plotMeta(scores_h3k4me3_tss, xcoord = c(-10000, 10000))
 ```
-
-? Equal signal before and after the TSS. Look in the GB at several TSSs, is this indeed the case?
+Clearly, we could have focused our plot on the region +/- 5kb as the signal remains near 0 before -5kb and after 5kb.  
 
 ```{r mc_strandawareness}
-question("Is H3K4me3 signal equally strong before and after the TSS or is there a difference?",
-         answer("H3K4me3 signal is in most cases equal before and after the TSS"),
-         answer("H3K4me3 signal is generally lower downstream the TSS compared to upstream  "),
-         answer("H3K4me3 signal is generally higher after the TSS", correct = T, message = "H3K4me3 signal is generally higher downstream the TSS. Therefore we should take the strand of the TSS window into accout when plotting."),
+question("Which command would you change and how, to make sure that the signal is limited to +/-5kb around the TSSs in the density plot?",
+         answer("Change the xcoord parameter in 'plotMeta', set it to c(-5000, 5000)."),
+         answer("Filter the ScoreMatrix 'scores_h3k4me3_tss' for columns c(-5000, 5000)."),
+         answer("Change the width parameter in 'resize', set it to 10000.", correct = T, message =  "Let's make this plot!"),
          allow_retry = T,
          random_answer_order = T)
 ```
 
-### Exercise ....  
-Redo the above plot but include strand awareness with `strand.aware = T`. 
-```{r q_prepare, eval = F}
-# monocyte H3K4me3 bigwig file 
-...
-# define 100 bp +/- around tss with resize()
 
-# calculate score matrix
-scores_h3k4me3 <- ScoreMatrix(target = bw_h3k4me3, windows = tss_windows, type = 'bigWig')
+### Changing the window to +/- 5kb  
+Repeat the calculations of the window, scores and plot from above but now make sure you plot a window +/- 5kb.  
+
+```{r h3k4me3_scores, exercise=TRUE, exercise.eval=F, error=T, exercise.setup="prepare_q2a"}
+# define the windows:  
+window <- 10000
+
+# resize the tss interval to this window.
+tss_window <- resize(tss_chr19, width = window, fix = "center")
+
+# filter for TSSs with H3K4me3 peak nearby: 
+tss_window_with_h3k4me3 <- tss_window %>% filter(name %in% dist_h3k4me3_to_tss$feature.name)
+
+# path to bigwig file (in this case stored in the folder "extdata" of the library "learnr.proto" which contains data specific to this tutorial)
+bw_h3k4me3 <- system.file("extdata", "week3",  "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19.bw", package = "learnr.proto")
+
+# create H3K4me3 ScoreMatrix for these intervals.
+scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3, windows = tss_window_with_h3k4me3, type = 'bigWig', strand.aware = TRUE)  
+
+# generate the density plot
+plotMeta(scores_h3k4me3_tss, xcoord = c(-5000, 5000) )
 ```
 
-```{r q, eval = F}
-# plot density plot
-plotMeta(scores_h3k4me3, xcoord = c(-1000, 1000))
+
+```{r mc_strandawareness}
+quiz(caption = "", 
+     question("Is H3K4me3 signal equally strong before and after the TSS or is there a difference?",
+              answer("H3K4me3 signal appears equal up- and downstream the TSS"),
+              answer("H3K4me3 signal is lower downstream the TSS compared to upstream  "),
+              answer("H3K4me3 signal is higher downstream the TSS", correct = T, message = "H3K4me3 signal is generally higher downstream the TSS."),
+              allow_retry = T),
+     question("What would the plot show, in case you would have set 'strand.aware = FALSE' in the 'ScoreMatrix()' function? You can adjust the code and try it out.",
+              answer("H3K4me3 signal appearing equal up- and downstream the TSS", correct = T, message = "As TSS are randomly distributed over strands, setting strand.aware to FALSE will lead to a plot where H3K4me3 signal appears equally strong before and after the TSS while in reality it is stronger downstream the TSS."),
+              answer("H3K4me3 signal would appear lower downstream the TSS compared to upstream.", message = "Realize that randomly distributed over strands while the H3K4me3 signal around the TSS is related to the directionality."),
+              answer("H3K4me3 signal would appear higher downstream the TSS", message = "Realize that randomly distributed over strands while the H3K4me3 signal around the TSS is related to the directionality."),
+              allow_retry = T),
+     question("What could explain the slight decrease in signal at pos. 0?", 
+              answer("The nucleosome depleted region found at the TSS of transcribed genes.", correct = T),
+              answer("The binding of specific TFs at the TSS."),
+              answer("The TSS itself is marked by H3K4ac instaed of H3K4me3"),
+              allow_retry = T)
+)
 ```
 
+### 3.3.4 Add H3K27me3 signal   
+So far we have examined the signal of a 'narrowPeak' ChIP. Now, let's add the H3K27me3 signal to our plot.  
+
+### Exercise 4  
+
+> **Exercise 4**: Generate a density plot of the H3K37me3 signal +/- 5kb around the TSSs with H3K4me3 (code check).  
+
+```{r h3k37me3_signal_tss, exercise=TRUE, exercise.eval=F, error=T, exercise.lines=9, exercise.setup="h3k4me3_scores"}
+# 1. Path to bigwig file 
+bw_h3k27me3 <- system.file("extdata", "week3",  "C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.20150528.chr19.bw", package = "learnr.proto")
+
+# 2. Create H3K27me3 ScoreMatrix for these intervals.
+scores_h3k27me3_tss <- ScoreMatrix(___)  
+
+# 3. Generate the H3K27me3 density plot
+
+```
+
+```{r h3k37me3_signal_tss-hint-1}
+# You can copy-paste the ScoreMatrix code from the exercise above and adjust the parameter 'targets' 
+```
+
+```{r h3k37me3_signal_tss-hint-2}
+# Eg 
+ScoreMatrix(target = bw_h3k27me3, windows = tss_window_with_h3k4me3, .....)  
+```
+
+```{r h3k37me3_signal_tss-hint3}
+# Warning: the next hint holds the solution!
+```
+
+```{r h3k37me3_signal_tss-solution}
+# 1. path to bigwig file (in this case stored in the folder "extdata" of the library "learnr.proto" which contains data specific to this tutorial)
+bw_h3k27me3 <- system.file("extdata", "week3",  "C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.20150528.chr19.bw", package = "learnr.proto")
+
+# 2. create H3K27me3 ScoreMatrix for the TSS windows with H3K4me3
+scores_h3k27me3_tss <- ScoreMatrix(target = bw_h3k27me3, windows = tss_window_with_h3k27me3, type = 'bigWig', strand.aware = TRUE)  
+
+# 3. generate the H3K27me3 density plot
+plotMeta(scores_h3k27me3_tss, xcoord = c(-5000, 5000))
+```
+
+```{r h3k37me3_signal_tss-code-check}
+grade_code()
+```
+
+Observe the difference in y-axis values between the density plot of H3K4me3 and H3K27me3. This reflects the different nature of these marks with H3K4me3 having a much larger range (as you might have observed in the genome browser). Additionally, not all H3K4me3 positive TSSs have H3K27me3 and the signal of the latter gets diluted (however, in this case, this is negligable. If you plot TSS with only H3K27me3 signal you will see that the maximum signal does not exceed 4.5).   
+
+### Exercise 5  
+Lastly, we can combine plots of two marks with by  
+
+1. generating a "ScoreMatrixList" object. 
+2. provide plotMeta with this "ScoreMatrixList".  
+
+See the following example:  
+
+```{r prepare_overlay_density, echo=F}
+dist_h3k4me3_to_tss <- distance2NearestFeature(monocytes_h3k4me3, tss_chr19)
+window <- 10000
+tss_window <- resize(tss_chr19, width = window, fix = "center")
+tss_window_with_h3k4me3 <- tss_window %>% filter(name %in% dist_h3k4me3_to_tss$feature.name)
+# scores for h3k27me3
+bw_h3k4me3 <- system.file("extdata", "week3",  "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19.bw", package = "learnr.proto")
+scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3, windows = tss_window_with_h3k4me3, type = 'bigWig', strand.aware = TRUE)  
+# scores for h3k27me3
+bw_h3k27me3 <- system.file("extdata", "week3",  "C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.20150528.chr19.bw", package = "learnr.proto")
+scores_h3k27me3_tss <- ScoreMatrix(target = bw_h3k27me3, windows = tss_window_with_h3k4me3, type = 'bigWig', strand.aware = TRUE)  
+```
+
+```{r overlay_density, exercise=TRUE, exercise.eval=F, error=T, exercise.setup="prepare_overlay_density"}
+# generate ScoreMartixList from two ScoreMatrix objects:
+scores_h3k4me3_h3k27me3_tss <- new("ScoreMatrixList", list(k4me3=scores_h3k4me3_tss, k27me3=scores_h3k27me3_tss))
+
+# generate density plot
+plotMeta(scores_h3k4me3_h3k27me3_tss, xcoord = c(-5000, 5000), overlay = TRUE, profile.names = c("H3K4me3", "H3K27me3"))
+```
+## 3.4 Signal vs gene expression  
+In fg2 we already observed a difference in expression between genes with and without overlap of a H3K4me3 peak and their promoter. What if we, besides the binary measure of peak presence/absence, took into account the actual signal intensity, would that improve our explanation of gene expression differences?  
+<br>
+In this section you will plot the relationship between H3K4me3 signal at the TSS and the extend of gene expression (as FPKM).  
+
+### 3.4.1 Summarize signal scores   
+First, we will calculate the average H3K4me3 signal in 10kb around *all TSSs*. We can do this quickly with a modified version of the 'ScoreMatrix' function we used above: `ScoreMatrixBin()`.  
+<br>
+As the name suggests, this function does not calculate the signal for each bp in the given windows, but for each bin. If we set the `bin.num` parameter to `1`, it will output the average signal over the whole window. Note that this function is also useful when working with windows of varying size like complete genes.  
+
+> **Exercise 6**: Calcualte the average H3K4me3 signal in a window of +/- 5kb around the TSS. Do this for *all* TSSs, irrespective of their overlap of distance to a H3K4me3 peak.   
+
+```{r q6_prepare}
 
 
-### 3.3.2 H3K4me3 signal vs gene expression  
-Plot the relationship between ChIP-seq signal at the TSS and gene expression per gene expression quantile.  
+```
 
-### 3.3.3 Scatter visualization of this relationship  
+```{q}
+window <- 10000
+tss_window <- resize(tss_chr19, width = window, fix = "center")
+scores_h3k4me3_tss_all <- ScoreMatrixBin(target = bw_h3k4me3, windows = tss_window, type = 'bigWig', bin.num = 1, strand.aware = TRUE)  # gives the average score over the complete window. And not the sum of 1bp bin windows. 
+scores_as_matrix <- as(scores_h3k4me3_tss_all, "matrix")
+scores_as_df <- as.data.frame(scores_h3k4me3_tss_all)
+scores_as_df$gene_id <- tss_window$gene_id
+head(scores_as_df) 
+
+scores_and_quant <- merge(scores_as_df, quantification_chr19, by.x = "gene_id", by.y = "entrezgene_id")
+plot(log10(scores_and_quant$FPKM), scores_and_quant$V1)
+
+scores_h3k4me3_tss_10kb <- ScoreMatrix(target = bw_h3k4me3, windows = tss_window, type = 'bigWig',strand.aware = TRUE) 
+scores_as_df_10kb <- as.data.frame(tss_window$gene_id)
+colnames(scores_as_df_10kb) <- "gene_id"
+scores_as_df_10kb$mean_h3k4me3 <- apply(as(scores_h3k4me3_tss_10kb, "matrix"), 1, mean)
+scores_as_df_10kb$sum_h3k4me3 <- apply(as(scores_h3k4me3_tss_10kb, "matrix"), 1, sum)
+scores10kb_and_quant <- merge(scores_as_df_10kb, quantification_chr19, by.x = "gene_id", by.y = "entrezgene_id")
+cor(log10(scores10kb_and_quant$FPKM+1), scores10kb_and_quant$sum_h3k4me3)
+cor(log10(scores10kb_and_quant$FPKM+1), scores10kb_and_quant$mean_h3k4me3)
+
+head(scores_as_df_10kb)
+
+# add gene expression 
+
+```
+
+### 3.4.1 H3K4me3 signal vs gene expression  
+Plot the relationship between ChIP-seq signal at the TSS and gene expression per gene expression quantile.
+
+### 3.4.2 Scatter visualization of this relationship  
 For each TSS we have a ChIP-seq signal and gene expression signal. Plot in scatter plot.  
 
-### 3.3.4 What about H3K27me3 signal vs. gene experession?  
+### 3.4.3 What about H3K27me3 signal vs. gene experession?  
+
 
 
 ## 3.4 Heatmaps  
+
+<!-- ```{r example_densityplot, exercise = TRUE, exercise.eval=F, error=T, exercise.setup = "example_scores"} -->
+<!-- # plot density plot -->
+<!-- plotMeta(scores_h3k4me3_tss, xcoord = c(-5000, 5000)) -->
+<!-- plotMeta(scores_h3k4me3_tss_all, xcoord = c(-5000, 5000)) -->
+
+<!-- # plot heatmap -->
+<!-- heatMatrix(scores_h3k4me3_tss, xcoord = c(-5000, 5000), order = T) -->
+<!-- heatMatrix(scores_h3k4me3_tss_all, xcoord = c(-5000, 5000), order = T) -->
+
+<!-- # k-means clustering -->
+<!-- cl1 <- function(x) kmeans(x, centers=3)$cluster -->
+<!-- set.seed(1000) -->
+<!-- heatMatrix(mat=scores_h3k4me3_tss_all,legend.name="tpm",winsorize=c(0,99),xlab="region around TSS", -->
+<!--          xcoords=c(-5000:4999),clustfun=cl1, -->
+<!--          cex.legend=0.8,main="H3K4me3 signal on promoters",cex.lab=1, -->
+<!--          cex.axis=0.9,grid=FALSE, -->
+<!--          user.order=c(1,3,2)) -->
+
+<!-- # hierarchical clustering -->
+<!-- cl2 <- function(x) cutree(hclust(dist(x), method="complete"), k=3) -->
+<!-- set.seed(1000) -->
+<!-- heatMatrix(mat=scores_h3k4me3_tss_all,legend.name="tpm",winsorize=c(0,99),xlab="region around TSS", -->
+<!--          xcoords=c(-5000:4999),clustfun=cl2, -->
+<!--          cex.legend=0.8,main="H3K4me3 signal on promoters",cex.lab=1, -->
+<!--          cex.axis=0.9,grid=FALSE) -->
+<!-- ``` -->
 ### 3.4.1 Heatmap of 1 mark  
 Summarize H3K4me3 ChIP-seq signal at all TSSs in a heatmap.  
 
