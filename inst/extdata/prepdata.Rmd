@@ -410,26 +410,29 @@ Note that I deleted the "chr21_bed" folder in "inst/extdata/week3/" after runnin
 The files in this folder can be found on cn54: `scratch/ctoenhake/data/fg1_r_data/blueprint/chip_bed`. Whole genome bed peak files were downloaded from blueprint data portal > Experiments > search for C000S5.   
 ```{r prepare monocyt data, echo = T, eval = F}
 # H3k4me1 
-mono_h3k4me1 <- rtracklayer::import("inst/extdata/week3/chr21_bed/C000S5H2.ERX547981.H3K4me1.bwa.GRCh38.broad.20150527.chr21.bed", format = "broadPeak")
+monocytes_h3k4me1 <- rtracklayer::import("inst/extdata/week3/chr21_bed/C000S5H2.ERX547981.H3K4me1.bwa.GRCh38.broad.20150527.chr21.bed", format = "broadPeak")
 # H3K4me3  
-mono_h3k4me3 <- rtracklayer::import("inst/extdata/week3/chr21_bed/C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr21.bed", format = "narrowPeak")
+monocytes_h3k4me3 <- rtracklayer::import("inst/extdata/week3/chr21_bed/C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr21.bed", format = "narrowPeak")
 # H3K9me3 
-mono_h3k9me3 <- rtracklayer::import("inst/extdata/week3/chr21_bed/C000S5H2.ERX547982.H3K9me3.bwa.GRCh38.broad.20150527.chr21.bed", format = "broadPeak")
+monocytes_h3k9me3 <- rtracklayer::import("inst/extdata/week3/chr21_bed/C000S5H2.ERX547982.H3K9me3.bwa.GRCh38.broad.20150527.chr21.bed", format = "broadPeak")
 # H3K27ac 
-mono_h3k27ac <- rtracklayer::import("inst/extdata/week3/chr21_bed/C000S5H2.ERX547980.H3K27ac.bwa.GRCh38.20150527.chr21.bed", format = "narrowPeak")
+monocytes_h3k27ac <- rtracklayer::import("inst/extdata/week3/chr21_bed/C000S5H2.ERX547980.H3K27ac.bwa.GRCh38.20150527.chr21.bed", format = "narrowPeak")
 # H3K27me3   
-mono_h3k27me3 <- rtracklayer::import("inst/extdata/week3/chr21_bed/C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.broad.20150527.chr21.bed", format = "broadPeak")
+monocytes_h3k27me3 <- rtracklayer::import("inst/extdata/week3/chr21_bed/C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.broad.20150527.chr21.bed", format = "broadPeak")
 # H3K36me3
-mono_h3k36me3 <- rtracklayer::import("inst/extdata/week3/chr21_bed/C000S5H2.ERX547979.H3K36me3.bwa.GRCh38.broad.20150527.chr21.bed", format = "broadPeak")
+monocytes_h3k36me3 <- rtracklayer::import("inst/extdata/week3/chr21_bed/C000S5H2.ERX547979.H3K36me3.bwa.GRCh38.broad.20150527.chr21.bed", format = "broadPeak")
 # create list
-mono_list  <- GRangesList(mono_h3k4me1, mono_h3k4me3, mono_h3k9me3, mono_h3k27ac, mono_h3k27me3, mono_h3k36me3)
+monocytes_list  <- GRangesList(monocytes_h3k4me1, monocytes_h3k4me3, monocytes_h3k9me3, monocytes_h3k27ac, monocytes_h3k27me3, monocytes_h3k36me3)
 # add names to each element in the list
-names(mono_list) <- c("h3k4me1", "h3k4me3", "h3k9me3", "h3k27ac", "h3k27me3", "h3k36me3")
+names(monocytes_list) <- c("h3k4me1", "h3k4me3", "h3k9me3", "h3k27ac", "h3k27me3", "h3k36me3")
+# make 1 GRanges object with all ChIPs
+monocytes_all <- unlist(monocytes_list)
+monocytes_all$chip <- names(monocytes_all)
 ```
 
 #### chr21 quantification   
 Note that I deleted the "quant" folder in "inst/extdata/week3/" after running this chunk because of the size of the file in it ("C000S5B1.gene_quantification.rsem_grape2_crg.GRCh38.20150622.results"). This is also why `eval=F` is set.  
-This was downaloaded from http://dcc.blueprint-epigenome.eu/#/experiments/ERX157053 --> "Transcription quantification (Genes)" file.  
+This was downloaded from http://dcc.blueprint-epigenome.eu/#/experiments/ERX157053 --> "Transcription quantification (Genes)" file.  
 
 ```{r quantification, echo = T, eval = F}
 #BiocManager::install("org.Hs.eg.db")
@@ -463,7 +466,7 @@ quantification_chr21 <- all_results[all_results$entrezgene_id %in% geneids_genes
 
 #### store chr21 granges and quantification  
 ```{r save prepare monocyt data, echo = T, eval = F}
-save(mono_h3k4me1, mono_h3k4me3, mono_h3k9me3, mono_h3k27ac, mono_h3k27me3, mono_h3k36me3, mono_list, quantification_chr21, file =  "inst/extdata/week3.RData")
+save(monocytes_h3k4me1, monocytes_h3k4me3, monocytes_h3k9me3, monocytes_h3k27ac, monocytes_h3k27me3, monocytes_h3k36me3, monocytes_list, monocytes_all, quantification_chr21, file =  "inst/extdata/week3.Rdata")
 ```
 
 ### session Info
