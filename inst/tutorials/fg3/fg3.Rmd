@@ -56,6 +56,10 @@ tss_chr21  <- resize(tss_chr21, width = 1, fix = "end")
 tss_chr21$name <- tss_chr21$gene_id
 promoters_chr21 <- unique(promoters(genes(txdb), upstream=2000, downstream=200)) 
 genes_chr21 <- unique(genes(txdb))
+
+#quantificaton chr19
+rdsfile <- system.file("extdata", "week2", "prepared_rds", "blueprint_c000s5_gene_quantification_chr19.rds", package = "learnr.proto") # week3 contains chr21 peaks in GRanges objects (week2 worked on chr19)
+quantification_chr19 <- readRDS(rdsfile)
 ```
 
 ```{r timeout1, context="server"}
@@ -614,7 +618,7 @@ plotMeta(scores_h3k27me3_tss, xcoord = c(-5000, 5000))
 grade_code()
 ```
 
-Observe the difference in y-axis values between the density plot of H3K4me3 and H3K27me3. This reflects the different nature of these marks with H3K4me3 having a much larger range (as you might have observed in the genome browser). Additionally, not all H3K4me3 positive TSSs have H3K27me3 and the signal of the latter gets diluted (however, in this case, this is negligable. If you plot TSS with only H3K27me3 signal you will see that the maximum signal does not exceed 4.5).   
+Observe the difference in y-axis values between the density plot of H3K4me3 and H3K27me3. This reflects the different nature of these marks with H3K4me3 having a much larger range (as you might have observed in the genome browser). Additionally, not all H3K4me3 positive TSSs have H3K27me3 and the signal of the latter gets diluted (however, in this case, this is negligible. If you plot TSS with only H3K27me3 signal you will see that the maximum signal does not exceed 4.5).   
 
 ### Exercise 5  
 Lastly, we can combine plots of two marks with by  
@@ -630,10 +634,12 @@ window <- 10000
 tss_window <- resize(tss_chr21, width = window, fix = "center")
 tss_window_with_h3k4me3 <- tss_window %>% filter(name %in% dist_h3k4me3_to_tss$feature.name)
 # scores for h3k27me3
-bw_h3k4me3 <- system.file("extdata", "week3",  "C000S5H2_ERX547984_H3K4me3_bwa_GRCh38_20150528_chr21_TSS_20kb.bw", package = "learnr.proto")
+# bw_h3k4me3 <- system.file("extdata", "week3",  "C000S5H2_ERX547984_H3K4me3_bwa_GRCh38_20150528_chr21_TSS_20kb.bw", package = "learnr.proto")
+bw_h3k4me3 <- "/home/ctoenhake/learnr.proto/inst/extdata/week3/chr21_bw/C000S5H2_ERX547984_H3K4me3_bwa_GRCh38_20150528_chr21_TSS_20_kb.bw"
 scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3, windows = tss_window_with_h3k4me3, type = 'bigWig', strand.aware =TRUE)  
 # scores for h3k27me3
-bw_h3k27me3 <- system.file("extdata", "week3",  "C000S5H2_ERX547983_H3K27me3_bwa_GRCh38_20150528_chr21_TSS_20_kb.bw", package = "learnr.proto")
+# bw_h3k27me3 <- system.file("extdata", "week3",  "C000S5H2_ERX547983_H3K27me3_bwa_GRCh38_20150528_chr21_TSS_20_kb.bw", package = "learnr.proto")
+bw_h3k27me3 <- "/home/ctoenhake/learnr.proto/inst/extdata/week3/chr21_bw/C000S5H2_ERX547983_H3K27me3_bwa_GRCh38_20150528_chr21_TSS_20_kb.bw"
 scores_h3k27me3_tss <- ScoreMatrix(target = bw_h3k27me3, windows = tss_window_with_h3k4me3, type = 'bigWig', strand.aware =TRUE)  
 ```
 
@@ -644,6 +650,7 @@ scores_h3k4me3_h3k27me3_tss <- new("ScoreMatrixList", list(k4me3=scores_h3k4me3_
 # generate density plot
 plotMeta(scores_h3k4me3_h3k27me3_tss, xcoord = c(-5000, 5000), overlay =TRUE, profile.names = c("H3K4me3", "H3K27me3"))
 ```
+
 ## 3.4 Signal vs gene expression  
 In fg2 we already observed a difference in expression between genes with and without overlap of a H3K4me3 peak and their promoter. What if we, besides the binary measure of peak presence/absence, took into account the actual signal intensity, would that improve our explanation of gene expression differences?  
 <br>
@@ -695,23 +702,6 @@ h3K4me3_and_rnaquant %>%
   geom_point(mapping=aes(col = as.factor(expression_group), x = log2(FPKM+1) ,y = V1))
 
 
-window <- 20000
-tss_window <- resize(tss_chr21, width = window, fix = "center")
-average_score_h3k4me3_tss <- ScoreMatrixBin(target = bw_h3k4me3, windows = tss_window, type = 'bigWig', bin.num = 1, strand.aware =TRUE)  # gives the average score over the complete window. And not the sum of 1bp bin windows. 
-scores_as_matrix <- as(average_score_h3k4me3_tss, "matrix")
-scores_as_df <- as.data.frame(scores_as_matrix)
-scores_as_df$gene_id <- tss_window$gene_id
-h3K4me3_and_rnaquant <- merge(scores_as_df, quantification_chr21, by.x = "gene_id", by.y = "entrezgene_id")
-h3K4me3_and_rnaquant %>% 
-  mutate(expression_group = ntile(FPKM, 4)) %>% 
-  ggplot(.)+ 
-  geom_boxplot(mapping=aes(x = as.factor(expression_group), y = V1)) 
-h3K4me3_and_rnaquant %>% 
-  mutate(expression_group = ntile(FPKM, 4)) %>% 
-  ggplot(.)+ 
-  geom_point(mapping=aes(col = as.factor(expression_group), x = log2(FPKM+1) ,y = V1))
-
-
 # h3K4me3_and_rnaquant <- merge(scores_as_df, quantification_chr21, by.x = "gene_id", by.y = "entrezgene_id")
 # h3K4me3_and_rnaquant %>% 
 #   mutate(expression_group = ntile(FPKM, 4)) %>% 
@@ -730,6 +720,8 @@ h3K4me3_and_rnaquant %>%
 # 
 # head(scores_as_df_10kb)
 ```
+
+`r colorize("Add density plots per quantile with select the correct statment question, wat zie je nu. Is like the fluffmap density with CI", col = "red")` 
 
 ### 3.4.1 H3K4me3 signal vs gene expression  
 Plot the relationship between ChIP-seq signal at the TSS and gene expression per gene expression quantile.
@@ -830,5 +822,4 @@ mat=heatTargetAnnotation(chrommhmm_anno_list,plot=FALSE)
 
       
 #BiocManager::install("pheatmap")
-
 ```
