@@ -1451,7 +1451,7 @@ quiz(caption ="",
 
 Realize that this transcript-oriented analyses gives you slightly different results compared to the gene-centered one in exercise 8a and 8b. For now, we will stick to the gene-centered values and look at how the presence of histone marks at the TSS is related to the expression of the downstream gene.  
 
-## 2.5 Comparing gene expression   
+## 2.5 Association with gene expression   
 ### 2.5.1 Genes with H3K4me3 at their promoter  
 Can we observe a difference in gene expression between genes with and without H3K4me3 in their promoters?
 <br>
@@ -1581,7 +1581,7 @@ ggplot(quantification_chr19_new)+
 grade_code()
 ```
 
-This doesn't look very informative. RNA-seq quantification has a high range. We must therefore log-transoform the y-axis. 
+This doesn't look very informative. RNA-seq quantification has a broad range. We must therefore log-transoform the y-axis. 
 
 ### Exericse 10c  
 
@@ -1599,6 +1599,8 @@ ggplot(quantification_chr19_new)+
   theme_calc()+
   scale_y_continuous(trans = "___")
 ```
+
+`r colorize("make y-axis-label log10(PPKM+1)", col = "red" )`  
 
 ```{r q10c_plot_genequant-solution, eval=FALSE}
 # Repeat the plot of 9b but log10-transform the y-axis    
