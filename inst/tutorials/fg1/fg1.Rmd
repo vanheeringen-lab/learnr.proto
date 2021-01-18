@@ -64,7 +64,7 @@ observeEvent(input[[session_id]], ignoreNULL=T, {
 // source1: https://community.rstudio.com/t/keeping-track-of-idle-time-during-app-usage/1735
 // source2: https://bookdown.org/yihui/rmarkdown/language-engines.html#javascript-and-css
 $(function() {
-  var timeoutSec = 15*60;
+  var timeoutSec = 25*60;
   var idleTimer;
 
   // receive this session's ID
@@ -131,8 +131,8 @@ Global learning objectives #8-11.
 - You will run a different tutorial for each week.    
 - Answers will be saved for each of your sessions.  
 - Exercises for the current tutorial vary from multiple choice, to selecting correct statements.    
-- To reserve server space to *active* running tutorials, and stop those that aren't actively used anymore, we set a time-out at 15 minutes. Meaning that if your tutorial has been idle for over 15 minutes, you will see the following warning "Tutorial stopped due to inactivity. Restart to continue where you left off!". When you see this warning, you should close the browser with the tutorial and restart the tutorial. Progress will be saved and once you restart the tutorial you can continue where you left.   
-- Refreshers, background information, tips, hints and optional checks are often formatted in gray boxes and are not obligatory. In most cases you should collapse the box before you can read it's content. This is an example:    
+- To reserve server space to *active* running tutorials, and stop those that aren't actively used anymore, we set a time-out at 15 minutes. Meaning that if your tutorial has been idle for over 25 minutes, you will see the following warning "Tutorial stopped due to inactivity. Restart to continue where you left off!". When you see this warning, you should close the browser with the tutorial and restart the tutorial. Progress will be saved and once you restart the tutorial you can continue where you left.   
+- Refreshers, background information, tips, hints and optional checks are often formatted in gray boxes and **are not obligatory**. These boxes are meant as reference material, **they are optional and the time taken to read them *is not* taken along in the time scheduled for the practical**. In most cases you should expand the box before you can read it's content. This is an example:    
 
 > #### Optional check:  
 <details><summary>Click on this sentence to see an example drop-down box.</summary>  
@@ -162,7 +162,7 @@ quiz(caption = "Example questions:",
 ```
 
 #### Need help?  
-Use the virtual classroom space in Brightspace/Zoom meeting when you need advice. A lecturer will be present there during practical hours.  
+Use the virtual classroom space in Brightspace/Zoom meeting when you need advice. A lecturer will be present there during practical hours. Breakout rooms in Zoom.   
 
 ## 1.1 Learning Objectives
 
@@ -502,30 +502,7 @@ quiz(caption = "Which answers summarize the appropriate combinations of artefact
              allow_retry = TRUE,
              random_answer_order = TRUE)   )
 ```
-<br>
 
-
-<!--
-`r colorize("Exercise 2: Choose the right order of steps that is used for ChIP-seq data analysis from the following list of options", "red")`
-
-![](images/wk1_3_Furay_2012_naturereviews_fig2_chipseqanalysis.png){width=80%}\
-[Furay, 2012, Nat Rev](https://pubmed.ncbi.nlm.nih.gov/23090257/)
-
-- **Amplification bias during the library preparation:** The amount of nucleic acids you generally obtain from your cells is often too low to be directly analyzed and one or more steps of PCR are needed (unless you use special, amplification-free protocols and sequencing methods). Not all DNA or RNA molecules behave the same in this reaction. Some are amplified more than others and this can generate a bias. We can control for amplification bias with:
-
-  + Use input sample, for example as control in peak calling
-  + Paired-end sequencing
-  + Add a Unique Molecular Identifier, UMI, to the barcodes, to
-
-
-- **Synthetic DNA sequence:** These include adapters ligated to the DNA molecules to allow their amplification with uniform primers during library prep and in the sequencer. These adapter sequences come with the kit or are designed by the researcher self. Whether they are custom or commercial, they should be removed because they were not part of the original DNA or RNA material.
-- **Base call accuracy:** The chemical reaction and quality of the optical measurement that occur in the sequencer are not perfect and depend among others on the nucleotide composition of all samples, the length of the DNA molecules and the concentration of the samples. Each nt is therefore given a quality score that reflects the accuracy of the measurement or base call accuracyas it is also called.
-- Lastly, when trying to pinpoint the location in the reference genome where the DNA mo lececule most likely was derived off, we are confronted with:
-
-  * **Genomic repeats.** The origin of reads coming from these reigons is difficult to pinpoint. But also, the reference genome might contain more or less number of repeats than the original sample.
-  * **Low complexity regions**. These are regions that contain a lot of sequence similarity, eg telomeres. Because of this the quality of the reference genome is generally low in these regions. -->
-
-<br>
 
 ### 1.3.3 Alternatively: use Publicy available data
 Instead of working solely with our own data, we can also make use of publicly available datasets. More and more, researchers, institutes and grant agencies advocate the [FAIR principle](https://www.nature.com/articles/sdata201618) for optimal sharing of research data. Research data and metadata should be **Findable**, **Accessible**, **Interoperable** and finally **Re-usable**. This makes it for us (other researchers) much easier to (re-use) these data or repeat analyses.
@@ -603,7 +580,7 @@ The starting page has been updated since the video was made but still holds the 
 
 On the left you can browse and select the genome you are interested in (not a drop-down menu anymore as in the video). By default, the human genome is selected.
 <br>
-We can go to a position of our choice by entering the gene or chromosomal coordinates under **Position/Search Term** or immediatly go to the 'Current position' by clicking on `GO` on the right-hand side or **Genome Browser** in the menu bar on top.
+We can go to a position of our choice by entering the gene or chromosomal coordinates under **Position/Search Term** or immediately go to the 'Current position' by clicking on `GO` on the right-hand side or **Genome Browser** in the menu bar on top.
 
 > **Action: Ensure that "Human" is selected in the REPRESENTED SPECIES tree and "Dec. 2013 (GRCh38/hg38)" is selected under Human Assembly (red arrows in image below).**
 
@@ -771,7 +748,7 @@ Note the "My Hubs" tab in the second screenshot:
 > 2. Connect the hub again.
 </details>
 
-Note that, after adding the trackhub, an additional section is added below the browser, specfic to the tracks in this trackhub.
+Note that, after adding the trackhub, an additional section is added below the browser, specific to the tracks in this trackhub.
 
 ```{r q8_trackhub}
 question("What is the name of this trackhub",
@@ -819,7 +796,7 @@ quiz(caption = "",
        answer("No"),
       allow_retry = T),
 
-  question("B.) Which (three) ChIP-seq datasets could you ahve used to answer (A.)?",
+  question("B.) Which (three) ChIP-seq datasets could you have used to answer (A.) (Select ALL that apply.)?",
          answer("monocyte_H3K9me3", message = "H3K9me3 is associated with silencing, not active genes."),
          answer("monocyte_H3K27me3", message = "H3K27me3 is associated with silencing, not active genes."),
          answer("monocyte_H3K4me3", correct = TRUE, message = "H3K4me3 is found at the 5' site of genes and is associated with gene activity."),
@@ -840,7 +817,7 @@ chr7:5,356,175-5,701,574 approximately, a few bases more or less is not a proble
 </details>
 
 ```{r q10_FSCN1_promoter}
-question("A prominant H3K27me3 peaks *upstream* of *ACTB* comes in view. The promoter of which gene is covered by this mark?)",
+question("A prominant H3K27me3 peaks *upstream* of *ACTB* comes in view. The promoter of which gene is covered by this mark?) (Select ALL that apply.)",
          answer("*ACTB*", message = "The *ACTB* promoter is not covered by H3K27me3."),
          answer("*FSCN1*", correct = T),
          answer("*FBXL18*", message = "The *FBXL18* promoter is not covered by H3K27me3 *and* is not located up- but downstream."),
@@ -895,7 +872,7 @@ chr18:54,078,542-54,297,733 approximately, a few bases more or less is not a pro
 <br>
 ```{r q13_MBD2_histone_marks_one}
 quiz(caption = "",
-     question("Is MBD2 activley transcribed in these cells?",
+     question("Is MBD2 activley transcribed in these cells? (Select ALL that apply.)",
               answer("Yes", correct = T),
               answer("No"),
               allow_retry = T),
@@ -922,7 +899,7 @@ Approximately: chr19:33,250,188-33,305,852
 
 
 ```{r q18_cebpa_enhancer}
-question("Which marks mark the enhancer downstream of *CEBPA*?",
+question("Which marks mark the enhancer downstream of *CEBPA*? (Select ALL that apply.)",
   answer("H3K9me3", message = "not H3K9me3"),
   answer("H3K27me3", message = "not H3K27me3"),
   answer("H3K4me3", correct = T, message = "Note that although H3K4me3 is generally a promoter signal, we see it here a little bit as well. This might be due to cross-reactivity of the H3K4me1 Ab and cross-linking/contact between the promoter and the enhancer."),
@@ -955,30 +932,24 @@ question("What is the approximate size of the H3K9me3 silenced region? (*Tip2: h
 <br>
 Silencing does not necessarily have to be mediated by H3K9me3.
 
-> **Action: Which of the following genes is silenced by H3K27me3? *ACTA1*,  *EED*, *GATA3*, *HDAC1*, *MYOD1*, *ATOH1* **
+> **Action: Which of the following genes is silenced by H3K27me3? *ACTA1*, *EED*, *MYOD1* **
 
 > #### **Optional check**:
 <details><summary> Table with genomic locations of these genes:</summary>
 >
-gene | genomic location | product
-:--|:---|:----
-*ACTA1* | chr1:229,431,245-229,434,094 | skeletal muscle actin
-*EED* | chr11:86,244,753-86,278,810 | part of PRC2 complex
-*GATA3* | chr10:8,054,810-8,074,890 | TF in various cell types (e.g. mammary gland maturation, T cells and keratinocytes)
-*HDAC1* | chr1:32,292,083-32,333,626 | Histone deacetylase 1
-*MYOD1* | chr11:17,719,571-17,722,136 | TF for myogenic differentiation
-*ATOH1* | chr4:93,818,790-93,840,929 | TF for sensory hair cell differentiation
+gene | genomic location | product  
+:--|:---|:----  
+*ACTA1* | chr1:229,431,245-229,434,094 | skeletal muscle actin   
+*EED* | chr11:86,244,753-86,278,810 | part of PRC2 complex  
+*MYOD1* | chr11:17,719,571-17,722,136 | TF for myogenic differentiation  
 >
 </details>
 
 ```{r q21_ACTA1_marking_one}
-question("Which hgenes are silenced by H#K27me3?",
-         answer("*ACTA*1", correct = T),
+question("Which genes are silenced by HK27me3? (Select ALL that apply.)",
+         answer("ACTA1", correct = T),
          answer("*EED*", message = "*EED* is not silenced."),
-         answer("*GATA3*", correct = T),
-         answer("*HDAC1*",  message = "*HDAC1* is not silenced."),
          answer("*MYOD*", correct = T),
-         answer("ATOH1", correct = T),
          allow_retry = T)
 ```
 <br>
@@ -990,7 +961,7 @@ Our colleague performed RNA-seq, DNaseI-seq and ChIPs for H3K9me3, H3K27me3, H3K
 <br>
 We know which experiments were performed, but which track (labeled a-f) is most likely which technique?
 
-> **Action: upload the following track hub** `http://mbdata.science.ru.nl/ctoenhake/edu/trackhub_unknown/hub.txt`.
+> **Action: upload the following track hub** `http://mbdata.science.ru.nl/ctoenhake/edu/trackhub_unknown/hub.txt`. Upload this trackhub as described in section 1.4.3.  
 
 <br>
 Note that the y-axis scale of these tracks is set to "auto-scale to data view". In the monocyte track we had set these to fixed values based on our experience with these datasets. "Auto-scaling" means that the y-axis adjusts to the reported signal in the corresponding genomic region.
@@ -1045,7 +1016,7 @@ To summarize, a brief quiz on the association between marks and functional eleme
 quiz( #caption = "Summarizing...",
 
   question(
-    "Promoters that are active are often marked by ...",
+    "Promoters that are active are often marked by ...(select ALL that apply)",
     answer("H3K4me3", correct = T),
     answer("H3K4me1", correct = T),
     answer("H3K27ac", correct = T),
