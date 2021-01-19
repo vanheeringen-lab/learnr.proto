@@ -487,40 +487,25 @@ Possible solutions:
 
 ```{r step 1 chr19 subsample per gene expression quantile, eval = F}
 # Important parameter: the chosen proportion of genes
-chosen_proportion <- 0.3
+chosen_proportion <- 0.4
 ```
 
 ```{r step 2 chr19 subsample per gene expression quantile, eval = F}
-# load required files and set directories:
-all_results <- read.table("/home/ctoenhake/learnr.proto/inst/extdata/week3/quant/C000S5B1.gene_quantification.rsem_grape2_crg.GRCh38.20150622.results", header =T)
-### remove version from ensemble gene id 
-all_results$gene_id <- sapply(all_results$gene_id,  sub, pattern = "\\.\\d+$", replacement = "")
-### map entrez id to ensemble id
-all_results$entrezgene_id = mapIds(org.Hs.eg.db,
-                    keys=all_results$gene_id, 
-                    column="ENTREZID",
-                    keytype="ENSEMBL",
-                    multiVals="first")
-
 ### set sqlevels in txdb to chr19
 library(TxDb.Hsapiens.UCSC.hg38.knownGene)
 txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene 
 seqlevels(txdb) <- seqlevels0(txdb)
 seqlevels(txdb) <- "chr19"
 
-### vector of entrez ids for genes on chr19 
-genes_chr19 <- genes(txdb)
-geneids_genes_chr19 <- mcols(genes_chr19)[,1]
-
-### subset all_results for genes on chr19
-quantification_chr19 <- all_results[all_results$entrezgene_id %in% geneids_genes_chr19,c("entrezgene_id", "TPM", "FPKM")]
+# load chr19 quantification (used in fg2)
+rdsfile <- system.file("extdata", "week2", "prepared_rds", "blueprint_c000s5_gene_quantification_chr19.rds", package = "learnr.proto")
+quantification_chr19 <- readRDS(rdsfile)
 ```
 
 ```{r step 3 chr19 subsample per gene expression quantile, eval = F}
 # define new variable based on quartiles of gene expression
 quantification_chr19 <- quantification_chr19 %>% 
   mutate(expression_group = ntile(FPKM, 4))
-
 
 ### set seed for slice_sample
 set.seed(13)
@@ -543,41 +528,36 @@ ggplot(quantification_chr19_sample, aes(x = as.factor(expression_group), y = log
 ```{r setp 4 subsample bigiwg file for these TSS windows, eval = F}
 # subsample bigwig for regions around the TSS of the subsampled genes on chr19  
 ## set fref files and libraries:
-library(TxDb.Hsapiens.UCSC.hg38.knownGene)
-txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene 
-seqlevels(txdb) <- seqlevels0(txdb)
-seqlevels(txdb) <- "chr19"
 tss_chr19 <- unique(promoters(genes(txdb), upstream = 2000, downstream = 0 )) 
 tss_chr19 <- resize(tss_chr19, width = 1, fix = "end")
 tss_chr19_sample <- tss_chr19 %>% filter(gene_id %in% quantification_chr19_sample$entrezgene_id )  
 
 ### input dir:
-dir_raw_files <- "/home/ctoenhake/learnr.proto/inst/extdata/week3/chr19_bw/"
+dir_raw_files <- "/home/ctoenhake/learnr.proto/inst/extdata/week3/bw_chr19/"
 ### output dir:
-dir_out_files <- "/home/ctoenhake/learnr.proto/inst/extdata/week3/chr19_bw_tss_subsample/"
+dir_out_files <- "/home/ctoenhake/learnr.proto/inst/extdata/week3/bw_chr19_tss_sample/"
 
 ### function to select regions in bigwig files and write output in outdir
 bw_files <- dir(path = dir_raw_files, pattern = "*.bw")
-bw_names <- sapply(bw_files,  sub, pattern = "\\$.bw", replacement = "")
 resize_bw <- function(w_in_kb, f, tss){
   print(deparse(substitute(f)))
   w_in_bp <- w_in_kb*1000+4
   tss_window <- resize(tss, width = w_in_bp, fix = "center")
-  tss_window_reduce <- reduce(tss_window)
-  sum(width(tss_window_reduce))
-  bw_tss_window_reduce <- import(paste(dir_raw_files, f, sep = "/"), which = tss_window_reduce, as = "RleList")
+  sum(width(tss_window))
+  bw_tss_window <- import(paste(dir_raw_files, f, sep = "/"), which = tss_window, as = "RleList")
   bw_out <- file.path(dir_out_files, 
-                      paste0(tools::file_path_sans_ext(f), "_chr19tss_", chosen_proportion, "ofGenes_", w_in_kb, "kb_window", ".bw"))
-  export.bw(object = bw_tss_window_reduce, bw_out)
+                      paste0(tools::file_path_sans_ext(f), "_chr19tss_", chosen_proportion, "ofGenes_", w_in_kb, "kb.bw"))
+  export.bw(object = bw_tss_window, bw_out)
+  rm(tss_window, bw_tss_window, bw_out)
 }
 
 ## perform function on all files in input directory. 
 for(file in bw_files){
-resize_bw(20, file, tss_chr19_sample)
+resize_bw(15, file, tss_chr19_sample)
 }
 
 ## save sliced quantification and TSSs
-save(quantification_chr19_sample, tss_chr19_sample, file = "inst/extdata/week3.Rdata"
+save(quantification_chr19_sample, tss_chr19_sample, file = "/home/ctoenhake/learnr.proto/inst/extdata/week3.Rdata")
 ```
 
 ### session Info
