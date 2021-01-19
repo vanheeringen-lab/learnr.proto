@@ -55,8 +55,8 @@ names(mono_list) <- c("h3k4me1", "h3k4me3", "h3k9me3", "h3k27ac", "h3k27me3", "h
 save(mono_h3k4me1, mono_h3k4me3, mono_h3k9me3, mono_h3k27ac, mono_h3k27me3, mono_h3k36me3, mono_list, file =  "data/prepared_rds/blueprint_monocyte_chr19_granges.RData")
 ```
 
-### chr19 GRanges of transcript-centered genomic features  
-Not used anymore in practical (2021 version)  
+### NOT USED - chr19 GRanges of transcript-centered genomic features      
+Had the idea to use this but decided not to anymore in practical (2021 version)  
 ```{r prepare-anno, echo = T, eval = F}
 # make my own list of GRanges objects of differnt genomic features (transcript-centered)
 
@@ -105,6 +105,7 @@ rm(newAnno.rd, newAnno, annotation_chr19, transcripts_chr19)
 # save the final GRangesList object
 saveRDS(annotation_chr19_gr, file = "data/prepared_rds/txdb_annotation_chr19_grangeslist.rds")
 ```
+
 Not used anymore in practical (2021 version)  
 ```{r prepare txdb, echo =T, echo = T, eval = F}
 genes <- unique(genes(txdb, filter = list(tx_chrom = "chr19")))
@@ -116,7 +117,7 @@ promoters_3k <- unique(promoters(txdb, filter = list(tx_chrom = "chr19"), upstre
 save(genes, transcripts, promoters_def, promoters_3k, file =  "data/prepared_rds/txdb_annotation_chr19_genes_tx_pr_tss_granges.RData")
 ```
 
-### chr19 df of gene symbols and entrezIDs  
+### NOT USED - chr19 df of gene symbols and entrezIDs    
 Not used anymore in practical (2021 version)  
 ```{r geneid mapping, , echo = T, echo = T, eval = F}
 # map ENTREZ gene id to gene SYMBOL
@@ -126,7 +127,7 @@ saveRDS(entrezid_symbols, file = "data/prepared_rds/gene_entrezids_genesymbols_d
 
 ```
 
-### chr19 df of ENCODE cis-regulatory elements  
+### NOT USED - chr19 df of ENCODE cis-regulatory elements    
 Not used anymore in practical (2021 version)  
 ```{r encode cres, echo = T, eval = F}
 library(plyr)
@@ -212,7 +213,7 @@ saveRDS(quantification_chr19, file = "data/prepared_rds/blueprint_c000s5_gene_qu
 
 ```
 
-#### chr19 Alternative gene ID  mapping with biomaRt:  
+#### NOT USED - chr19 Alternative gene ID  mapping with biomaRt:  
 
 - add entrez gene id using biomaRt (see steps on )  
 - restrict to genes on chromosome 19  
@@ -289,7 +290,7 @@ saveRDS(monocytes_combinationmatrix, file =  "data/prepared_rds/blueprint_monocy
 
 ```
 
-### Select bigwig files for chr19 limited to regions TSS +/- 20kb   
+### NOT USED - Select bigwig files for chr19 limited to regions TSS +/- 20kb   
 **2020-01-17**  
 This is to reduce the .bw file size as for tutorial we should have files of ±5MB and useing onlu chr19 still leaves 20-30MB per file. 
 I've tried a w of 40004, 20004, 15002; but output remains > 10 MB while.  
@@ -326,7 +327,7 @@ export.bw(object = bw_h3k4me3_tss_chr19_window, bw_out )
 
 ```
 <br>
-### chr21 - Test bigwig size of chr21 TSS windows - not used
+### NOT USED - chr21 - Test bigwig size of chr21 TSS windows
 What if I used chr21?  
 <br>
 40004 - 3.1 MB  
@@ -407,11 +408,11 @@ resize_bw_tss_dnase(20, file, tss_chr21, dnase_chr21)
 }
 ```
 
-## chr21 peaks and quantification for week 3 - not used  
+## NOT USED - chr21 peaks and quantification for week 3  
  
 > **Although bigwig of chip-seq data limited to chromosome 21 is nicely small enough in size. if we next visualize gene epxression per quantile this gives quantiles where the median expression of the first two quantiles is near 0. This is not representative for genome-wide expression. We therefor decide to stick with chr19 but randomly select 50% (or a bit less) of the genes per quantile to limit the data size.**  
 
-####  chr21 peaks in GRanges  
+#### NOT USED - chr21 peaks in GRanges  
 Note that I deleted the "chr21_bed" folder in "inst/extdata/week3/" after running this chunk to save space in the learnr.proto library. This is also why `eval=F` is set.    
 The files in this folder can be found on cn54: `scratch/ctoenhake/data/fg1_r_data/blueprint/chip_bed`. Whole genome bed peak files were downloaded from blueprint data portal > Experiments > search for C000S5.   
 ```{r prepare monocyt data, echo = T, eval = F}
@@ -436,7 +437,7 @@ monocytes_all <- unlist(monocytes_list)
 monocytes_all$chip <- names(monocytes_all)
 ```
 
-#### chr21 quantification   
+#### NOT USED - chr21 quantification   
 Note that I deleted the "quant" folder in "inst/extdata/week3/" after running this chunk because of the size of the file in it ("C000S5B1.gene_quantification.rsem_grape2_crg.GRCh38.20150622.results"). This is also why `eval=F` is set.  
 This was downloaded from http://dcc.blueprint-epigenome.eu/#/experiments/ERX157053 --> "Transcription quantification (Genes)" file.  
 
@@ -470,74 +471,92 @@ geneids_genes_chr21 <- mcols(genes_chr21)[,1]
 quantification_chr21 <- all_results[all_results$entrezgene_id %in% geneids_genes_chr21,c("entrezgene_id", "TPM", "FPKM")]
 ```
 
-#### store chr21 granges and quantification  
+#### NOT USED - store chr21 granges and quantification  
 ```{r save prepare monocyt data, echo = T, eval = F}
 save(monocytes_h3k4me1, monocytes_h3k4me3, monocytes_h3k9me3, monocytes_h3k27ac, monocytes_h3k27me3, monocytes_h3k36me3, monocytes_list, monocytes_all, quantification_chr21, file =  "inst/extdata/week3.Rdata")
 ```
 
-## chr19 - downsample gene counts  
+## chr19 - get smaller bigwig by downsampling genes   
 Problem: chip-seq bigwig files of 1 chromosome are too large  
 Aim: for 5MB per tutorial on data.  
 Possible solutions:  
 
-1. Select chr19, only 20kb +/- TSS sites --> files remain too large   
-2. Work with chr21 --> files are small enough but gene expression is not representative for genome wide  
-3. Random select subsample of genes from chr19 based on quantification quartiles.  
+1. Select chr19, only 20kb +/- TSS sites \-\-\> files remain too large   
+2. Work with chr21 \-\-\> files are small enough but gene expression is not representative for genome wide  
+3. Random select subsample of genes from chr19 based on quantification quartiles and used these to select regions in bigwig file.    
 
-```{r chr19 subsample per gene expression quantile, eval = F}
+```{r step 1 chr19 subsample per gene expression quantile, eval = F}
+# Important parameter: the chosen proportion of genes
+chosen_proportion <- 0.3
+```
+
+```{r step 2 chr19 subsample per gene expression quantile, eval = F}
+# load required files and set directories:
 all_results <- read.table("/home/ctoenhake/learnr.proto/inst/extdata/week3/quant/C000S5B1.gene_quantification.rsem_grape2_crg.GRCh38.20150622.results", header =T)
-# remove version from ensemble gene id 
+### remove version from ensemble gene id 
 all_results$gene_id <- sapply(all_results$gene_id,  sub, pattern = "\\.\\d+$", replacement = "")
-# map entrez id to ensemble id
+### map entrez id to ensemble id
 all_results$entrezgene_id = mapIds(org.Hs.eg.db,
                     keys=all_results$gene_id, 
                     column="ENTREZID",
                     keytype="ENSEMBL",
                     multiVals="first")
 
-# set sqlevels in txdb to chr19
+### set sqlevels in txdb to chr19
 library(TxDb.Hsapiens.UCSC.hg38.knownGene)
 txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene 
 seqlevels(txdb) <- seqlevels0(txdb)
 seqlevels(txdb) <- "chr19"
 
-# vector of entrez ids for genes on chr19 
+### vector of entrez ids for genes on chr19 
 genes_chr19 <- genes(txdb)
 geneids_genes_chr19 <- mcols(genes_chr19)[,1]
 
-# subset all_results for genes on chr19
+### subset all_results for genes on chr19
 quantification_chr19 <- all_results[all_results$entrezgene_id %in% geneids_genes_chr19,c("entrezgene_id", "TPM", "FPKM")]
+```
 
-# make 4 quantiles and subsample per quantile  
-quantification_chr19_slice <- quantification_chr19 %>% 
-  mutate(expression_group = ntile(FPKM, 4)) %>% 
+```{r step 3 chr19 subsample per gene expression quantile, eval = F}
+# define new variable based on quartiles of gene expression
+quantification_chr19 <- quantification_chr19 %>% 
+  mutate(expression_group = ntile(FPKM, 4))
+
+
+### set seed for slice_sample
+set.seed(13)
+
+# subsample per quartile  
+quantification_chr19_sample <- quantification_chr19 %>% 
   group_by(expression_group) %>% 
-  slice_sample(prop=0.3, replace = F)
+  slice_sample(prop=chosen_proportion, replace = F)
 
 # check number of genes per quantile and in expression plot
-table(quantification_chr19_slice$expression_group)
+table(quantification_chr19_sample$expression_group)
 ggplot(quantification_chr19, aes(x = as.factor(expression_group), y = log10(FPKM+1)))+
   geom_boxplot()+
   geom_jitter()
-ggplot(quantification_chr19_slice, aes(x = as.factor(expression_group), y = log10(FPKM+1)))+
+ggplot(quantification_chr19_sample, aes(x = as.factor(expression_group), y = log10(FPKM+1)))+
   geom_boxplot()+
   geom_jitter()
-
 ```
 
-```{r subsample bigiwg file for these TSS windows, eval = F}
+```{r setp 4 subsample bigiwg file for these TSS windows, eval = F}
+# subsample bigwig for regions around the TSS of the subsampled genes on chr19  
+## set fref files and libraries:
 library(TxDb.Hsapiens.UCSC.hg38.knownGene)
 txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene 
 seqlevels(txdb) <- seqlevels0(txdb)
 seqlevels(txdb) <- "chr19"
 tss_chr19 <- unique(promoters(genes(txdb), upstream = 2000, downstream = 0 )) 
 tss_chr19 <- resize(tss_chr19, width = 1, fix = "end")
-tss_chr19_slice <- tss_chr19 %>% filter(gene_id %in% quantification_chr19_slice$entrezgene_id )  
+tss_chr19_sample <- tss_chr19 %>% filter(gene_id %in% quantification_chr19_sample$entrezgene_id )  
 
+### input dir:
 dir_raw_files <- "/home/ctoenhake/learnr.proto/inst/extdata/week3/chr19_bw/"
+### output dir:
+dir_out_files <- "/home/ctoenhake/learnr.proto/inst/extdata/week3/chr19_bw_tss_subsample/"
 
-chr19_subsample_tss <- "/home/ctoenhake/learnr.proto/inst/extdata/week3/chr19_bw_tss_subsample/"
-  
+### function to select regions in bigwig files and write output in outdir
 bw_files <- dir(path = dir_raw_files, pattern = "*.bw")
 bw_names <- sapply(bw_files,  sub, pattern = "\\$.bw", replacement = "")
 resize_bw <- function(w_in_kb, f, tss){
@@ -546,16 +565,19 @@ resize_bw <- function(w_in_kb, f, tss){
   tss_window <- resize(tss, width = w_in_bp, fix = "center")
   tss_window_reduce <- reduce(tss_window)
   sum(width(tss_window_reduce))
-  bw_h3k4me3_tss_chr21_window <- import(paste(dir_raw_files, f, sep = "/"), which = tss_window_reduce, as = "RleList")
-  bw_out <- file.path(chr19_subsample_tss, 
-                      paste(tools::file_path_sans_ext(f), "chr19_TSSsubsample", w_in_kb, "kb.bw", sep = "_"))
-  export.bw(object = bw_h3k4me3_tss_chr21_window, bw_out)
+  bw_tss_window_reduce <- import(paste(dir_raw_files, f, sep = "/"), which = tss_window_reduce, as = "RleList")
+  bw_out <- file.path(dir_out_files, 
+                      paste0(tools::file_path_sans_ext(f), "_chr19tss_", chosen_proportion, "ofGenes_", w_in_kb, "kb_window", ".bw"))
+  export.bw(object = bw_tss_window_reduce, bw_out)
 }
+
+## perform function on all files in input directory. 
 for(file in bw_files){
-resize_bw(20, file, tss_chr19_slice)
+resize_bw(20, file, tss_chr19_sample)
 }
 
-
+## save sliced quantification and TSSs
+save(quantification_chr19_sample, tss_chr19_sample, file = "inst/extdata/week3.Rdata"
 ```
 
 ### session Info
