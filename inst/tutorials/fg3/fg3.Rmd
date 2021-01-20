@@ -60,12 +60,13 @@ genes_chr19 <- unique(genes(txdb))
 
 # sample of tss_chr19 and quantification_chr19 
 # those those for which we have data in bigwig files, see extdata/prepdata.Rmd)
-rdata = "/home/ctoenhake/learnr.proto/inst/extdata/week3.Rdata"
+rdata = system.file("extdata", "week3.Rdata", package = "learnr.proto")
 load(rdata)
 rm(rdata)
 quantification_chr19_sample <- quantification_chr19_sample %>% dplyr::rename(gene_id = entrezgene_id)
+quantification_chr19_sample$expression_group <- NULL
 
-# # gene quantification chromosome 19  
+# gene quantification chromosome 19  
  rdsfile <- system.file("extdata", "week2", "prepared_rds", "blueprint_c000s5_gene_quantification_chr19.rds", package = "learnr.proto")
 quantification_chr19 <- readRDS(rdsfile)
 quantification_chr19 <- quantification_chr19 %>% dplyr::rename(gene_id = entrezgene_id)
@@ -388,7 +389,7 @@ The ChIP-seq signal can be obtained from the data stored in .bam files or from .
 Not all packages and functions are compatible with both file types and the resulting plots may look differ in resolution in part because .bam files - as they store read information -  give you more freedom to define how coverage is calculated. However, as BLUEPRINT only provides the .bigwig files we will use those today and not the .bam files.   
 <!-- REF: https://www.bioconductor.org/packages/release/bioc/vignettes/genomation/inst/doc/GenomationManual.html#4_Extraction_and_visualization_of_genomic_data   -->
 <br>
-We limited the data stored in the bigWig files to a 20kb window around the TSSs of a randomly selected 30% of genes on chromosome 19. This was done to reduce the size of these files (bigWig but also .bam files are huge!) and speed up the tutorial a bit. We have made sure that this random selection still reflects the genome-wide relationships.  
+We limited the data stored in the bigWig files to a **15kb window around the TSSs of 40% of genes (randomly selected) on chromosome 19**. This was done to reduce the size of these files (bigWig and .bam files are huge!) and speed up the tutorial a bit. We have made sure that this random selection still reflects the genome-wide relationships. However, because of this decision you can't make plots of other or wider windows than 15kb.   
 
 ### Exercise 3  
 You will plot the H3K4me3 ChIP-seq signal strength around the TSSS in a density plot.  
@@ -408,35 +409,43 @@ Kernel density estimates have one major pitfall: they have the tendency to extra
 See for a more extended discussion on histograms and density plots Chapter 7 of Fundamentals of Data Visualization by Claus O. Wilke [ref](https://clauswilke.com/dataviz/histograms-density-plots.html).  
 </details>  
 
-A trick that prevents loading complete bigWig files in your environment is to load only the the regions of interest; in this case the window around the TSS. You load the signal in a "ScoreMatrix" object with the following function from the genomation package:  
+A trick that prevents loading complete bigWig files in your environment is to load only the the regions of interest; in this case the window around the TSS. You load the signal in a "ScoreMatrix" object with the `ScoreMatrix()` function from the genomation package:  
 
-`ScoreMatrix(target = [path to bigwig file], windows = [regions of interest], type = "bigWig", strand.aware = [TRUE/FALSE])`   
+```{r scorematrixcode, eval=FALSE, echo=TRUE}
+ScoreMatrix(target = [path to bigwig file], 
+            windows = [GRanges object with intervals of interest], 
+            type = "bigWig", 
+            strand.aware = [TRUE/FALSE])
+```
 
-* To take the strand of the TSS into account, we set `strand.aware` to TRUE.   
-* Every row in the resulting ScoreMatrix object corresponds to a window of the [regions of interest].  
-* Every column in the resulting ScoreMatrix object is a bp within that window.   
+* To take the strand of the TSS into account, we set `strand.aware=TRUE`.   
+* Every row in the resulting ScoreMatrix object corresponds to a window of the `[regions of interest]`.  
+* Every column in the resulting ScoreMatrix object is a bp within that window (see the image below).   
 
-![ScoreMatrix visual](images/genomation_scorematrix.png){width=50%}\  
-<br>
-The object `tss_chr19_sample` contains the TSSs (1bp) of which we also have data in the bigwig files. The window is currently 1bp but we want to plot the signal *around* the TSS. To do so, we resize these 1bp intervals with the function:  
+  ![ScoreMatrix visual](images/genomation_scorematrix.png){width=50%}\   
+<br>  
+The GRanges object `tss_chr19_sample` contains the TSSs (1bp) of which we also have data in the bigwig files. The window is currently 1bp but we want to plot the signal *around* the TSS. To do so, we resize these 1bp intervals with the `resize()` function from the GenomicRanges package:  
 
-`resize(x = [GRanges object], width = [desired width], fix = ["start", "end" or "center"])`.   
+```{r resizexcode, eval=FALSE, echo=TRUE}
+resize(x = [GRanges object], width = [desired width], fix = ["start", "end" or "center"])
+```
 
-* As we want to have a window *around* the TSS we set the `fix =` parameter to "center".    
+* If we want a window of 10kb around the TSS, use `width = 100001` to include the TSS (1bp extra).  
+* As we want to have a window *around* the TSS we set the `fix = "center"`.  
 
-> **Exercise 3a**: Run the code below to obtain the H3K4me3 signal in a +/-7.5kb window around the TSSs. Hit "Run Code" to view the structure of the resulting ScoreMatrix object.   
+> **Exercise 3a**: Run the code below to obtain the H3K4me3 signal in a 15kb window around the TSSs. Hit "Run Code" to view the structure of the resulting ScoreMatrix object.   
 
 `r colorize("The system.file fucntion contains the old subdir name, I corrected it, it is corrected on git, but did not get it installed in my local environment. ", col = "red")`  
 
 ```{r q3a_h3k4me3_scores, exercise=TRUE, exercise.eval=FALSE, error=TRUE}
 # define the window size  
-window <- 15000
+window <- 15001
 
 # resize the tss interval to this window.
 tss_window <- resize(tss_chr19_sample, width = window, fix = "center")
 
 # path to bigwig file (in this case stored in the folder "extdata" of the library "learnr.proto" which contains data specific to this tutorial)
-bw_h3k4me3 <- file.path("/home", "ctoenhake", "learnr.proto","inst", "extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw")
+bw_h3k4me3 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw", package = "learnr.proto")
 
 # create H3K4me3 ScoreMatrix for these intervals.
 # strand.aware =TRUE takes into account the strand of the TSS. 
@@ -445,86 +454,65 @@ scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3, windows = tss_window, typ
 # what structure is scores_h3k4me3? Hit "Run code" to view the result. 
 str(scores_h3k4me3_tss)
 ```
-<br>
+
 The object `scores_h3k4me3_tss` is of formal class ScoreMatrix, which is related to a basic matrix but - as it says - "more formal". In other words, it has special functions to retrieve and set the data. We won't go into the details of these differences with basic matrices but focus on how we can use this result.  
 
 ### 3.3.3 Density plot of H3K4me3 signal around the TSS  
-Using this ScoreMatrix you can plot the average H3K4me3 signal in these windows. To do so, use the function:   
+Using this ScoreMatrix you can plot the average H3K4me3 signal in these windows. To do so, use the `plotMeta()` function:   
 
-`plotMeta(mat = [score matrix object])`.  
+```{r plotmeta_example, eval=FALSE, echo=TRUE}
+plotMeta(mat = [scoreMatrix_object], xcoord = c([start,end]))
+```  
 
-> **Exercise 3b**: Run the code below to view the resulting plot.  
->  
-* Define the x-coordinates with the `xcoord = ` parameter to set the TSS at 0. If you remove this setting you will see that the x-axis is labeled from 0 to 15000.   
+* You can use the `xcoord =` parameter to define relative base positions for the x-axis and set the TSS at base '0'.  
 
-```{r example_densityplot, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup = "q3a_h3k4me3_scores"}
-# plot density plot
-plotMeta(scores_h3k4me3_tss, xcoord = c(-7500, 7500))
+> **Exercise 3b**: Make a density plot of the H3K4me3 signal stored in "scores_h3k4me3_tss" from exercise 3a (code check).   
+>
+> * Hit "Subit Answer" to submit your code.  
+> * Hit "Run Code" to view the plot (necessary for exercise 3c).   
+
+```{r prepare_q3b}
+tss_window <- resize(tss_chr19_sample, width = 15001, fix = "center")
+bw_h3k4me3 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw", package = "learnr.proto")
+scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3, windows = tss_window, type = 'bigWig', strand.aware =TRUE) 
 ```
-Clearly, you could have focused our plot on the region +/- 5kb around the TSS as the signal remains near 0 read per million outside that region.   
 
-### Exercise 3c  
 
-```{r mc_strandawareness}
-question("Which command would you change and how, to make sure that the signal is limited to +/-5kb around the TSSs in the density plot?",
-         answer("Change the xcoord parameter in 'plotMeta', set it to c(-5000, 5000)."),
-         answer("Filter the ScoreMatrix 'scores_h3k4me3_tss' for columns c(-5000, 5000)."),
-         answer("Change the width parameter in 'resize', set it to 10000.", correct = T, message =  "Let's make this plot!"),
+```{r q3b_h3k4me3plot, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup = "prepare_q3b"}
+# plot density plot of ScoreMatrix "scores_h3k4me3_tss"
+___(mat = ___, xcoord = c(-7500, 7500))
+```
+
+```{r q3b_h3k4me3plot-solution}
+plotMeta(mat = scores_h3k4me3_tss, xcoord = c(-7500, 7500))
+```
+
+```{r q3b_h3k4me3plot-code-check}
+grade_code()
+```
+
+Clearly, we could have restricted the plot tp the region +/- 3kb the TSS as the H3K4me3 signal remains near 0 read per million outside that region.   
+
+>**Exercise 3c**: Use the plot above to answer the following questions.    
+
+```{r q3c_mc_densityplot}
+quiz(caption="",
+  question("Which command would you change and how, to make sure that the signal is limited to +/-3kb around the TSSs in the density plot?",
+         answer("Change the xcoord parameter in 'plotMeta', set it to c(-3000, 3000).", message = "Changing the xcoord parameter only changes the thickmarks on the x-axis but does not change the actual window size of the interval."),
+         answer("Filter the ScoreMatrix 'scores_h3k4me3_tss' for columns c(-3000, 3000).", message = "We could filter the matrix indeed but these are not the correct columns as there are no 'negative' columns."),
+         answer("Change the width parameter in 'resize', set it to 6001.", correct = T),
          allow_retry = T,
-         random_answer_order = T)
-```
-
-> **Exercise 3c**:  Repeat the calculations of the window, scores and plot but now make sure you plot a window +/- 5kb.  
-* You can copy-paste and adjust the code used in exercise 3a.  
-
-```{r q3c_h3k4me3_scores, exercise.lines=15, exercise =TRUE, exercise.eval=FALSE, error=TRUE}
-# 1. define the window size  
-
-
-# 2. resize the interval tss_chr19_sample to this window
-
-
-# 3. path to bigwig file 
-bw_h3k4me3 <- file.path("/home", "ctoenhake", "learnr.proto","inst", "extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw")
-
-# 4. create H3K4me3 ScoreMatrix for these intervals.
-
-
-# 5. generate the density plot
-
-
-```
-
-
-```{r q3c_h3k4me3_scores-solution}
-# define the windows:  
-window <- 10000
-
-# resize the tss interval to this window.
-tss_window <- resize(tss_chr19_sample, width = window, fix = "center")
-
-# path to bigwig file (in this case stored in the folder "extdata" of the library "learnr.proto" which contains data specific to this tutorial)
-bw_h3k4me3 <- file.path("/home", "ctoenhake", "learnr.proto","inst", "extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw")
-
-# create H3K4me3 ScoreMatrix for these intervals.
-scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3, windows = tss_window, type = 'bigWig', strand.aware =TRUE)  
-
-# generate the density plot
-plotMeta(scores_h3k4me3_tss, xcoord = c(-5000, 5000) )
-```
-
-```{r mc_densityplotshape}
-quiz(caption = "", 
+         random_answer_order = T), 
      question("Is H3K4me3 signal equally strong before and after the TSS or is there a difference?",
-              answer("H3K4me3 signal appears equal up- and downstream the TSS"),
-              answer("H3K4me3 signal is lower downstream the TSS compared to upstream  "),
-              answer("H3K4me3 signal is higher downstream the TSS", correct = T, message = "H3K4me3 signal is generally higher downstream the TSS."),
+              answer("H3K4me3 signal appears equal up- and downstream the TSS.", message = "Look at the density plot, the y-axis gives the H3K4me3 signal, the TSS is located at x=0."),
+              answer("H3K4me3 signal is lower downstream the TSS compared to upstream.", message = "Review what is 'upstream' and what is 'downstream'."),
+              answer("H3K4me3 signal is higher downstream the TSS", correct = T, message = "Indeed, H3K4me3 signal is on average higher downstream the TSS."),
               allow_retry = T),
-     question("What would the plot show, in case you would have set 'strand.aware=FALSE' in the 'ScoreMatrix()' function? Tip: You can adjust the code and try it.",
-              answer("H3K4me3 signal appearing equal up- and downstream the TSS", correct = T, message = "As TSS are randomly distributed over strands, setting strand.aware to FALSE will lead to a plot where H3K4me3 signal appears equally strong before and after the TSS while in reality it is stronger downstream the TSS."),
-              answer("H3K4me3 signal would appear lower downstream the TSS compared to upstream.", message = "Realize that randomly distributed over strands while the H3K4me3 signal around the TSS is related to the directionality."),
-              answer("H3K4me3 signal would appear higher downstream the TSS", message = "Realize that randomly distributed over strands while the H3K4me3 signal around the TSS is related to the directionality."),
-              allow_retry = T),
+     # question("What would the plot show, in case you would have set 'strand.aware=FALSE' in the 'ScoreMatrix()' function? Tip: You can adjust the code from 3a and 3b and try it.",
+     #          answer("H3K4me3 signal appearing equal up- and downstream the TSS", correct = T, message = "As TSS are randomly distributed over strands, setting strand.aware to FALSE will lead to a plot where H3K4me3 signal appears equally strong before and after the TSS while in reality it is stronger downstream the TSS."),
+     #          answer("H3K4me3 signal would appear lower downstream the TSS compared to upstream.", message = "Realize that randomly distributed over strands while the H3K4me3 signal around the TSS is related to the directionality."),
+     #          answer("H3K4me3 signal would appear higher downstream the TSS", message = "Realize that randomly distributed over strands while the H3K4me3 signal around the TSS is related to the directionality."),
+     #          allow_retry = T),
      question("What could explain the slight decrease in signal at pos. 0?", 
               answer("The nucleosome depleted region found at the TSS of transcribed genes.", correct = T),
               answer("The binding of specific TFs at the TSS."),
@@ -534,84 +522,142 @@ quiz(caption = "",
 ```
 
 ### 3.3.4 Add H3K27me3 signal   
-So far we have examined the signal of a 'narrowPeak' ChIP. Now, let's add the H3K27me3 signal to our plot.  
+So far we have examined the signal of a "narrowPeak" ChIP mark. Let's look at a mark with a different peak shape: **H3K27me3**.  
 
 ### Exercise 4   
 
-> **Exercise 4**: Generate a density plot of the H3K37me3 signal +/- 5kb around the TSSs with H3K4me3 (code check).  
+> **Exercise 4**: Generate a density plot of the H3K37me3 signal +/- 15kb around the TSS.  
+>
+> * The object `tss_window` of exercise 3a is available to you (15 kb window around the TSS).  
 
-```{r h3k37me3_signal_tss, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=9, exercise.setup="q3c_h3k4me3_scores"}
-# 1. Path to bigwig file 
+```{r prepare_q4, echo = F}
+# define the windows:  
+window <- 15001
+
+# resize the tss interval to this window.
+tss_window <- resize(tss_chr19_sample, width = window, fix = "center")
+```
+
+```{r q4_h3k37me3_density, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=9, exercise.setup="prepare_q4"}
+# 1. Path to bigwig file with H3K37me3 signal      
 bw_h3k27me3 <- file.path("/home", "ctoenhake", "learnr.proto", "inst", "extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw")
 
-# 2. Create H3K27me3 ScoreMatrix for these intervals.
-scores_h3k27me3_tss <- ScoreMatrix(___)  
+# 2. Create H3K27me3 ScoreMatrix for the 15kb TSS windows.
+scores_h3k27me3_tss <- ScoreMatrix(target = ___,
+                                   windows = ___, 
+                                   type = 'bigWig',
+                                   strand.aware =TRUE)  
 
 # 3. Generate the H3K27me3 density plot
 
 ```
 
-```{r h3k37me3_signal_tss-hint-1}
-# You can copy-paste the ScoreMatrix code from the exercise above and adjust the parameter 'targets' 
+```{r q4_h3k37me3_density-hint-1}
+# "target =" should direct to the bigwig file. 
 ```
 
-```{r h3k37me3_signal_tss-hint-2}
+```{r q4_h3k37me3_density-hint-2}
 # Eg 
-ScoreMatrix(target = bw_h3k27me3, windows = tss_window, .....)  
+ScoreMatrix(target = bw_h3k27me3, .....)  
 ```
 
-```{r h3k37me3_signal_tss-hint3}
+```{r q4_h3k37me3_density-hint-3}
+# And the "windows =" to the GRanges object with the intervals
+```
+
+```{r q4_h3k37me3_density-hint-4}
+# Eg 
+ScoreMatrix(target = bw_h3k27me3, windows = tss_window, ....)  
+```
+
+```{r q4_h3k37me3_density-hint-5}
+# You can copy-paste and adjust the plotMeta() function from exercise 3b to make the density plot. 
+```
+
+```{r q4_h3k37me3_density-hint-6}
 # Warning: the next hint holds the solution!
 ```
 
-```{r h3k37me3_signal_tss-solution}
+```{r q4_h3k37me3_density-solution}
 # 1. path to bigwig file (in this case stored in the folder "extdata" of the library "learnr.proto" which contains data specific to this tutorial)
-bw_h3k27me3 <- file.path("/home", "ctoenhake", "learnr.proto", "inst", "extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw")
+bw_h3k27me3 <- file.path("/home", "ctoenhake", "learnr.proto", "inst", "extdata", "week3", "bw_chr19", "C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.20150528.chr19.bw")
 
 # 2. create H3K27me3 ScoreMatrix for the TSS windows with H3K4me3
 scores_h3k27me3_tss <- ScoreMatrix(target = bw_h3k27me3, windows = tss_window, type = 'bigWig', strand.aware =TRUE)  
 
 # 3. generate the H3K27me3 density plot
-plotMeta(scores_h3k27me3_tss, xcoord = c(-5000, 5000))
+plotMeta(scores_h3k27me3_tss, xcoord = c(-7500, 7500))
 ```
 
-```{r h3k37me3_signal_tss-code-check}
+```{r q4_h3k37me3_density-check}
+tss_window <- resize(tss_chr19_sample, width = 15001, fix = "center")
+bw_h3k27me3 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw", package = "learnr.proto")
+scores_h3k27me3_tss <- ScoreMatrix(target = bw_h3k27me3, windows = tss_window, type = 'bigWig', strand.aware =TRUE) 
+
+grade_result(pass_if(~identical(.result, 
+                     plotMeta(scores_h3k27me3_tss, xcoord = c(-7500, 7500))))
+             )
+```
+
+Observe the different pattern in this density plots compared to the one you generated for H3K4me3. This reflects the different nature of these marks with H3K4me3 having a much larger range (as you might have observed in the genome browser) as well as the frequency that these marks are found at promoters. 
+
+### 3.3.5 Multiple density profiles in one plot  
+We can observe these differences better when we combine density plots of the two marks. This is done by generating a "ScoreMatrixList" object and providing that to the `plotMeta()` function:    
+
+```{r example_scorematrixlist, echo=TRUE, eval=FALSE}
+# 1. Generate a "ScoreMatrixList" object:   
+ScoreMatrixList_object <- new("ScoreMatrixList", 
+                              list([object1_name]=[ScoreMatrix_1], ..., [objectN_name]=[ScoreMatrix_N]))
+
+# 2. Provide plotMeta with this "ScoreMatrixList":   
+plotMeta(mat = ScoreMatrixList_object, 
+         xcoord = c([start,end]),
+         overlay = [TRUE/FALSE], 
+         profile.names = [vector of custom names, used for the legend])
+```
+
+* With `overlay=TRUE` the two density profiles are plotted in one plot.   
+* With `overlay=FALSE` the two density profiles are plotted in seperate plots with the same x- and y-axis limits and scales.  
+* In `profile.names =` you can give a character vector of names, for every ScoreMatrix in the ScoreMatrixList.  
+
+> **Exercise 5**: Complete the code below to generate one plot with the density profiles of H3K4me3 and H3K27me3 in a 15kb window around the TSS.  
+> 
+> * The objects `scores_h3k4me3_tss` and `scores_h3k27me3_tss` of exercise 3 and 4 are available to you.   
+> * Hit "Submit Answer" to evaluate your code.  
+> * Hit "Run Code" to view the plot.  
+
+```{r prepare_q5, echo=FALSE}
+tss_window <- resize(tss_chr19_sample, width = 15001, fix = "center")
+# scores for h3k4me3 - 15 kb window TSS
+bw_h3k4me3 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw", package = "learnr.proto")
+scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3, windows = tss_window, type = 'bigWig', strand.aware =TRUE) 
+
+# scores h3k27me3 
+bw_h3k27me3 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw", package = "learnr.proto")
+scores_h3k27me3_tss <- ScoreMatrix(target = bw_h3k27me3, windows = tss_window, type = 'bigWig', strand.aware =TRUE) 
+```
+
+```{r q5_overlay, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q5"}
+# generate a ScoreMartixList of "scores_h3k4me3_tss" and "scores_h3k27me3_tss" 
+# (of exercise 3 and 4)
+scores_h3k4me3_h3k27me3 <- new("ScoreMatrixList", list(h3k4me3=___, h3k27me3=___))
+
+# generate the density plot
+plotMeta(mat = ___, xcoord = c(-7500, 7500), 
+        overlay = ___, profile.names = c("H3K4me3", "H3K27me3"))
+```
+
+```{r q5_overlay-solution}
+scores_h3k4me3_h3k27me3 <- new("ScoreMatrixList", list(h3k4me3=scores_h3k4me3_tss, h3k27me3=scores_h3k27me3_tss))
+
+plotMeta(scores_h3k4me3_h3k27me3, xcoord = c(-7500, 7500), overlay = TRUE, profile.names = c("H3K4me3", "H3K27me3"))
+```
+
+```{r q5_overlay-code-check}
 grade_code()
 ```
 
-Observe the difference in y-axis values between the density plot of H3K4me3 and H3K27me3. This reflects the different nature of these marks with H3K4me3 having a much larger range (as you might have observed in the genome browser). 
-<br>
-Lastly, you can combine density plots of two marks with by:    
-
-1. Generate a "ScoreMatrixList" object with:   
-  `new("ScoreMatrixList", list([object1_name]=[ScoreMatrix_1], [object2_name]=[ScoreMatrix_2], ..., [objectN_name]=[ScoreMatrix_N]))`  
-2. Provide plotMeta with this "ScoreMatrixList":   
-  `plotMeta([ScoreMatrixList_object], overlay =TRUE, profile.names = [vector of custom names, used in legend])`  
-
-This is done in the following example:  
-
-```{r prepare_overlay_density, echo=FALSE}
-window <- 10000
-tss_window <- resize(tss_chr19_sample, width = window, fix = "center")
-# scores for h3k27me3
-bw_h3k4me3 <- file.path("/home", "ctoenhake", "learnr.proto","inst", "extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw")
-scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3, windows = tss_window, type = 'bigWig', strand.aware =TRUE)  
-# scores for h3k27me3
-bw_h3k27me3 <- file.path("/home", "ctoenhake", "learnr.proto", "inst", "extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw")
-scores_h3k27me3_tss <- ScoreMatrix(target = bw_h3k27me3, windows = tss_window, type = 'bigWig', strand.aware =TRUE)  
-```
-
-```{r overlay_density, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_overlay_density"}
-# generate ScoreMartixList from two ScoreMatrix objects:
-scores_h3k4me3_h3k27me3_tss <- new("ScoreMatrixList", list(k4me3=scores_h3k4me3_tss, k27me3=scores_h3k27me3_tss))
-
-# generate density plot
-plotMeta(scores_h3k4me3_h3k27me3_tss, xcoord = c(-5000, 5000), overlay =TRUE, profile.names = c("H3K4me3", "H3K27me3"))
-```
-
-Observe the much lower average signal for H3K27me3 compared to H3K4me3 around the TSS. This reflects the small proportion of promoters that have H3K27me3 marking in combination with the different enrichment profiles of these marks (narrow, sharp peak with high enrichment vs broad domain).  
-<br>
-This density plot shows the *average* ChIP-seq signal around the TSS. Is this signal the same for low and high expressed genes? You will  examine that in the coming section.  
+This density plot shows the *average* ChIP-seq signal around the TSS. *But is this signal the same for gene with low and highly expression?*.  
 
 ## 3.4 Signal vs gene expression  
 You will investigate the the relationship between H3K4me3 signal (as reads per million extracted from the BigWig file) in a defined window around the TSS and gene expression (as FPKM). 
@@ -620,62 +666,47 @@ You will investigate the the relationship between H3K4me3 signal (as reads per m
 To investigate this relationship you will:  
 
 a. Calculate the average H3K4me3 signal in a 5kb window around the TSS.  
-b. Convert the output to a data.frame.  
-c. Combine the data.frame with H3K4me3 signal scores with those containing gene expression values for the same TSSs.  
+b. Convert the output of (a) in to a data.frame.  
+c. Combine the data.frame with H3K4me3 scores with those containing gene expression values for the corresponding genes.    
 d. Group genes based on their gene expression in 4 quartiles and plot the H3K4me3 signal per group in a boxplot.  
 
-### Exercise 5a  
-To calculate the average H3K4me3 signal a defined window around the TSS. Let's take 10kb. You can obtain these values relatively quickly with a modified version of the 'ScoreMatrix' function: `ScoreMatrixBin()`.   
-<br>
-As the name suggests, this function does not calculate the coverage for each bp in the given windows, but for each **bin**. If we set the `bin.num=` parameter to `1`, it will output the average signal for each window.  
-<br>
-Note that this function is also useful when working with windows of varying size like  genes, in those cases we set `bin.num` to 50 or 100.    
+### Exercise 6a  
+To calculate the average H3K4me3 signal in a defined window around the TSS you can use a modified version of the 'ScoreMatrix' function: 
 
-> **Exercise 5a**: Calculate the average H3K4me3 signal in a window of +/- 2.5kb around the TSS (code check).  
+```{r scorematrixbincode, eval=FALSE, echo=TRUE}
+ScoreMatrixBin(target = [path to bigwig file], 
+               windows = [GRanges object with intervals of interest], 
+               bin.num = n,
+               type = "bigWig", 
+               strand.aware = [TRUE/FALSE])
+```
+As the name suggests, this function does not calculate the coverage for each bp in the given windows, but it will chop the intervals into `n` number of **bins**. The number of bins can be set with the `bin.num=` parameter. Setting this to  `bin.num=1`, will give the average signal for each window.  
+<br>
+Note that this function is also useful when working with windows of varying size like genes, in those cases we set `bin.num` to 50 or 100.    
+
+> **Exercise 6a**: Calculate the average H3K4me3 signal in a window of 5kb around the TSS (code check).  
 > 
-> * `tss_chr19_sample` is the GRanges object with TSS locations for which we have signal in the BigWig available files.  
+> * `tss_chr19_sample` is the GRanges object with TSS locations for which we have signal in the BigWig files.  
 > * Use `resize()` to resize the window in `tss_chr19_sample` to 5kb.  
 
 
-```{r q5a_prepare}
-# scores for h3k4me3
-bw_h3k4me3 <- file.path("/home", "ctoenhake", "learnr.proto","inst", "extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw")
+```{r q6a_prepare}
+# bigwig for h3k4me3 
+bw_h3k4me3 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw", package = "learnr.proto")
 ```
 
-```{r q5a_signal_vs_fpkm_allgenes, eval = F, echo = F}
-# bw_h3k4me3 <- file.path("/home", "ctoenhake", "learnr.proto","inst", "extdata", "week3", "bw_chr19", "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19.bw")
-# window <- 5000
-# tss_window <- resize(tss_chr19, width = window, fix = "center")
-# average_score_h3k4me3_tss <- ScoreMatrixBin(target = bw_h3k4me3, windows = tss_window, type = 'bigWig', bin.num = 1, strand.aware =TRUE)  # gives the average score over the complete window. And not the sum of 1bp bin windows. 
-# scores_as_matrix <- as(average_score_h3k4me3_tss, "matrix")
-# scores_as_df <- as.data.frame(scores_as_matrix)
-# scores_as_df$gene_id <- tss_window$gene_id
-# h3K4me3_and_rnaquant <- merge(scores_as_df, quantification_chr19, by.x = "gene_id", by.y = "entrezgene_id")
-# h3K4me3_and_rnaquant %>% 
-#   mutate(expression_group = ntile(FPKM, 4)) %>% 
-#   ggplot(.)+ 
-#   geom_boxplot(mapping=aes(x = as.factor(expression_group), y = V1))+
-#   scale_y_continuous(limits = c(0,100), breaks = c(0,25,50,70,100))
-# h3K4me3_and_rnaquant %>% 
-#   mutate(expression_group = ntile(FPKM, 4)) %>% 
-#   ggplot(.)+ 
-#   geom_point(mapping=aes(col = as.factor(expression_group), x = log2(FPKM+1) ,y = V1)) 
-
-
-```
-
-```{r q5a_signalVSfpkm, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="q5a_prepare"}
-# Re-size the window in "tss_chr_sample" to 5kb
+```{r q6a_signalfpkm, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="q6a_prepare"}
+# Re-size the window in "tss_chr_sample" to 5001bp
 tss_chr19_sample_window <- resize(___, width = ___, fix = "center")
 
 # Obtain the average H3K4me3 core for each window in "tss_chr19_sample_window"
-average_h3k4me3_tss <- ScoreMatrixBin(target = ___, 
+average_h3k4me3_tss <- ScoreMatrixBin(target = bw_h3k4me3, 
                                              windows = ___, 
                                              bin.num = ___, 
                                              type = 'bigWig', strand.aware =TRUE)  
 ```
 
-```{r q5a_signalVSfpkm-solution}
+```{r q6a_signalfpkm-solution}
 # Resize the window in "tss_chr_sample" to 10kb
 tss_chr19_sample_window <- resize(tss_chr19_sample, width = 5000, fix = "center")
 
@@ -686,26 +717,27 @@ average_h3k4me3_tss <- ScoreMatrixBin(target = bw_h3k4me3,
                                              type = 'bigWig', strand.aware =TRUE)  
 ```
 
-```{r q5a_signalVSfpkm-code-check}
-#saveRDS(average_h3k4me3_tss, file = file.path("/home", "ctoenhake", "learnr.proto","inst", "extdata", "week3", "prepared_rds", "scorematrix_q5_average_scores_h3k4me3_tss_10kbwindow.rds"))
+```{r q6a_signalfpkm-code-check}
+#when I designed the tutorial, I saved this scorematrix object so that we do not need to rerun the function in coming questions but can directly load the output. 
+#saveRDS(average_h3k4me3_tss, file = file.path("/home", "ctoenhake", "learnr.proto","inst", "extdata", "week3", "prepared_rds", "scorematrix_q6_average_scores_h3k4me3_tss_10kbwindow.rds"))
 
 grade_code()
 ```
 
-### Exercise 5b  
-Next, transform the resulting 'ScoreMatrix' object into a data.frame to facilitate data manipulation with dplyr and plotting with ggplot2. You can transform:  
+### Exercise 6b  
+Next, transform the resulting 'ScoreMatrix' object to a data.frame to facilitate data manipulation with dplyr and plotting with ggplot2. You can transform:  
 
 * a 'ScoreMatrix' into a basic matrix with: `matrix_object <- as([ScoreMatrix_object], "matrix")`  
 * a matrix into data.frame with: `dataframe_object <- as.data.frame([matrix_object])`.    
 
-> **Exercise 5b**: Transform the `average_h3k4me3_tss` into a data.frame.   
+> **Exercise 6b**: Transform the `average_h3k4me3_tss` to a data.frame.   
 
-```{r q5b_prepare}
+```{r q6b_prepare}
 # scores from ex 5
-average_h3k4me3_tss <- readRDS(file = file.path("/home", "ctoenhake", "learnr.proto","inst", "extdata", "week3", "prepared_rds", "scorematrix_q5_average_scores_h3k4me3_tss_10kbwindow.rds"))
+average_h3k4me3_tss <- readRDS(file = system.file("extdata", "week3", "prepared_rds", "scorematrix_q5_average_scores_h3k4me3_tss_10kbwindow.rds", package = "learnr.proto"))
 ```
 
-```{r q5b_signalVSfpkm, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="q5b_prepare"}
+```{r q6b_signalvsfpkm, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="q6b_prepare"}
 # transform average_h3k4me3_tss into a matrix
 scores_as_matrix <- as(___, "matrix")
 
@@ -717,7 +749,7 @@ average_h3k4me3_tss_df <- as.data.frame(___)
 head(__)
 ```
 
-```{r q5b_signalVSfpkm-solution}
+```{r q6b_signalvsfpkm-solution}
 # transform average_h3k4me3_tss into a matrix
 scores_as_matrix <- as(average_h3k4me3_tss, "matrix")
 
@@ -729,7 +761,7 @@ average_h3k4me3_tss_df <- as.data.frame(scores_as_matrix)
 head(average_h3k4me3_tss_df)
 ```
 
-```{r q5b_signalVSfpkm-check}
+```{r q6b_signalvsfpkm-check}
 grade_result(
   pass_if(~identical(.result, head(as.data.frame(as(average_h3k4me3_tss, "matrix")))))
 )
@@ -740,7 +772,7 @@ grade_result(
 In the code below we therefore:... 
 
 * renamed 'V1' using `rename()` from dplyr;  
-* added the variable 'gene_id' (matching those in the windows we used in the `ScoreMatrixBin()` function).  
+* added the variable "gene_id" (matching those in `tss_chr19_smaple` we used in the `ScoreMatrixBin()` function).  
 
 ```{r rename_example, echo=TRUE, eval=FALSE}
 average_h3k4me3_tss_df <- as.data.frame(as(average_h3k4me3_tss, "matrix")) %>% 
@@ -748,49 +780,101 @@ average_h3k4me3_tss_df <- as.data.frame(as(average_h3k4me3_tss, "matrix")) %>%
 average_h3k4me3_tss_df$gene_id <- tss_chr19_sample$gene_id
 ```
 
-### Exercise 5c  
-Now, the data from `average_h3k4me3_tss_df` and `quantification_chr19` to get a data.frame with the H3K4me3 signal at the TSS and the corresponding gene expression.   
-<br>
-To join two data.frames you can use the following function from dplyr:   
+### Exercise 6c  
+Next, join the data from `quantification_chr19_sample` and `average_h3k4me3_tss_df` to get a data.frame with gene expression values and the corresponding avearge H3K4me3 signal at the TSS.   
+
+* `quantification_chr19_sample` contains contains the gene expression values for this dataset, filtered for the genes for which we have data in our bigwig files.  
+* These data were downloaded from the [blueprint dataportal](http://dcc.blueprint-epigenome.eu/#/experiments/ERX157053).  
+
+To join these two data.frames you can use the `left_join()` function from dplyr:   
 
 ```{r inner_joing , echo=TRUE, eval=FALSE}
-inner_join(x = [dataframe 1], y = [dataframe 2], by = [variable to join by])
+left_join(x = [dataframe 1], y = [dataframe 2], by = [variable to join by])
 ```
 
-This function outputs a data.frame with all rows in `x` and `y` that match for the variable defined  by `by=`.   
+* This function outputs a data.frame includes all rows in `x` and their matching values for variables in `y` when they match for the variable defined by `by=`.  
+* Print the head of `quantification_chr19_sample` to identify a useful variable to use in `by=` (**Hit "Run Code"**):    
 
-> **Exercise 5c**: Join `average_h3k4me3_tss_df` and `quantification_chr19` (code check). 
+```{r q6_prep, exercise=TRUE, exercise.eval=FALSE, error=TRUE}
+# print the head of quantification_chr19_sample
+head(quantification_chr19_sample, n=3)
+```
+> **Exercise 6c**: Use the `left_join()` function to combine `average_h3k4me3_tss_df` and `quantification_chr19_sample` (code check). 
 >
 > * Join these two data.frames by the variable "gene_id". 
 > * Because we enable code checking, you have to explicitly define `x = ` and `y=` parameters. 
 
 
-```{r q5c_prepare}
+```{r q6c_prepare}
 # scores from ex 5
-average_h3k4me3_tss <- readRDS(file = file.path("/home", "ctoenhake", "learnr.proto","inst", "extdata", "week3", "prepared_rds", "scorematrix_q5_average_scores_h3k4me3_tss_10kbwindow.rds"))
-
+average_h3k4me3_tss <- readRDS(file = system.file("extdata", "week3", "prepared_rds", "scorematrix_q6_average_scores_h3k4me3_tss_10kbwindow.rds", package = "learnr.proto"))
 average_h3k4me3_tss_df <- as.data.frame(as(average_h3k4me3_tss, "matrix")) 
 average_h3k4me3_tss_df <- average_h3k4me3_tss_df %>% dplyr::rename(H3K4me3 = V1)
 average_h3k4me3_tss_df$gene_id <- tss_chr19_sample$gene_id
 ```
 
-```{r q5c_signalVSfpkm, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="q5b_prepare"}
-# Join `average_h3k4me3_tss_df` and `quantification_chr19`.  
-h3k4me3_and_fpkm <- ____
+```{r q6c_signalfpkm, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="q6c_prepare", exercise.lines=6}
+# Join "quantification_chr19_sample" and "average_h3k4me3_tss_df" by "gene_id"
+expresssion_and_h3k4me3 <- ____
+
+# Print the head of the resulting output
+
 ```
 
-```{r q5c_signalVSfpkm-solution}
-h3k4me3_and_fpkm <- inner_join(x = average_h3k4me3_tss_df, y = quantification_chr19, by = "gene_id")
+```{r q6c_signalfpkm-solution}
+# Join "quantification_chr19_sample" and "average_h3k4me3_tss_df" by "gene_id"
+expresssion_and_h3k4me3 <- right_join(x = quantification_chr19_sample, y = average_h3k4me3_tss_df, by = "gene_id")
+
+# Print the head of the resulting output
+head(expresssion_and_h3k4me3)
 ```
 
-```{r q5c_signalVSfpkm-code-check}
-grade_code()
+```{r q6c_signalfpkm-check}
+grade_result(
+  pass_if(~identical(.result, 
+                   head(right_join(x = quantification_chr19_sample, y = average_h3k4me3_tss_df, by = "gene_id"))
+                   ))
+)
 ```
 
-### Exercise 5d  
-> **Exercise 5d**: To investigate the relationship between H3K4me3 signal and gene expression, plot the H3K4me3 signal (y-axis) for genes grouped by 
+### Exercise 6d 
+
+> **Exercise 6d**: To investigate the relationship between H3K4me3 signal and gene expression, plot the H3K4me3 signal (y-axis) for genes grouped by gene expression quantile.  
 >
 > * Join these two data.frames by the variable "gene_id"  
+
+```{r q6d_prepare}
+# scores from ex 5
+average_h3k4me3_tss <- readRDS(file = system.file("extdata", "week3", "prepared_rds", "scorematrix_q6_average_scores_h3k4me3_tss_10kbwindow.rds", package = "learnr.proto"))
+average_h3k4me3_tss_df <- as.data.frame(as(average_h3k4me3_tss, "matrix")) 
+average_h3k4me3_tss_df <- average_h3k4me3_tss_df %>% dplyr::rename(H3K4me3_rpm = V1)
+average_h3k4me3_tss_df$gene_id <- tss_chr19_sample$gene_id
+expresssion_and_h3k4me3 <- right_join(x = quantification_chr19_sample, y = average_h3k4me3_tss_df, by = "gene_id")
+```
+
+```{r q6d_signalfpkm, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="q6d_prepare", exercise.lines=6}
+# Define new variable with mutate that groups genes in four groups, based on the quartiles of gene expression levels
+expresssion_and_h3k4me3 %>%  
+  mutate(gene_group = ntile(FPKM, n=4)) %>% 
+  ggplot(.)+  
+  geom_boxplot(mapping=aes(x = as.factor(gene_group), y = H3K4me3_rpm))+ 
+  scale_y_continuous(limits = c(0,100), breaks = c(0,25,50,70,100))
+
+# Print the head of the resulting output
+
+```
+
+```{r q6d_signalfpkm-solution}
+expresssion_and_h3k4me3 %>%  
+  mutate(gene_group = ntile(FPKM, n=4)) %>% 
+  ggplot(.)+  
+  geom_boxplot(mapping=aes(x = as.factor(gene_group), y = H3K4me3_rpm))+ 
+  scale_y_continuous(limits = c(0,100), breaks = c(0,25,50,70,100))
+```
+
+```{r q6c_signalfpkm-code-check}
+grade_code()
+```
 
 
 
@@ -805,31 +889,6 @@ grade_code()
 <!--   ggplot(.)+  -->
 <!--   geom_point(mapping=aes(col = as.factor(expression_group), x = log2(FPKM+1) ,y = V1))  -->
 
-
-```{r q6_03sampled, eval = F}
-# scores for h3k4me3
-bw_h3k4me3 <- file.path("/home", "ctoenhake", "learnr.proto","inst", "extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19_chr19tss_0.3ofGenes_20kb_window.bw")
-rdata = file.path("/home", "ctoenhake", "learnr.proto","inst", "extdata", "week3_03sample.Rdata")
-load(rdata)
-
-window <- 5000
-tss_window_03sample <- resize(tss_chr19_sample, width = window, fix = "center")
-average_score_h3k4me3_tss_03 <- ScoreMatrixBin(target = bw_h3k4me3, windows = tss_window_03sample, type = 'bigWig', bin.num = 1, strand.aware =TRUE)  # gives the average score over the complete window. And not the sum of 1bp bin windows. 
-scores_as_matrix_03 <- as(average_score_h3k4me3_tss_03, "matrix")
-scores_as_df_03 <- as.data.frame(scores_as_matrix_03)
-scores_as_df_03$gene_id <- tss_window_03sample$gene_id
-h3K4me3_and_rnaquant_03 <- merge(scores_as_df_03, quantification_chr19_sample, by.x = "gene_id", by.y = "entrezgene_id")
-h3K4me3_and_rnaquant_03 %>% 
-  mutate(expression_group = ntile(FPKM, 4)) %>% 
-  ggplot(.)+ 
-  geom_boxplot(mapping=aes(x = as.factor(expression_group), y = V1))+
-  scale_y_continuous(limits = c(0,100), breaks = c(0,25,50,70,100))
-h3K4me3_and_rnaquant_03 %>% 
-  mutate(expression_group = ntile(FPKM, 4)) %>% 
-  ggplot(.)+ 
-  geom_point(mapping=aes(col = as.factor(expression_group), x = log2(FPKM+1) ,y = V1)) 
-
-```
 
 
 ```{r making correlation, eval = F}
