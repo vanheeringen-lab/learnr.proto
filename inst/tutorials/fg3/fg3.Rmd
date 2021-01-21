@@ -60,8 +60,10 @@ genes_chr19 <- unique(genes(txdb))
 rdata = system.file("extdata", "week3.Rdata", package = "learnr.proto")
 load(rdata)
 rm(rdata)
+tss_chr19_sample <- tss_chr19_sample[-(tss_chr19_sample$gene_id =="554235")] # this geneID is not present in quantification data
 quantification_chr19_sample <- quantification_chr19_sample %>% dplyr::rename(gene_id = entrezgene_id)
 quantification_chr19_sample$expression_group <- NULL
+quantification_chr19_sample <- quantification_chr19_sample[-(quantification_chr19_sample$gene_id =="114335"), ] # this geneID is not present in TSSs
 
 # gene quantification chromosome 19  
 rdsfile <- system.file("extdata", "week2", "prepared_rds", "blueprint_c000s5_gene_quantification_chr19.rds", package = "learnr.proto")
@@ -161,11 +163,11 @@ The exercises in this tutorial are similar to those in fg2. A brief reminder:
 
 Although we ask for specific answers or completion of specific code, you are encouraged to test your own code and use `Run Code` and `Start Over` extensively. I.e., remove the pre-coded code and write your own code for a different graph or different summary of the data. Use `Run Code` to preview the results. Unfortunately these self-thought of codes can not be evaluated. For the evaluation you need to use our pre-coded code. Hit `Start Over` to get this pre-coded code.  
 
-#### Used resources   
+#### **Used resources**   
 
-- Akalin A, Franke V, Vlahovicek K, Mason C, Schubeler D (2014). “genomation: a toolkit to summarize, annotate and visualize genomic intervals.” Bioinformatics. doi: 10.1093/bioinformatics/btu775, http://bioinformatics.oxfordjournals.org/content/early/2014/12/04/bioinformatics.btu775.long
+- Akalin A, Franke V, Vlahovicek K, Mason C, Schubeler D (2014). “genomation: a toolkit to summarize, annotate and visualize genomic intervals.” Bioinformatics. doi: 10.1093/bioinformatics/btu775.  
 - [Genomation package vignette](http://bioconductor.org/packages/release/bioc/vignettes/genomation/inst/doc/GenomationManual.html).    
-- Data was downlaoded from the [BLUEPRINT data portal](http://dcc.blueprint-epigenome.eu/#/home).    
+- Data were obtained from the [BLUEPRINT data portal](http://dcc.blueprint-epigenome.eu/#/home).    
 
 ### 3.1.1 Learning Objectives  
 
@@ -175,16 +177,15 @@ Although we ask for specific answers or completion of specific code, you are enc
 3. Plot the distribution of distances between ChIP-seq peaks and the nearest TSS.      
 2. Import coverage data from bigwig files into r.  
 4. Plot the average histone ChIP-seq signal around a genomic feature like the TSS.  
-5. Plot the relationship between ChIP-seq signal at the TSS and gene expression.   
-6. Optionally, test for significance of the observed association.  
-7. Summarize ChIP-seq signal in a heatmap figure.  
-8. Order the heatmap of (7) by gene expression.  
-9. Cluster the heatmap of (7) based on ChIP-seq signals of different marks.  
-10. Optionally, back-analyze chromHmm output, in other words, heatmap summary of signal intensities of the different marks in chromHMM defined regions. Regions are labelled 1-12, can you, using the sig
+5. Plot the relationship between the average ChIP-seq signal at the TSS and gene expression.   
+6. Summarize ChIP-seq signal in a heatmap figure.  
+7. Order the heatmap of (7) by gene expression.  
+8. Cluster the heatmap of (7) based on ChIP-seq signals of different marks.  
+9. Optionally, back-analyze chromHmm output, in other words, heatmap summary of signal intensities of the different marks in chromHMM defined regions. Regions are labelled 1-12, can you, using the sig
   
 ## 3.2 Identify nearby TSSs  
 ### 3.2.1 Identify the nearest TSS   
-First, let's identify the nearest TSS and plot the distance between a histone mark and its nearest TSS (in contrast to identifying strict overlap as in fg3).  
+First, let's identify the nearest TSS and plot the distance between a histone mark and its nearest TSS (in contrast to identifying strict overlap as in **fg2**).  
 
 ### Exercise 1    
 Identify the nearest TSS for each H3K4me3 peak in monocytes.   
@@ -193,31 +194,29 @@ Identify the nearest TSS for each H3K4me3 peak in monocytes.
 
 ```{r qimport}
 question("Which function imports the H3K4me3 peaks into a GRanges object?",
-         answer("import(\"C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr19.bed\", format = \"narrowPeak\")", correct =TRUE),
-         answer("import(\"C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr19.bed\", format = \"BED\")", message = "BED is not the right format."),
-         answer("import(\"C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr19.bed\", format = \"broadPeak\")", message = "check the file format."),
-         answer("read.table(\"C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr19.bed\", format = \"broadPeak\")", message = "read.table parses the data into a data.frame while we asked for a GRanges object."),
+         answer("import(\"H3K4me3.bwa.GRCh38.chr19.bed\", format = \"narrowPeak\")", correct =TRUE),
+         answer("import(\"H3K4me3.bwa.GRCh38.chr19.bed\", format = \"BED\")", message = "BED is not the right format."),
+         answer("import(\"H3K4me3.bwa.GRCh38.chr19.bed\", format = \"broadPeak\")", message = "check the file format."),
+         answer("read.table(\"H3K4me3.bwa.GRCh38.chr19.bed\", format = \"broadPeak\")", message = "read.table parses the data into a data.frame while we asked for a GRanges object."),
          allow_retry =TRUE,
          random_answer_order =TRUE)
 ```
 
 ### Exercise 1b  
-To identify the nearest TSS, you use the function:   
+To identify the nearest TSS, you use the `distance2NearestFeature()` function:   
 
-`distance2NearestFeature(g.idh = [GRanges object withe peaks], tss = [GRanges object with TSSs])`  
+```{r nearestfeature_example, eval=FALSE, echo=TRUE}
+distance2NearestFeature(g.idh = [hip_peaks_in_GRanges], 
+                        tss = [TSSs_in_GRanges])  
+```
 
-The output is a data.frame reporting for each range in the `g.idh` object:
+The output is a data.frame reporting for each range in the `g.idh` object:  
 
 - its nearest TSS  
 - the name of the corresponding peak and TSS  
 - the distance between them. 
 
 The fact that the output is a data.frame makes it easy for us to summarize the results with dplyr and ggplot2.      
-
-<!-- 1. target.row = index of the peak in the GRanges object with peaks.   -->
-<!-- 2. dist.to.feature = distance to the nearest TSS, negative when the peak is *upstream* of the TSS.    -->
-<!-- 3. feature.name = the Entrez gene id of the corresponding gene, given in the column "names" of object `tss_chr19`.    -->
-<!-- 4. feature.strand = strand of the TSS.    -->
 
 > **Exercise 1b**: Identify the nearest TSS for each H3K4me3 ChIP-seq peak.  
 > 
@@ -263,7 +262,7 @@ The `dist_h3k4me3_to_tss` reports for each H3K4me3 peak a nearest TSS. In total 
 <br>
 
 >#### **Optional check**:  
-<details><summary>Curious to check the matches in the genome browser?:</summary>   
+<details><summary>Curious to check the matches in the genome browser? Click here for a quick how-to:</summary>   
 <br>
 You may want to check some of the matches. For example to check that positive distances are indeed peaks that are located *downstream* the TSS. To do so...  
 1. View a part of the output of `dist_h3k4me3_to_tss`. For example, peaks with `dist.to.feature` above 1kb, sorted by distance, showing only the top 5 of the output by running: `dist_h3k4me3_to_tss %>% filter(dist.to.feature >= 1000) %>% arrange(dist.to.feature) %>% slice_head(n=5)`   
@@ -284,7 +283,8 @@ You may want to check some of the matches. For example to check that positive di
 </details>  
 
 ### 3.2.2 Plot distances between ChIP peaks and features  
-Having identified the nearest TSS for each H3K4me3 peak, you willsummarize the distances between H3K4me3 peaks and TSSs.  
+Having identified the nearest TSS for each H3K4me3 peak, you will summarize the distances between H3K4me3 peaks and TSSs.   
+
 ### Exercise 2   
 
 > **Exercise 2a:** Print a summary of the distances reported in `dist_h3k4me3_to_tss` using the `summary()` function.
@@ -1016,7 +1016,7 @@ grade_code()
 
 ### 3.4.2 H3K27me3 signal vs. gene experession  
 
->**Exercise 8a**: Use the code from exercises 7a-7d to plot the average H3K7me3 signal in a 5kb window around the TSS for genes grouped in quantile of gene expression (code check).    
+>**Exercise 8a**: Use the code from [Exercise 7a], [Exercise 7b], [Exercise 7c] and [Exercise 7d] to plot the average H3K7me3 signal in a 5kb window around the TSS for genes grouped in quantile of gene expression (code check).    
 > 
 > * `bw_h3k27me3` points to the H3K27me3 ChIP-seq BigWig file.  
 
@@ -1162,26 +1162,70 @@ ggsave(filename= "images/scatterplot_logfpkm1_h3k27me3_tss_5kbwindow.png")
 question("What does best desicribe the relationship between H3K27me3 and gene expression as log(FPKM+1)?",
          answer("The data show a linear relationship."),
          answer("The data show an inverse linear relationship.", ),
-         answer("The data show a non-lienar relationship.", correct=TRUE, message = "Note that it ."),
+         answer("The data show a non-lienar relationship.", correct=TRUE, message = "Indeed. What you can clearly see in this graph is that the mere presence of H3K27me3 at the TSS translates in to gene silencing for the majority of TSSs, irrespecitve of the H3K27me3 level. We observe a couple of outliers. These may be due to the expression different transcript isoforms, expressed from a different TSS. Or TSSs marked by H3K27me3 in a fraction of the cell population."),
          allow_retry=TRUE
          )
 ```
 
 
 ## 3.5 Heatmaps  
-In profile plts.... 
-In boxplots and scatters... 
-What now ....
+In fg2 (and on a per-locus basis in fg1) we observed that some histome marks occur more often than expected at the promoter and that, at a per-bp-level, some marks co-occur more than others. In the profile plots of [3.3 ChIP-seq signal strength] we summarized that different marks have different signals strengths and that this profile is, for some marks, directional suggesting a functional association with gene expression. Lastly, in the box- and scatter plots of [3.4 Signal vs gene expression] we observed that the relationship between the signal of a histone mark at the TSS and a gene's expression is different depending on the mark and is never a hard, 1-to-1 relationship.  
+<br>
+A method to display these 
 
 ### 3.5.1 Heatmap of 1 mark unordered  
 Summarize H3K4me3 ChIP-seq signal at all TSSs in a heatmap.  
-```{r example_densityplot, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup = "prepare_q5"}
-# plot density plot
-plotMeta(scores_h3k4me3_tss, xcoord = c(-5000, 5000))
-
+10kb window
+data of [Exercise 5]  
+```{r example_heatmap, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup = "prepare_q5"}
 # plot heatmap
-heatMatrix(scores_h3k4me3_tss, xcoord = c(-5000, 5000), order = T)
-multiHeatMatrix(scores_h3k4me3_h3k27ac_h3k27me3, xcoord = c(-5000, 5000), order = T)
+heatMatrix(scores_h3k4me3_tss, xcoord = c(-5000, 5000), col = colorRampPalette(c("white", "red"))(100))
+```
+
+### 3.5.2 Heatmap of 1 mark ordered by gene expression   
+
+`rank()` takes a group of values and calculates the rank of each value within the group, e.g. rank(c(21, 22, 24, 23)) has output [1] 1 2 4 3
+
+```{r example_heatmap_customorder, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup = "prepare_q5"}
+# define order 
+my_order <- inner_join(x=as.data.frame(mcols(tss_chr19_sample)), y=quantification_chr19_sample , by = "gene_id") %>%  
+  mutate(gene_rank = rank(dplyr::desc(FPKM))) %>% 
+  dplyr::select(gene_rank)
+# plot heatmap
+heatMatrix(scores_h3k4me3_tss[my_order$gene_rank,], xcoord = c(-5000, 5000) , col = colorRampPalette(c("white", "green4"))(100))
+```
+
+### 3.5.3 Same order, different mark  
+By k-means or hierarchical clustering. 
+```{r example_heatmap_customorder, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup = "prepare_q5"}
+# define order 
+my_order <- inner_join(x=as.data.frame(mcols(tss_chr19_sample)), y=quantification_chr19_sample , by = "gene_id") %>%  
+  mutate(gene_rank = rank(dplyr::desc(FPKM))) %>% 
+  dplyr::select(gene_rank)
+# plot heatmap
+heatMatrix(scores_h3k27ac_tss[my_order$gene_rank,], xcoord = c(-5000, 5000) , col = colorRampPalette(c("white", "red"))(100))
+```
+
+### 3.5.4 Heatmap of all available histone marks, cluster on patterns    
+Heatmap of all marks at the TSSs.   
+ 
+```{r example_heatmap_ordered}
+list_3colors <- list(col = colorRampPalette(c("white", "green4"))(100), col = colorRampPalette(c("white", "red"))(10), col = colorRampPalette(c("white", "blue"))(100))
+list_3colors_v2 <- list(col = colorRampPalette(c("white", "red"))(10), col = colorRampPalette(c("white", "red"))(10), col = colorRampPalette(c("white", "red"))(10))
+
+
+# plot density plot
+#plotMeta(scores_h3k4me3_tss, xcoord = c(-5000, 5000))
+
+
+# plot multiple marks in heatmap
+multiHeatMatrix(scores_h3k4me3_h3k27ac_h3k27me3, xcoord = c(-5000, 5000), order = T, clustfun = function(x) kmeans(x, centers = 4)$cluster, col = list_3colors)
+
+# scale and plot scaled --> can identify bivalent regions
+scaled <- scaleScoreMatrixList(scores_h3k4me3_h3k27ac_h3k27me3)
+multiHeatMatrix(scaled, xcoord = c(-5000, 5000), order = T, clustfun = function(x) kmeans(x, centers = 4)$cluster, col = list_3colors)
+multiHeatMatrix(scaled, xcoord = c(-5000, 5000), order = T, clustfun = function(x) kmeans(x, centers = 4)$cluster, col = list_3colors_v2)
+
 
 # multimatrix, cluster 
 #multiHeatMatrix(scores_h3k4me3_h3k27ac_h3k27me3, xcoord = c(-5000, 5000), order = T, clustfun = function(x) kmeans(x, centers = 4)$cluster, col = list(wit-rood,wit-groen,wit-paars) )
@@ -1234,12 +1278,9 @@ head(scores_as_df_10kb)
 ### 3.5.2 Ordering a heatmap  
 By gene expression of corresponding gene  
 
-### 3.5.3 Same order, other mark  
-By k-means or hierarchical clustering. 
-Perhaps add background info section on clustering (?)  
 
-### 3.5.4 Heatmap of all available histone marks, cluster on patterns    
-Heatmap of all marks at the TSSs.   
+
+
 
 How do you define the clusters? Use ChromHMM. 
 
