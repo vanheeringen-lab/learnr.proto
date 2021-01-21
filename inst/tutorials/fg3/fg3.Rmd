@@ -442,7 +442,9 @@ Using this ScoreMatrix you can plot the average H3K4me3 signal in these windows.
 plotMeta(mat = [ScoreMatrix_object], xcoord = c([start,end]))
 ```  
 
-* You can use the `xcoord =` parameter to define relative base positions for the x-axis and set the TSS at base '0'.  
+* Use the `xcoord =` parameter to define relative base positions for the x-axis and set the TSS at base '0'.  
+
+<br>
 
 > **Exercise 3b**: Plot the H3K4me3 signal stored in "scores_h3k4me3_tss" from exercise 3a (code check).   
 >
@@ -833,14 +835,15 @@ average_h3k4me3_tss_df$gene_id <- tss_chr19_sample$gene_id
 ```
 
 We can now visualize the range of average H3K4me3 scores in this 5kb window by running: 
-```{r h3k4me3_boxplot_example, echo=TRUE, eval=F}
+```{r h3k4me3_boxplot_example, echo=TRUE, eval=FALSE}
 ggplot(average_h3k4me3_tss_df) + 
   geom_boxplot(mapping = aes(y = H3K4me3_rpm))+
   scale_x_discrete(labels=NULL)+
   theme_bw()
 ```
-![]("images/boxplot_average_h3k4me3_tss_5kbwindow.png")
-```{r h3k4me3_boxplot_example2, eval =FALSE, echo=FALSE, fig.width=3, fig.height=3.8}
+
+![](images/boxplot_average_h3k4me3_tss_5kbwindow.png){width=40%}\  
+```{r h3k4me3_boxplot_example2, eval=FALSE, echo=FALSE, fig.width=3, fig.height=3.8}
 # when I made the tutorial, I saved the figure. The code to make the boxplot is shonw below, it is not run but the image from this chunk is shown. 
 average_h3k4me3_tss <- readRDS(file = system.file("extdata", "week3", "prepared_rds", "scorematrix_q6_average_scores_h3k4me3_tss_10kbwindow.rds", package = "learnr.proto"))
 average_h3k4me3_tss_df <- as.data.frame(as(average_h3k4me3_tss, "matrix")) 
@@ -854,7 +857,7 @@ ggplot(average_h3k4me3_tss_df) +
 ggsave(filename= "images/boxplot_average_h3k4me3_tss_5kbwindow.png")
 ```
 
-To generate this boxplot for groups of genes grouped into four bins by gene expression level, we first add thes JH3K4me3 scores to the gene expression data.  
+To generate this boxplot for groups of genes grouped into four bins by gene expression level, we first combine thess H3K4me3 scores with the gene expression data into one data.frame.  
 
 ### Exercise 7c  
 Join the data from `quantification_chr19_sample` and `average_h3k4me3_tss_df` to get a data.frame with gene expression values and the corresponding average H3K4me3 signal at the TSS.   
@@ -917,13 +920,10 @@ grade_result(
 
 ### Exercise 7d  
 To investigate the relationship between H3K4me3 signal strengths and gene expression, you will plot the average H3K4me3 signal for genes grouped by quantiles of gene expression. You thus need to define a new categorical variable that groups genes into 4 bins of equal size. You can achieve that using `ntile()` from dplyr:  
-```{r ntile_example, ehco=TRUE, eval=FALSE}
+```{r ntile_example, echo=TRUE, eval=FALSE}
 ntile(x = [variable to rank] , n = [number of bins])
 ```
-By running `ntile()` within `mutate()` you can define the new variable.   
-
-<br>
-For example, below we, categorize genes into either quantiles or quintiles based on their gene expression in `quantification_chr19`:   
+By running `ntile()` within `mutate()` you can define the new variable. For example, below we, categorize genes into either quantiles or quintiles based on their gene expression in `quantification_chr19`:   
 ```{r ntile_example2, echo=TRUE}
 # quantiles and quintiles in 
 quantification_chr19 %>% 
@@ -1146,7 +1146,8 @@ grade_result(
 ```
 
 If we make a scatter plot of the same relation we get the following plot:  
-![]("images/scatterplot_logfpkm1_h3k27me3_tss_5kbwindow.png")\  
+
+![](images/scatterplot_logfpkm1_h3k27me3_tss_5kbwindow.png){width=70%}\  
 ```{r prepare_scatter, echo=FALSE, eval=FALSE, fig.height=4, fig.width=6}
 # I used this chunk to prepare the plot in advance.  
 # plot scatter
@@ -1168,7 +1169,9 @@ question("What does best desicribe the relationship between H3K27me3 and gene ex
 
 
 ## 3.5 Heatmaps  
-In heatmaps we can visualize individual loci 
+In profile plts.... 
+In boxplots and scatters... 
+What now ....
 
 ### 3.5.1 Heatmap of 1 mark unordered  
 Summarize H3K4me3 ChIP-seq signal at all TSSs in a heatmap.  
