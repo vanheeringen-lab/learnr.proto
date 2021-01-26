@@ -527,25 +527,36 @@ You will use ggplot2 and dplyr package to explore the ChIP-seq data further. You
 <br>
 
 > #### **Refresher**: ggplot2  
-<details><summary>For a very brief refresher on ggplot2-ting...(click here)</summary>  
-> With **ggplot2** you generally begin with the `ggplot(data = ..)` function and you add so-called layers with `geom..()` functions. Example geom functions include `geom_point()` for a scatter plot, `geom_histogram()` for a histogram, `geom_density()` for a smoothened version of the histogram, and `geom_bar()` for a barplot.  
+<details><summary>Click here for a very brief refresher on ggplot2-ting...</summary>  
+> Adapted from the [ggplot2 cheatsheet](https://github.com/rstudio/cheatsheets/raw/master/data-visualization-2.1.pdf).  
 > <br>
-> The **geom functions** take a `mapping = aes(x = ..., y = ..., ...)` argument that defines how variables in the dataset are mapped to visual properties (aes for "aesthetic mapping"). Depending on the geom function, you can map variables to the x- and y-axis, to the shape of symbols, the line type of line graphs, to the fill color of symbols and more.  
+> **ggplot2** is based on the **grammar of graphics**: the idea that you  can build every graph from the same components: a **data**set, a **coordinate system** and **geoms**. Geoms are visual marks that represent data points.    
 > <br>
-**Scales** can be customized with `scale_[]_[]` functions. These can be used to for example, change a color palette, set limits to the values included in the mapping, or log transform an axis.  
+> To display values, map variables in the dataset to visual properties of the geom (**aesthetics**) like **size**, **color**, and **x** and **y** locations.   
 <br>
-Modifications of the plot appearance (including background colors, thick labels, thick lines, axis labels, titles) can be achieved by combinations of several functions.  
+> To build a ggplot graph you can use this template:  
+```{r ggplotexample, eval=FALSE, echo=TRUE}
+ggplot(data = <DATA>)+   # required
+  <GEOM_FUNCTION>(mapping = aes(<MAPPING>), # required
+  stat = <STAT>, position = <POSITION>)+   # not-required
+  <COORDINATE_FUNCTION>+ # not-required
+  <SCALE_FUNCTION>+ # not-required
+  <THEME_FUNCTION>+ # not-required
+  <FACET_FUNCTION> # not-required
+```
+> In **ggplot2** you begin with the `ggplot(data = ..)` function and add layers with `geom()` functions. Example geom functions include `geom_point()` for a scatter plot, `geom_histogram()` for a histogram, `geom_density()` for a smoothened version of the histogram, and `geom_bar()` for a barplot.  
+> <br>
+> The **geom functions** take a `mapping = aes(x = ..., y = ..., ...)` argument that defines how data from variables in the dataset are mapped to visual properties (aes for "aesthetic mapping"). Depending on the geom function, you can map variables to the x- and y-axis, to the shape of symbols, the line type of line graphs, to the fill color of symbols and more.  
+> <br>
+> Each plot has a **coordinate system** that determine the scales and orientation of the x and/or y-axis. The default coordinate system is given by the `coord_cartesian()` funtion. Adding this to a default ggplot won't change your plot. What is helpful is that within `coord_cartesian()` you can set the `xlim=` and `ylim=` arguments. Other coordinate systems can be found on the ggplot2 cheatsheet](https://github.com/rstudio/cheatsheets/raw/master/data-visualization-2.1.pdf).  
+> **Scales** control the mapping from data to aesthetics and can be customized with `scale_[]_[]` functions. These can be used to, for example, change a color palette, set limits to the values included in the mapping, or log transform an axis.  
 <br>
-A template code for a ggplot2 plot:  
-`ggplot(data = <DATA>)+`  
-  `geom_<FUNCTION>(mapping = aes(<MAPPING>))+`   
-  `<SCALE_FUNCTION>+`
-  `<THEME_FUNCTION>+`
-  `<GGTITLE>`  
+> **Theme** elements include functions to specifify non-data elements of your graph. You can also provide function that contain **complete** themes, eg in `theme_bw()`, `theme_grey()` and many more.   
+> Finally **Faceting** generates small multiples of the graph, each showing a different subset of the data grouped by a categorical variable. 
 ><br>
-> **References**:  
-> *[R for Datascience, chapter 3 Data visualization](https://r4ds.had.co.nz/data-visualisation.html)*  
-> *[ggplot2 cheatsheet](https://github.com/rstudio/cheatsheets/raw/master/data-visualization-2.1.pdf)*  
+> **Additional reference**:  
+> *[R for Data Science, chapter 3 Data visualization](https://r4ds.had.co.nz/data-visualisation.html)*  
+> *[ggplot2: elegant graphics for data analysis](https://ggplot2-book.org/index.html)*  
 </details>
 
 ### Exercise 3  
