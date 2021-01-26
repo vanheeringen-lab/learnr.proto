@@ -532,6 +532,15 @@ tss_chr19 <- unique(promoters(genes(txdb), upstream = 2000, downstream = 0 ))
 tss_chr19 <- resize(tss_chr19, width = 1, fix = "end")
 tss_chr19_sample <- tss_chr19 %>% filter(gene_id %in% quantification_chr19_sample$entrezgene_id )  
 
+## make sure the same geneIDs are present in tss_chr19_sample and quantification_chr19_sample 
+tss_genes <- tss_chr19_sample$gene_id
+quant_genes <- quantification_chr19_sample$entrezgene_id
+
+which(!(quant_genes %in% tss_genes))
+quant_genes[246]
+quantification_chr19_sample <- quantification_chr19_sample[-246,]
+which(!(quantification_chr19_sample$entrezgene_id %in% tss_genes))
+
 ### input dir:
 dir_raw_files <- "/home/ctoenhake/learnr.proto/inst/extdata/week3/bw_chr19/"
 ### output dir:
@@ -555,6 +564,8 @@ resize_bw <- function(w_in_kb, f, tss){
 for(file in bw_files){
 resize_bw(15, file, tss_chr19_sample)
 }
+
+quantification_chr19_sample$expression_group <- NULL
 
 ## save sliced quantification and TSSs
 save(quantification_chr19_sample, tss_chr19_sample, file = "/home/ctoenhake/learnr.proto/inst/extdata/week3.Rdata")
