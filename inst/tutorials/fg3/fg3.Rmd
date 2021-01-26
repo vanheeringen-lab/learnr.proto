@@ -60,10 +60,14 @@ genes_chr19 <- unique(genes(txdb))
 rdata = system.file("extdata", "week3.Rdata", package = "learnr.proto")
 load(rdata)
 rm(rdata)
-tss_chr19_sample <- tss_chr19_sample[-(tss_chr19_sample$gene_id =="554235")] # this geneID is not present in quantification data
 quantification_chr19_sample <- quantification_chr19_sample %>% dplyr::rename(gene_id = entrezgene_id)
-quantification_chr19_sample$expression_group <- NULL
-quantification_chr19_sample <- quantification_chr19_sample[-(quantification_chr19_sample$gene_id =="114335"), ] # this geneID is not present in TSSs
+
+# add FPKM to TSS windows such that these intervals can be arranged by FPKM
+FPKM_tssorder<- as.vector(NA)
+for(i in 1:length(tss_chr19_sample)) {
+  FPKM_tssorder[i] <- quantification_chr19_sample[which(quantification_chr19_sample[, "gene_id"] == tss_chr19_sample$gene_id[i]),]$FPKM
+}
+tss_chr19_sample$FPKM <- FPKM_tssorder
 
 # gene quantification chromosome 19  
 rdsfile <- system.file("extdata", "week2", "prepared_rds", "blueprint_c000s5_gene_quantification_chr19.rds", package = "learnr.proto")
@@ -75,6 +79,7 @@ bw_h3k4me3 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.E
 bw_h3k4me1 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547981.H3K4me1.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw", package = "learnr.proto")
 bw_h3k27me3 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw", package = "learnr.proto")
 bw_h3k27ac <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547980.H3K27ac.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw", package = "learnr.proto")
+bw_h3k36me3 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547979.H3K36me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw", package = "learnr.proto")
 ```
 
 ```{r timeout1, context="server"}
@@ -168,6 +173,7 @@ Although we ask for specific answers or completion of specific code, you are enc
 - Akalin A, Franke V, Vlahovicek K, Mason C, Schubeler D (2014). “genomation: a toolkit to summarize, annotate and visualize genomic intervals.” Bioinformatics. doi: 10.1093/bioinformatics/btu775.  
 - [Genomation package vignette](http://bioconductor.org/packages/release/bioc/vignettes/genomation/inst/doc/GenomationManual.html).    
 - Data were obtained from the [BLUEPRINT data portal](http://dcc.blueprint-epigenome.eu/#/home).    
+
 
 ### 3.1.1 Learning Objectives  
 
@@ -393,12 +399,14 @@ A trick that prevents loading complete bigWig files in your environment is to lo
 ScoreMatrix(target = [path to bigwig file], 
             windows = [GRanges object with intervals of interest], 
             type = "bigWig", 
-            strand.aware = [TRUE/FALSE])
+            strand.aware = [TRUE/FALSE], 
+            ...)
 ```
 
 * To take the strand of the TSS into account, we set `strand.aware=TRUE`.   
 * Every row in the resulting ScoreMatrix object corresponds to a window of the `[regions of interest]`.  
 * Every column in the resulting ScoreMatrix object is a bp within that window (see the image below).   
+* `...` means that there are additional, optional arguments, some of which we will come back to later.    
 
   ![ScoreMatrix visual](images/genomation_scorematrix.png){width=50%}\   
   *Modified from [GenomationManual](https://www.bioconductor.org/packages/release/bioc/vignettes/genomation/inst/doc/GenomationManual.html#1_Introduction): Wikipedia, Gene Structure*
@@ -439,10 +447,11 @@ The object `scores_h3k4me3_tss` is of formal class ScoreMatrix, which is related
 Using this ScoreMatrix you can plot the average H3K4me3 signal in these windows. To do so, use the `plotMeta()` function:   
 
 ```{r plotmeta_example, eval=FALSE, echo=TRUE}
-plotMeta(mat = [ScoreMatrix_object], xcoord = c([start,end]))
+plotMeta(mat = [ScoreMatrix_object], xcoord = c([start,end]), ...)
 ```  
 
-* Use the `xcoord =` parameter to define relative base positions for the x-axis and set the TSS at base '0'.  
+* Use the `xcoord =` parameter to define relative base positions for the x-axis and set the TSS at base '0'.   
+* `...` means that there are additional, optional arguments, some of which will come back later on.   
 
 <br>
 
@@ -879,7 +888,7 @@ left_join(x = [dataframe 1], y = [dataframe 2], by = [variable to join by])
 head(quantification_chr19_sample, n=3)
 ```
 
-> **Exercise 6c**: Use the `left_join()` function to combine `average_h3k4me3_tss_df` and `quantification_chr19_sample` (code check). 
+> **Exercise 7c**: Use the `left_join()` function to combine `average_h3k4me3_tss_df` and `quantification_chr19_sample` (code check). 
 >
 > * Join these two data.frames by the variable "gene_id". 
 > * Because we enable code checking, you have to explicitly define `x = ` and `y=` parameters. 
@@ -953,7 +962,11 @@ expression_and_h3k4me3 %>%
   mutate(____ = factor(ntile(FPKM, n=___))) %>% 
   ggplot(.)+  
   geom_boxplot(mapping=aes(x = ____, y = ___))+ 
-  theme_bw()
+  theme_bw()+
+  labs(
+    title = "Average H3K4me3 signal at TSS per gene group.",
+  subtitle = "5kb window around the TSS, gene groups by gene expression quantiles."
+  )
 ```
 
 ```{r q7d_signalfpkm-solution}
@@ -961,7 +974,11 @@ expression_and_h3k4me3 %>%
   mutate(gene_group = factor(ntile(FPKM, n=4))) %>% 
   ggplot(.)+  
   geom_boxplot(mapping=aes(x = gene_group, y = H3K4me3_rpm))+ 
-  theme_bw()
+  theme_bw()+
+  labs(
+    title = "Average H3K4me3 signal at TSS per gene group.",
+  subtitle = "5kb window around the TSS, gene groups by gene expression quantiles."
+  )
 ```
 
 ```{r q7d_signalfpkm-code-check}
@@ -1141,7 +1158,7 @@ grade_result(
                         geom_boxplot(mapping=aes(x = gene_group, y = h3k27me3_rpm))+
                         theme_bw()
                       )),
-   incorrect = "Copy pase and adjust the code of exercise 7d."
+   incorrect = "Copy paste and adjust the code of exercise 7d."
 )
 ```
 
@@ -1169,47 +1186,294 @@ question("What does best desicribe the relationship between H3K27me3 and gene ex
 
 
 ## 3.5 Heatmaps  
-In fg2 (and on a per-locus basis in fg1) we observed that some histome marks occur more often than expected at the promoter and that, at a per-bp-level, some marks co-occur more than others. In the profile plots of [3.3 ChIP-seq signal strength] we summarized that different marks have different signals strengths and that this profile is, for some marks, directional suggesting a functional association with gene expression. Lastly, in the box- and scatter plots of [3.4 Signal vs gene expression] we observed that the relationship between the signal of a histone mark at the TSS and a gene's expression is different depending on the mark and is never a hard, 1-to-1 relationship.  
+### 3.5.1 Introducing heatmaps  
+In fg2 (and on a per-locus basis in fg1) you observed that H3K4me3 peaks occur more often than expected at the promoter, that the presence of H3K4me3 at the promoter is associated with gene expression, but also that, at a per-bp-level, some marks co-occur more than others.  
 <br>
-A method to display these 
+The average signal plots of [3.3 ChIP-seq signal strength] showed you that different marks have different *average* signals strengths and that this profile is, for some marks, directional suggesting a functional association with gene expression. This remained, however, an average signal and you also observed in the box- and scatter plots of [3.4 Signal vs gene expression] that the signal strength at the TSS can be associated with a gene's expression level, depending on the mark, although this is never a hard, 1-to-1 relationship.  
+<br>
+A method to summarize peak (co-)occurrence at a genomic feature like the TSS and signal strength is a heatmap. If we order this heatmap by the gene's expression level it can visualize the relationship with gene expression, if present, in a crude manner.  
+<br>
+In heatmaps of genomics data, each row represents an interval, often aligned at the genomic feature in the middle. The signal strength at each bp or within each bin is encoded by a color scale (eg. white for backgroun signal, bright red for strong signal). 
+<br>
+You will start by making an unordered heatmap.  
 
-### 3.5.1 Heatmap of 1 mark unordered  
-Summarize H3K4me3 ChIP-seq signal at all TSSs in a heatmap.  
-10kb window
-data of [Exercise 5]  
-```{r example_heatmap, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup = "prepare_q5"}
+### 3.5.2 Heatmap of 1 mark     
+To make a heatmap of the H3K4me3 signal around the TSS, you can use the same ScoreMatrix as you used for the average signal plot in section [3.3 ChIP-seq signal strength]. To do so, use the `heatMatrix()` function:   
+
+```{r heatmatrix_example, eval=FALSE, echo=TRUE}
+heatMatrix(mat = [ScoreMatrix_object], 
+           xcoord = c([start,end]),
+           col = [vector_with_color_pallette], .....)
+```  
+
+* The `xcoord =` parameter sets relative base positions for the x-axis and sets the TSS at position '0', same as for the `plotMeta()` function.    
+* Use `col =` to define your own color palette. This palette should be provided as a vector.  
+* `...` means that there are additional, optional arguments, some of which we will come back to soon.   
+
+
+#### Defining your color palette  
+There are many r packages out there that help you generate color palettes (eg.. RColorBrewer, viridis, rcartocolor and more). We suggest you work with the `colorRampPalette()` function for these heatmaps. `colorRampPalette()` takes a set of colors as input and returns a function that can subsequently be called with the integer argument `n=` and will return a palette with `n` entries.   
+<br>
+Here's an example of a red-to-blue palette with 4 colors applied to the boxplot of [Exercise 7d]:   
+
+```{r create_colpal_example, eval=FALSE, echo=TRUE}
+# Create function
+palette_function <- colorRampPalette(c('red', 'blue'))
+
+# Invoke palette_function to create a palette with four entries.
+my_palette <- palette_function(n=4)   
+
+# Plot the boxplot of exercise 7d with these colors 
+expression_and_h3k4me3 %>%  
+  mutate(gene_group = factor(ntile(FPKM, n=4))) %>% 
+  ggplot(.)+
+  geom_boxplot(mapping=aes(x = gene_group, y = H3K4me3_rpm, fill = gene_group))+
+  scale_fill_manual(values = my_palette)+
+  theme_bw()+
+  labs(
+    title = "Average H3K4me3 signal at TSS per gene group.",
+  subtitle = "5kb window around the TSS, gene groups by gene expression quantiles."
+  )
+```
+```{r create_colpal_example_forsaving, eval=FALSE, echo=FALSE}
+# I used this chunk to prepare and save the plot in advance.  
+# Create function
+palette_function <- colorRampPalette(c('red', 'blue'))
+# Invoke palette_function to create a palette with four entries.
+my_palette <- palette_function(4)   
+# Plot the boxplot of exercise 7d with these colors 
+expression_and_h3k4me3 %>%  
+  mutate(gene_group = factor(ntile(FPKM, n=4))) %>% 
+  ggplot(.)+
+  geom_boxplot(mapping=aes(x = gene_group, y = H3K4me3_rpm, fill = gene_group))+
+  scale_fill_manual(values = my_palette)+
+  theme_bw()+
+  labs(
+    title = "Average H3K4me3 signal at TSS per gene group.",
+  subtitle = "5kb window around the TSS, gene groups by gene expression quantiles."
+  )
+ggsave(filename= "images/boxplot_average_h3k4me3_tss_5kbwindow_genegroup_withcolors.png")
+```
+![](images/boxplot_average_h3k4me3_tss_5kbwindow_genegroup_withcolors.png){width=80%}\    
+<br>
+Instead of creating the palette function, you can also define `n` immediately after calling `colorRampPalette()`, see the following example:  
+```{r create_colpal_example2, eval=FALSE, echo=TRUE}
+# Skip creating the palette function but immediately create your color palette
+my_palette <- colorRampPalette(c('red', 'blue'))(4)
+```
+<br>  
+
+> You will use `colorRampPalette()([n])` with `n=100` to generate white-to-[color]-colorscales that encode low/background-to-maximum signal measured in these ChIPs.      
+
+### Exercise 8  
+
+>**Exercise 8**: Generate a heatmap of the H3K4me3 ChIP-seq signal in a 10kb window around the TSS on a white-to-red color scale.  
+> 
+> * `bw_h3k4me3` points to the H3K4me3 ChIP-seq BigWig file.   
+> * `tss_chr19_sample` contains the TSSs of which we have data in the available BigWig files.  
+> * Rembember that the TSSs are 1bp wide and should be resized.  
+> * Review previous exercises (eg [Exercise 5]) for how to resize your tss window and generate the ScoreMatrix object.  
+> * We created a colorpalette for you using `colorRampPalette()`.   
+> * In case you are interested in the effect of using for example a different window size, or different color settings, you can adjust the code accordingly but then hit "Run Code".  
+
+```{r q8_heatmap1mark, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=18}
+# 1. obtain 10kb windows around the TSS (add 1 bp for the TSS itself)
+tss_window <- ____
+
+# 2. generate the ScoreMatrix again 
+scores_h3k4me3_tss <- ScoreMatrix(target = ___, 
+                                  windows = ___, 
+                                  type = 'bigWig', 
+                                  strand.aware =___) 
+
+# 3. define your color palette
+h3k4me3_cols <- colorRampPalette(c("white", "red"))(10000)
+
+# 4. plot the H3K4me3 heatmap
+heatMatrix(mat = ___, 
+           xcoord = c(-5000, 5000), 
+           col = ___, 
+           main = "Unordered H3K4me3 signal, centered at TSS", 
+           xlab = "bp (TSS = 0)")
+```
+
+```{r q8_heatmap1mark-hint-1}
+# Complete step 1 using the resize() function
+```
+
+```{r q8_heatmap1mark-hint-2}
+# Review exercise 3 to complete step 1 and step 2
+```
+
+```{r q8_heatmap1mark-hint-3}
+# Review the introduction to this section (3.5.2) to complete the heatMatrix() code   
+```
+
+```{r q8_heatmap1mark-hint-4}
+# obtain 10kb windows around the TSS you should use
+tss_window <- resize(tss_chr19_sample, width = 10001, fix = "center")
+```
+
+```{r q8_heatmap1mark-hint-5}
+# to generate the scorematrix, you should use
+scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3, 
+                                  windows = tss_window, 
+                                  type = 'bigWig', 
+                                  strand.aware =TRUE) 
+```
+
+```{r q8_heatmap1mark-hint-6}
+# the heatMatrix() function should look like:
+heatMatrix(mat = scores_h3k4me3_tss, 
+           xcoord = c(-5000, 5000), 
+           col = h3k4me3_cols, 
+           main = "Unordered H3K4me3 signal, centered at TSS", 
+           xlab = "bp (TSS = 0)")
+```
+
+<!-- ```{r q8_heatmap1mark-solution} -->
+<!-- # obtain 10kb windows around the TSS -->
+<!-- tss_window <- resize(tss_chr19_sample, width = 10001, fix = "center") -->
+
+<!-- # generate the scorematrix again -->
+<!-- scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3, -->
+<!--                                   windows = tss_window, -->
+<!--                                   type = 'bigWig', -->
+<!--                                   strand.aware =TRUE) -->
+
+<!-- # define your color palette -->
+<!-- h3k4me3_cols <- colorRampPalette(c("white", "red"))(10000) -->
+
+<!-- # plot the H3K4me3 heatmap -->
+<!-- heatMatrix(mat = scores_h3k4me3_tss, -->
+<!--            xcoord = c(-5000, 5000), -->
+<!--            col = h3k4me3_cols, -->
+<!--            main = "H3K4me3 signal, centered at TSS", -->
+<!--            xlab = "bp (TSS = 0)") -->
+<!-- ``` -->
+
+```{r q8_heatmap1mark-check}
+grade_result(
+ pass_if(~identical(.result, heatMatrix(mat = scores_h3k4me3_tss, 
+           xcoord = c(-5000, 5000), 
+           col = h3k4me3_cols, 
+           main = "H3K4me3 signal, centered at TSS", 
+           xlab = "bp (TSS = 0)")
+           )),
+ correct = ""
+)
+```
+
+
+```{r q8_heatmap1mark_mc}
+question("Are the rows (=intervals around the TSS) in this heatmap from top-to-bottom, ordered by H3K4me3 signal or gene expression of the corresponding gene?",
+         answer("Yes, by H3K4me3 signal.", message = "A brigher red signal indicates a higher H3K4me3 signal, are the lines with bright red signal really all on top and those without at the bottom?"),
+         answer("Yes, by gene expression of the corresponding gene.", message = "Remember, H3K4me3 signal is associated with gene expression levels and you would expect that ordering the heatmap by gene expression would reflect that if this ordering was applied."),         
+         answer("No, the rows are not ordered.", correct = T, message = "You can use the argument 'order = TRUE/FALSE' within heatMatrix() to order the heatmap by H3K4me3 signal. To order the heatmap by gene expression, we have to order the windows up front."),
+         allow_retry = T)
+```
+
+### 3.5.3 Heatmap of 1 mark ordered H3K4me3 signal  
+
+### Exercise 9  
+
+>**Exercise 9**: Repeat the heatmap of [Exercise 8] but this time ensure that it is *ordered by H3K4me3 signal* (code check).   
+
+> * `scores_h3k4me3_tss` and `h3k4me3_cols` generate in exercise 8 are available to you.   
+> * Make sure to hit "Run Code" to view the resulting plot.  
+
+```{r prepare_q9a, echo=FALSE}
+# obtain 10kb windows around the TSS you should use
+tss_window <- resize(tss_chr19_sample, width = 10001, fix = "center")
+# to generate the scorematrix, you should use
+scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3, 
+                                  windows = tss_window, 
+                                  type = 'bigWig', 
+                                  strand.aware =TRUE) 
+# define your color palette
+h3k4me3_cols <- colorRampPalette(c("white", "red"))(10000)
+```
+
+```{r q9_heatmap1mark, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=18. exercise.setup="prepare_q9a"}
+# plot the H3K4me3 heatmap, order by H3K4me3 signal
+heatMatrix(mat = ___, 
+           xcoord = , 
+           col = ___, 
+           order = ___, 
+           main = "Ordered H3K4me3 signal, centered at TSS", 
+           xlab = "bp (TSS = 0)")
+```
+
+```{r q9_heatmap1mark-solution}
+# plot the H3K4me3 heatmap, order by H3K4me3 signal
+heatMatrix(mat = scores_h3k4me3_tss, 
+           xcoord = c(-5000, 5000), 
+           col = h3k4me3_cols, 
+           order = TRUE, 
+           main = "Ordered H3K4me3 signal, centered at TSS", 
+           xlab = "bp (TSS = 0)")
+```
+
+```{r q9_heatmap1mark-code-check}
+grade_code(
+  correct = ""
+)
+```
+
+```{r q9_heatmap1mark_mc}
+question("Can?",
+         answer("Yes, by H3K4me3 signal.", message = "A brigher red signal indicates a higher H3K4me3 signal, are the lines with bright red signal really all on top and those without at the bottom?"),
+         answer("Yes, by gene expression of the corresponding gene.", message = "Remember, H3K4me3 signal is associated with gene expression levels and you would expect that ordering the heatmap by gene expression would reflect that if this ordering was applied."),         
+         answer("No, the rows are not ordered.", correct = T, message = "You can use the argument 'order = TRUE/FALSE' within heatMatrix() to order the heatmap by H3K4me3 signal. To order the heatmap by gene expression, we have to order the windows up front."),
+         allow_retry = T)
+```
+
+### 3.5.4 Heatmap of 1 mark ordered by gene expression   
+
+```{r heatmap_fpkmorder, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup = "prepare_q5"}
+# order TSS regions by gene expression from high-to-low
+tss_chr19_sample_arranged  <- sort(tss_chr19_sample, by = ~FPKM, decreasing =TRUE)
+tss_chr19_sample_arranged_window <- resize(tss_chr19_sample_arranged, width = 10001, fix = "center")
+# generate scorematrix again
+scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3, windows = tss_chr19_sample_arranged_window, type = 'bigWig', strand.aware =TRUE) 
 # plot heatmap
+heatMatrix(scores_h3k4me3_tss, xcoord = c(-5000, 5000), col = colorRampPalette(c("white", "red"))(10))
 heatMatrix(scores_h3k4me3_tss, xcoord = c(-5000, 5000), col = colorRampPalette(c("white", "red"))(100))
+
+
+
 ```
 
-### 3.5.2 Heatmap of 1 mark ordered by gene expression   
+### 3.5.4 Same order, different marks   
+available bigwigs = 
+bw_h3k4me3
+bw_h3k4me1
+bw_h3k27ac
+bw_h3k36me3
+bw_h3k27me3
 
-`rank()` takes a group of values and calculates the rank of each value within the group, e.g. rank(c(21, 22, 24, 23)) has output [1] 1 2 4 3
+```{r}
 
-```{r example_heatmap_customorder, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup = "prepare_q5"}
-# define order 
-my_order <- inner_join(x=as.data.frame(mcols(tss_chr19_sample)), y=quantification_chr19_sample , by = "gene_id") %>%  
-  mutate(gene_rank = rank(dplyr::desc(FPKM))) %>% 
-  dplyr::select(gene_rank)
-# plot heatmap
-heatMatrix(scores_h3k4me3_tss[my_order$gene_rank,], xcoord = c(-5000, 5000) , col = colorRampPalette(c("white", "green4"))(100))
 ```
 
-### 3.5.3 Same order, different mark  
-By k-means or hierarchical clustering. 
+
 ```{r example_heatmap_customorder, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup = "prepare_q5"}
-# define order 
-my_order <- inner_join(x=as.data.frame(mcols(tss_chr19_sample)), y=quantification_chr19_sample , by = "gene_id") %>%  
-  mutate(gene_rank = rank(dplyr::desc(FPKM))) %>% 
-  dplyr::select(gene_rank)
+# generate scorematrix again
+scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k36me3, windows = tss_chr19_sample_arranged_window, type = 'bigWig', strand.aware =TRUE) 
+
 # plot heatmap
 heatMatrix(scores_h3k27ac_tss[my_order$gene_rank,], xcoord = c(-5000, 5000) , col = colorRampPalette(c("white", "red"))(100))
 ```
 
+```{r}
+#Which mark reflects the H3K4me3 pattern the most?   
+```
+
+
 ### 3.5.4 Heatmap of all available histone marks, cluster on patterns    
 Heatmap of all marks at the TSSs.   
- 
-```{r example_heatmap_ordered}
+ By k-means or hierarchical clustering. 
+```{r example_heatmap_ordered, eval = F}
 list_3colors <- list(col = colorRampPalette(c("white", "green4"))(100), col = colorRampPalette(c("white", "red"))(10), col = colorRampPalette(c("white", "blue"))(100))
 list_3colors_v2 <- list(col = colorRampPalette(c("white", "red"))(10), col = colorRampPalette(c("white", "red"))(10), col = colorRampPalette(c("white", "red"))(10))
 
