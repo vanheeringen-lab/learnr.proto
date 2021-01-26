@@ -731,8 +731,8 @@
       "RemoteUsername": "rstudio",
       "RemoteRepo": "htmltools",
       "RemoteRef": "master",
-      "RemoteSha": "11cfbf3b331387922c0144203cf6e947c8bdaee9",
-      "Hash": "a5eb46169b514a62c170275299e8f8e1"
+      "RemoteSha": "e7f0393e3bc89cc76ba34fc2fab5536f47837247",
+      "Hash": "196479fa5107bfc48c21dc0776097eeb"
     },
     "htmlwidgets": {
       "Package": "htmlwidgets",
@@ -853,8 +853,8 @@
       "RemoteUsername": "vanheeringen-lab",
       "RemoteRepo": "learnr.dashboard",
       "RemoteRef": "master",
-      "RemoteSha": "8a6d77e4d6c03d6481d7fc1275d0562fb679e5cc",
-      "Hash": "7b3927461c9403cf8878ceb94322b03a"
+      "RemoteSha": "ddee8f82d6298850dac94dacf6eb3453e2477aa4",
+      "Hash": "4e7188feba7a31e2f161c86a5cb7a5c5"
     },
     "lifecycle": {
       "Package": "lifecycle",
