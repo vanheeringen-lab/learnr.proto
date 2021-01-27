@@ -1398,7 +1398,7 @@ scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3,
 h3k4me3_cols <- colorRampPalette(c("white", "red"))(10000)
 ```
 
-```{r q9_heatmap1mark, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=18. exercise.setup="prepare_q9a"}
+```{r q9_heatmap1mark, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=18, exercise.setup="prepare_q9a"}
 # plot the H3K4me3 heatmap, order by H3K4me3 signal
 heatMatrix(mat = ___, 
            xcoord = , 
