@@ -18,22 +18,26 @@ description: >
 
 
 ```{r setup, include=FALSE}
-# # for Shiny Server
-# learnr.dashboard::set_lib_paths("/home/siebrenf/miniconda3/envs/learnr/lib/R/library")
-
-# packages
-library(learnr)     # 0.10.1.9006 (github)
-library(gradethis)  # 0.1.0.9004  (github)
-library(testthat)   # 3.0.0 
-library(tidyverse)  # 1.3.0
-#library(ggplot2)    # 3.3.2
-
-# configuration
-knitr::opts_chunk$set(echo = FALSE)
-gradethis::gradethis_setup()
+suppressPackageStartupMessages({
+  # # for Shiny Server
+  # learnr.dashboard::set_lib_paths("/home/siebrenf/miniconda3/envs/learnr/lib/R/library")
+  
+  # packages
+  library(learnr)     # 0.10.1.9006 (github)
+  library(gradethis)  # 0.1.0.9004  (github)
+  library(testthat)   # 3.0.0 
+  library(tidyverse)  # 1.3.0
+  #library(ggplot2)    # 3.3.2
+  
+  # configuration
+  knitr::opts_chunk$set(echo = FALSE)
+  gradethis::gradethis_setup()
+})
 ```
 
 ```{r timeout1, context="server"}
+session$onSessionEnded(stopApp)
+
 isolate({
   # obtain the session id
   # source 1: https://shiny.rstudio.com/reference/shiny/latest/session.html

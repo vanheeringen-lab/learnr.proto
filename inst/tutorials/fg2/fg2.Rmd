@@ -17,80 +17,83 @@ description: >
 
 
 ```{r setup, include=FALSE}
-library(learnr)     # 0.10.1.9006 (github)
-library(gradethis)  # 0.1.0.9004  (github)
-library(testthat)   # 3.0.0 
-library(tidyverse)  # 1.3.0
-library(learnr.proto)
-
-library(IRanges)
-library(GenomicRanges)
-library(plyranges)
-library(rtracklayer)
-library(VennDiagram)
-library(GenomicFeatures)
-library(ComplexHeatmap)
-library(genomation)
-library(ChIPpeakAnno)
-library(ggthemes)
-library(org.Hs.eg.db)
-
-
-# load the txdb package which holds transcript-based gene models of hg38 genome  
-library(TxDb.Hsapiens.UCSC.hg38.knownGene)
-txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene 
-seqlevels(txdb) <- "chr19"
-
-## installing additional packages by:
-# BiocManager::install('genomation')
-# BiocManager::install("ggthemes")
-# BiocManager::install("ComplexHeatmap")  # for upset plot with GRanges
-# BiocManager::install("org.Hs.eg.db")
+suppressPackageStartupMessages({
+  library(learnr)     # 0.10.1.9006 (github)
+  library(gradethis)  # 0.1.0.9004  (github)
+  library(testthat)   # 3.0.0 
+  library(tidyverse)  # 1.3.0
+  library(learnr.proto)
+  
+  library(IRanges)
+  library(GenomicRanges)
+  library(plyranges)
+  library(rtracklayer)
+  library(VennDiagram)
+  library(GenomicFeatures)
+  library(ComplexHeatmap)
+  library(genomation)
+  library(ChIPpeakAnno)
+  library(ggthemes)
+  library(org.Hs.eg.db)
 
 
-# configuration
-knitr::opts_chunk$set(echo=FALSE, message=F)
-gradethis::gradethis_setup()
-
-# data accessible to all exercises
-rdata = system.file("extdata", "week2.Rdata", package = "learnr.proto")
-load(rdata)
-monocytes_all <- unlist(monocytes_list)
-monocytes_all$chip <- names(monocytes_all)
-monocytes_list <- GRangesList(monocytes_list, compress=F)
-
-# chr19_windows_1bp <- tileGenome(seqinfo(txdb), tilewidth = 10, cut.last.tile.in.chrom =T)
-tss_chr19 <- unique(promoters(genes(txdb), upstream=100, downstream=0)) 
-tss_chr19  <- resize(tss_chr19, width = 1, fix = "end")
-promoters_chr19 <- unique(promoters(genes(txdb), upstream=2000, downstream=200)) 
-genes_chr19 <- unique(genes(txdb))
-
-# gene quantification chromosome 19  
-rdsfile <- system.file("extdata", "week2", "prepared_rds", "blueprint_c000s5_gene_quantification_chr19.rds", package = "learnr.proto")
-quantification_chr19 <- readRDS(rdsfile)
-
-### not used anymore 2020-12-14 ###
-# rdata <- system.file("extdata", "week2", "prepared_rds", "txdb_annotation_chr19_genes_tx_pr_tss_granges.RData", package = "learnr.proto")
-# load(rdata)
-# identify TSS (in this case 1 per gene even though we know that genes have multiple TSSs)
-# tss <- resize(genes, width = 1, fix = "start")
-
-# consider 1kb upstream and 200bp downstream the TSS as promoter
-# promoters <- resize(tss, width = 1000, fix = "end")
-# promoters <- resize(promoters, width = 1200, fix = "start")
-
-# windows_1bp <- tileGenome(seqinfo(txdb), tilewidth = 10, cut.last.tile.in.chrom =T)
-# saveRDS(annotation_chr19,"~/learnr.proto/renv/library/R-3.6/x86_64-pc-linux-gnu/learnr.proto/extdata/week2/prepared_rds/genomation_chr19_background_annotation.rds")
-
-#  genomation_chr19 <- system.file("extdata", "week2", "prepared_rds","genomation_chr19_background_annotation.rds", package = "learnr.proto")
-
-# import the gencode features for annotation with genomation (exercise 8)
-gencode_chr19 <- system.file("extdata", "week2", "encode", "gencodev32.chr19.bed", package = "learnr.proto")
-gencode_chr19 <- readTranscriptFeatures(gencode_chr19, up.flank = 2000, down.flank = 200) 
-
+  # load the txdb package which holds transcript-based gene models of hg38 genome  
+  library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+  txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene 
+  seqlevels(txdb) <- "chr19"
+  
+  ## installing additional packages by:
+  # BiocManager::install('genomation')
+  # BiocManager::install("ggthemes")
+  # BiocManager::install("ComplexHeatmap")  # for upset plot with GRanges
+  # BiocManager::install("org.Hs.eg.db")
+  
+  
+  # configuration
+  knitr::opts_chunk$set(echo=FALSE, message=F)
+  gradethis::gradethis_setup()
+  
+  # data accessible to all exercises
+  rdata = system.file("extdata", "week2.Rdata", package = "learnr.proto")
+  load(rdata)
+  monocytes_all <- unlist(monocytes_list)
+  monocytes_all$chip <- names(monocytes_all)
+  monocytes_list <- GRangesList(monocytes_list, compress=F)
+  
+  # chr19_windows_1bp <- tileGenome(seqinfo(txdb), tilewidth = 10, cut.last.tile.in.chrom =T)
+  tss_chr19 <- unique(promoters(genes(txdb), upstream=100, downstream=0)) 
+  tss_chr19  <- resize(tss_chr19, width = 1, fix = "end")
+  promoters_chr19 <- unique(promoters(genes(txdb), upstream=2000, downstream=200)) 
+  genes_chr19 <- unique(genes(txdb))
+  
+  # gene quantification chromosome 19  
+  rdsfile <- system.file("extdata", "week2", "prepared_rds", "blueprint_c000s5_gene_quantification_chr19.rds", package = "learnr.proto")
+  quantification_chr19 <- readRDS(rdsfile)
+  
+  ### not used anymore 2020-12-14 ###
+  # rdata <- system.file("extdata", "week2", "prepared_rds", "txdb_annotation_chr19_genes_tx_pr_tss_granges.RData", package = "learnr.proto")
+  # load(rdata)
+  # identify TSS (in this case 1 per gene even though we know that genes have multiple TSSs)
+  # tss <- resize(genes, width = 1, fix = "start")
+  
+  # consider 1kb upstream and 200bp downstream the TSS as promoter
+  # promoters <- resize(tss, width = 1000, fix = "end")
+  # promoters <- resize(promoters, width = 1200, fix = "start")
+  
+  # windows_1bp <- tileGenome(seqinfo(txdb), tilewidth = 10, cut.last.tile.in.chrom =T)
+  # saveRDS(annotation_chr19,"~/learnr.proto/renv/library/R-3.6/x86_64-pc-linux-gnu/learnr.proto/extdata/week2/prepared_rds/genomation_chr19_background_annotation.rds")
+  
+  #  genomation_chr19 <- system.file("extdata", "week2", "prepared_rds","genomation_chr19_background_annotation.rds", package = "learnr.proto")
+  
+  # import the gencode features for annotation with genomation (exercise 8)
+  gencode_chr19 <- system.file("extdata", "week2", "encode", "gencodev32.chr19.bed", package = "learnr.proto")
+  gencode_chr19 <- readTranscriptFeatures(gencode_chr19, up.flank = 2000, down.flank = 200) 
+})
 ```
 
 ```{r timeout1, context="server"}
+session$onSessionEnded(stopApp)
+
 isolate({
   # obtain the session id
   # source 1: https://shiny.rstudio.com/reference/shiny/latest/session.html
