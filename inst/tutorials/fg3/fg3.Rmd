@@ -17,72 +17,76 @@ description: >
 
 
 ```{r setup, include=FALSE}
-library(learnr)     # 0.10.1.9006 (github)
-library(gradethis)  # 0.1.0.9004  (github)
-library(testthat)   # 3.0.0 
-library(tidyverse)  # 1.3.0
-library(learnr.proto)
-
-library(IRanges)
-library(GenomicRanges)
-library(rtracklayer)
-library(GenomicFeatures)
-library(genomation)
-library(ggthemes)
-#library(org.Hs.eg.db)
-
-
-# load the txdb package which holds transcript-based gene models of hg38 genome  
-library(TxDb.Hsapiens.UCSC.hg38.knownGene)
-txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene 
-seqlevels(txdb) <- "chr19"
-
-# configuration
-knitr::opts_chunk$set(echo=FALSE, message=FALSE)
-gradethis::gradethis_setup()
-
-# data accessible to all exercises
-rdata = system.file("extdata", "week2.Rdata", package = "learnr.proto")
-load(rdata)
-monocytes_all <- unlist(monocytes_list)
-monocytes_all$chip <- names(monocytes_all)
-monocytes_list <- GRangesList(monocytes_list, compress=FALSE)
-
-# chr19_windows_1bp <- tileGenome(seqinfo(txdb), tilewidth = 10, cut.last.tile.in.chrom =TRUE)
-tss_chr19 <- unique(promoters(genes(txdb), upstream=100, downstream=0)) 
-tss_chr19  <- resize(tss_chr19, width = 1, fix = "end")
-tss_chr19$name <- tss_chr19$gene_id
-promoters_chr19 <- unique(promoters(genes(txdb), upstream=2000, downstream=200)) 
-genes_chr19 <- unique(genes(txdb))
-
-# sample of tss_chr19 and quantification_chr19 
-# those those for which we have data in bigwig files, see extdata/prepdata.Rmd)
-rdata = system.file("extdata", "week3.Rdata", package = "learnr.proto")
-load(rdata)
-rm(rdata)
-quantification_chr19_sample <- quantification_chr19_sample %>% dplyr::rename(gene_id = entrezgene_id)
-
-# add FPKM to TSS windows such that these intervals can be arranged by FPKM
-FPKM_tssorder<- as.vector(NA)
-for(i in 1:length(tss_chr19_sample)) {
-  FPKM_tssorder[i] <- quantification_chr19_sample[which(quantification_chr19_sample[, "gene_id"] == tss_chr19_sample$gene_id[i]),]$FPKM
-}
-tss_chr19_sample$FPKM <- FPKM_tssorder
-
-# gene quantification chromosome 19  
-rdsfile <- system.file("extdata", "week2", "prepared_rds", "blueprint_c000s5_gene_quantification_chr19.rds", package = "learnr.proto")
-quantification_chr19 <- readRDS(rdsfile)
-quantification_chr19 <- quantification_chr19 %>% dplyr::rename(gene_id = entrezgene_id)
-
-## bw file locations 
-bw_h3k4me3 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw", package = "learnr.proto")
-bw_h3k4me1 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547981.H3K4me1.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw", package = "learnr.proto")
-bw_h3k27me3 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw", package = "learnr.proto")
-bw_h3k27ac <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547980.H3K27ac.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw", package = "learnr.proto")
-bw_h3k36me3 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547979.H3K36me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw", package = "learnr.proto")
+suppressPackageStartupMessages({
+  library(learnr)     # 0.10.1.9006 (github)
+  library(gradethis)  # 0.1.0.9004  (github)
+  library(testthat)   # 3.0.0 
+  library(tidyverse)  # 1.3.0
+  library(learnr.proto)
+  
+  library(IRanges)
+  library(GenomicRanges)
+  library(rtracklayer)
+  library(GenomicFeatures)
+  library(genomation)
+  library(ggthemes)
+  #library(org.Hs.eg.db)
+  
+  
+  # load the txdb package which holds transcript-based gene models of hg38 genome  
+  library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+  txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene 
+  seqlevels(txdb) <- "chr19"
+  
+  # configuration
+  knitr::opts_chunk$set(echo=FALSE, message=FALSE)
+  gradethis::gradethis_setup()
+  
+  # data accessible to all exercises
+  rdata = system.file("extdata", "week2.Rdata", package = "learnr.proto")
+  load(rdata)
+  monocytes_all <- unlist(monocytes_list)
+  monocytes_all$chip <- names(monocytes_all)
+  monocytes_list <- GRangesList(monocytes_list, compress=FALSE)
+  
+  # chr19_windows_1bp <- tileGenome(seqinfo(txdb), tilewidth = 10, cut.last.tile.in.chrom =TRUE)
+  tss_chr19 <- unique(promoters(genes(txdb), upstream=100, downstream=0)) 
+  tss_chr19  <- resize(tss_chr19, width = 1, fix = "end")
+  tss_chr19$name <- tss_chr19$gene_id
+  promoters_chr19 <- unique(promoters(genes(txdb), upstream=2000, downstream=200)) 
+  genes_chr19 <- unique(genes(txdb))
+  
+  # sample of tss_chr19 and quantification_chr19 
+  # those those for which we have data in bigwig files, see extdata/prepdata.Rmd)
+  rdata = system.file("extdata", "week3.Rdata", package = "learnr.proto")
+  load(rdata)
+  rm(rdata)
+  quantification_chr19_sample <- quantification_chr19_sample %>% dplyr::rename(gene_id = entrezgene_id)
+  
+  # add FPKM to TSS windows such that these intervals can be arranged by FPKM
+  FPKM_tssorder<- as.vector(NA)
+  for(i in 1:length(tss_chr19_sample)) {
+    FPKM_tssorder[i] <- quantification_chr19_sample[which(quantification_chr19_sample[, "gene_id"] == tss_chr19_sample$gene_id[i]),]$FPKM
+  }
+  tss_chr19_sample$FPKM <- FPKM_tssorder
+  
+  # gene quantification chromosome 19  
+  rdsfile <- system.file("extdata", "week2", "prepared_rds", "blueprint_c000s5_gene_quantification_chr19.rds", package = "learnr.proto")
+  quantification_chr19 <- readRDS(rdsfile)
+  quantification_chr19 <- quantification_chr19 %>% dplyr::rename(gene_id = entrezgene_id)
+  
+  ## bw file locations 
+  bw_h3k4me3 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw", package = "learnr.proto")
+  bw_h3k4me1 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547981.H3K4me1.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw", package = "learnr.proto")
+  bw_h3k27me3 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw", package = "learnr.proto")
+  bw_h3k27ac <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547980.H3K27ac.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw", package = "learnr.proto")
+  bw_h3k36me3 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547979.H3K36me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_15kb.bw", package = "learnr.proto")
+})
 ```
 
 ```{r timeout1, context="server"}
+session$onSessionEnded(stopApp)
+
 isolate({
   # obtain the session id
   # source 1: https://shiny.rstudio.com/reference/shiny/latest/session.html
