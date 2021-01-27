@@ -198,7 +198,7 @@ Identify the nearest TSS for each H3K4me3 peak in monocytes.
 
 > **Exercise 1a**: Recap, which of the commands below imports the peaks table into a GRanges object?  
 
-```{r qimport}
+```{r q1_mc_import}
 question("Which function imports the H3K4me3 peaks into a GRanges object?",
          answer("import(\"H3K4me3.bwa.GRCh38.chr19.bed\", format = \"narrowPeak\")", correct =TRUE),
          answer("import(\"H3K4me3.bwa.GRCh38.chr19.bed\", format = \"BED\")", message = "BED is not the right format."),
@@ -421,7 +421,7 @@ resize(x = [GRanges object], width = [desired width], fix = ["start", "end" or "
 * If we want a window of 20kb around the TSS, use `width = 200001` to include the TSS (1bp extra).  
 * As we want to have a window *around* the TSS we set the `fix = "center"`.  
 
-> **Exercise 3a**: Run the code below to obtain the H3K4me3 signal in a 10kb window around the TSSs.  
+> **Exercise 3a**: Run the code below to obtain the H3K4me3 signal in a 10kb window around the TSSs **and** answer the multiple-choice question below.  
 >
 > * The object `bw_h3k4me3` directs to the H3K4me3 ChIP-seq BigWig file.  
 > * Hit "Run Code" to view the structure of the resulting ScoreMatrix object.   
@@ -441,10 +441,20 @@ scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3, windows = tss_window, typ
 str(scores_h3k4me3_tss)
 ```
 
+```{r q3a_mc_h3k4me3_scores}
+question("What is the 'class' of the resulting object 'scores_h3k4me3_tss'?",
+         answer("ScoreMatrix", correct =TRUE, message = "The object `scores_h3k4me3_tss` is of formal class ScoreMatrix, which is related to a basic matrix but - as it says - 'more formal'. In other words, it has special functions to retrieve and set the data. We won't go into the details of these differences with basic matrices but focus on how we can use this result."),
+         answer(".Data", message = "It is not a .Data. The '.Data' is a so-called slot within the 'scores_h3k4me3_tss' object but is not its class. Review the output of the 'str(scores_h3k4me3_tss)' again."),
+         answer("List", message = "It is not a List. Review the output of the 'str(scores_h3k4me3_tss)' again."),
+         answer("matrix", message = "It is not a matrix. Review the output of the 'str(scores_h3k4me3_tss)' again."),
+         allow_retry =TRUE,
+         random_answer_order =TRUE)
+```
+
 The object `scores_h3k4me3_tss` is of formal class ScoreMatrix, which is related to a basic matrix but - as it says - "more formal". In other words, it has special functions to retrieve and set the data. We won't go into the details of these differences with basic matrices but focus on how we can use this result.  
 
 ### 3.3.2 Plot the average H3K4me3 signal around the TSS   
-Using this ScoreMatrix you can plot the average H3K4me3 signal in these windows. To do so, use the `plotMeta()` function:   
+You can plot the average H3K4me3 signal over these windows using this ScoreMatrix. To do so, you use the `plotMeta()` function:   
 
 ```{r plotmeta_example, eval=FALSE, echo=TRUE}
 plotMeta(mat = [ScoreMatrix_object], xcoord = c([start,end]), ...)
@@ -455,8 +465,9 @@ plotMeta(mat = [ScoreMatrix_object], xcoord = c([start,end]), ...)
 
 <br>
 
-> **Exercise 3b**: Plot the H3K4me3 signal stored in "scores_h3k4me3_tss" from exercise 3a (code check).   
+> **Exercise 3b**: Plot the H3K4me3 signal stored in "scores_h3k4me3_tss" from exercise 3a.   
 >
+> * Note that we set `xcoord = c(-5000, 5000)` for you, as our window was 10kb.  
 > * Hit "Subit Answer" to submit your code.  
 > * Hit "Run Code" to view the plot (necessary for exercise 3c).   
 
@@ -467,16 +478,32 @@ scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3, windows = tss_window, typ
 
 
 ```{r q3b_h3k4me3plot, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup = "prepare_q3b"}
-# plot of ScoreMatrix "scores_h3k4me3_tss"
+# Generate a plot showing the average H3K4me3 signal over a 10kb window around the TSS
 ___(mat = ___, xcoord = c(-5000, 5000))
 ```
 
-```{r q3b_h3k4me3plot-solution}
-plotMeta(mat = scores_h3k4me3_tss, xcoord = c(-5000, 5000))
+```{r q3b_h3k4me3plot-hint-1}
+# In the "mat =" parameter you should give the ScoreMatrix object which holds the scores to be plotted.....  
 ```
 
-```{r q3b_h3k4me3plot-code-check}
-grade_code()
+```{r q3b_h3k4me3plot-hint-2}
+# ....in other words, the output of exercise 3a
+```
+
+```{r q3b_h3k4me3plot-hint-3}
+# Eg 
+___(mat = scores_h3k4me3_tss, .....)  
+```
+
+```{r q3b_h3k4me3plot-hint-4}
+# the function to make the plot is
+plotMeta()
+```
+
+```{r q3b_h3k4me3plot-check}
+grade_result(
+  pass_if(~identical(.result, plotMeta(mat = scores_h3k4me3_tss, xcoord = c(-5000, 5000))))
+)
 ```
 
 Clearly, we could have restricted the plot tp the region +/- 3kb the TSS as the H3K4me3 signal remains near 0 read per million outside that region.   
@@ -556,55 +583,53 @@ ScoreMatrix(target = bw_h3k27ac, windows = tss_window, ....)
 # You can copy-paste and adjust the plotMeta() function from exercise 3b to make the plot. 
 ```
 
-```{r q4_h3k27ac_density-hint-6}
-# Warning: the next hint holds the solution!
-```
+<!-- ```{r q4_h3k27ac_density-solution} -->
+<!-- # create H3K27ac ScoreMatrix for the 10kb TSS windows. -->
+<!-- scores_h3k27ac_tss <- ScoreMatrix(target = bw_h3k27ac, windows = tss_window, type = 'bigWig', strand.aware =TRUE)   -->
 
-```{r q4_h3k27ac_density-solution}
-# create H3K27ac ScoreMatrix for the 10kb TSS windows.
-scores_h3k27ac_tss <- ScoreMatrix(target = bw_h3k27ac, windows = tss_window, type = 'bigWig', strand.aware =TRUE)  
+<!-- # Generate the plot with average H3K27ac scores t -->
+<!-- plotMeta(scores_h3k27ac_tss, xcoord = c(-5000, 5000)) -->
+<!-- ``` -->
 
-# Generate the plot with average H3K27ac scores t
-plotMeta(scores_h3k27ac_tss, xcoord = c(-5000, 5000))
+
+```{r q4_h3k27ac_density-check}
+grade_result(pass_if(~identical(.result,plotMeta(scores_h3k27ac_tss, xcoord = c(-5000, 5000)))))
 ```
 
 ```{r q4_h3k27ac_density_mc}
-question("Compared to the average score profile of H3K4me3, the H3K27ac profile ... (Select the correct statments)",
-         answer("shows, on average, stronger signal scrores around the TSS.", message = "The signal scores are plotted on the y-axis of the plot. Compare the values in plot from ex 3 with t he latest plot."),
-         answer("shows, on average, weaker signal scrores around the TSS.", correct = T, message = "To compare two profiles, you can plot them in one plot. Let's do that!"),
-         answer("shows, on average, a wider region of enrichment around the TSS.", message = "Based on these two plots, the H3K27ac is not clearly wider on average than H3K4me3."),
-         answer("shows, on average, a more narrow region of enrichment around the TSS.", message = "Based on these two plots, the H3K27ac is not clearly narrower on average than H3K4me3."),
+question("Compared to the average score profile of H3K4me3, the H3K27ac profile ... (select the correct statement)",
+         answer("shows, on average, stronger signal scores around the TSS.", message = "The signal scores are plotted on the y-axis of the plot. Compare the values in plot from ex 3 with t he latest plot. Tip, look at the scale of  the y-axis."),
+         answer("shows, on average, weaker signal scores around the TSS.", correct = T, message = "To compare two profiles, you can plot them in one plot. Let's do that!"),
+         answer("shows, on average, a wider region of enrichment around the TSS.", message = "Based on these two plots, the H3K27ac is not clearly wider on average than H3K4me3. Tip, look at the scale of  the y-axis."),
+         answer("shows, on average, a more narrow region of enrichment around the TSS.", message = "Based on these two plots, the H3K27ac is not clearly narrower on average than H3K4me3. Tip, look at the scale of  the y-axis."),
          allow_retry=TRUE,
          random_answer_order=TRUE
          )
 ```
 
 ### 3.3.4 Multiple density profiles in one plot  
-We can observe  differences and comparable trends better when we combine plots of the two marks. This is done by generating a "ScoreMatrixList" object and providing that to the `plotMeta()` function:    
+We can observe  differences and similarities better when plot the two marks in one plot. This can be achieved by generating a "ScoreMatrixList" object and providing that to the `plotMeta()` function:    
 
 ```{r example_scorematrixlist, echo=TRUE, eval=FALSE}
 # 1. Generate a "ScoreMatrixList" object:   
-ScoreMatrixList_object <- new("ScoreMatrixList", 
-                              list([object1_name]=[ScoreMatrix_1], ..., [objectN_name]=[ScoreMatrix_N]))
+ScoreMatrixList_object <- new("ScoreMatrixList",list([object1_name]=[ScoreMatrix_1], ..., [objectN_name]=[ScoreMatrix_N]))
 
 # 2. Provide plotMeta with this "ScoreMatrixList":   
 plotMeta(mat = ScoreMatrixList_object, 
          xcoord = c([start,end]),
          overlay = [TRUE/FALSE], 
-         profile.names = [vector of custom names, used for the legend])
+         profile.names = [vector of names, used in the legend])
 ```
 
 * With `overlay=TRUE` the two density profiles are plotted in one plot.   
 * With `overlay=FALSE` the two density profiles are plotted in separate plots with the same x- and y-axis limits and scales.  
-* In `profile.names =` you can give a character vector of names, for every ScoreMatrix in the ScoreMatrixList.  
+* In `profile.names =` you can give a character vector of names, for every ScoreMatrix in the ScoreMatrixList. These names will be used for the legend.   
 
 ### Exercise 5  
 
-> **Exercise 5**: Complete the code below to generate one plot with the density profiles of H3K4me3 and H3K27ac in a 10kb window around the TSS.  
+> **Exercise 5**: Complete the code below to generate one plot with the average signal profiles of H3K4me3 and H3K27ac in a 10kb window around the TSS.  
 > 
-> * The objects `scores_h3k4me3_tss` and `scores_h3k27ac_tss` of exercise 3 and 4 are available to you.   
-> * Hit "Submit Answer" to evaluate your code.  
-> * Hit "Run Code" to view the plot.  
+> * The objects `scores_h3k4me3_tss` and `scores_h3k27ac_tss` of [Exercise 3] and [Exercise 4] are available to you.   
 
 ```{r prepare_q5, echo=FALSE}
 tss_window <- resize(tss_chr19_sample, width = 10001, fix = "center")
@@ -616,36 +641,51 @@ scores_h3k27ac_tss <- ScoreMatrix(target = bw_h3k27ac, windows = tss_window, typ
 ```
 
 ```{r q5_overlay, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q5"}
-# generate a ScoreMartixList of "scores_h3k4me3_tss" and "scores_h3k27ac_tss" 
+# 1. generate a ScoreMartixList of "scores_h3k4me3_tss" and "scores_h3k27ac_tss" 
 # (of exercise 3 and 4)
 scores_h3k4me3_h3k27ac <- new("ScoreMatrixList", list(h3k4me3=___, h3k27ac=___))
 
-# generate the plotMeta with overlay
-plotMeta(mat = ___, xcoord = c(-5000, 5000), 
-        overlay = ___, profile.names = c("H3K4me3", "H3K27me3"))
+# 2. generate the plotMeta with overlay
+plotMeta(mat = ___,
+         xcoord = ___,
+         overlay = ___,
+         profile.names = c("H3K4me3", "H3K27ac"))
 ```
 
-```{r q5_overlay-solution}
-scores_h3k4me3_h3k27ac <- new("ScoreMatrixList", list(h3k4me3=scores_h3k4me3_tss, h3k27ac=scores_h3k27ac_tss))
-
-plotMeta(scores_h3k4me3_h3k27ac, xcoord = c(-5000, 5000), overlay = TRUE, profile.names = c("H3K4me3", "H3K27ac"))
+```{r q5_overlay-hint-1}
+# In (1), place the objects "scores_h3k4me3_tss" and "scores_h3k27ac_tss" at the correct 'blank' locations. 
 ```
 
-```{r q5_overlay-code-check}
-grade_code()
+```{r q5_overlay-hint-2}
+# (2) is similar to plotMeta() functions you have seen in ex. 3 and 4 
+# but this time you have to define the `xcoord=` yourself
+# and set 'overlay=' to TRUE or FALSE
 ```
 
-Now we clearly see the differences in signal strengths between H3K4me3 and H3K27ac at the TSS!   
+<!-- ```{r q5_overlay-solution} -->
+<!-- scores_h3k4me3_h3k27ac <- new("ScoreMatrixList", list(h3k4me3=scores_h3k4me3_tss, h3k27ac=scores_h3k27ac_tss)) -->
+
+<!-- plotMeta(scores_h3k4me3_h3k27ac, xcoord = c(-5000, 5000), overlay = TRUE, profile.names = c("H3K4me3", "H3K27ac")) -->
+<!-- ``` -->
+
+```{r q5_overlay-check}
+grade_result(pass_if(~identical(.result,plotMeta(scores_h3k4me3_h3k27ac, xcoord = c(-5000, 5000), overlay = TRUE, profile.names = c("H3K4me3", "H3K27ac")))),
+             correct = "Now we clearly see the differences between the average signals of H3K4me3 and H3K27ac at the TSS.")
+```
 <br>
-So far you have examined the average enrichment of "narrowPeak" ChIP marks. Let's add a mark with a different enrichment profile: **H3K27me3**.  
+So far you have examined the average enrichment of ChIP marks with very narrow peaks. Let's add a mark that showed a 'broad' ChIP peaks in the genome browser: **H3K27me3**.  
 
 ### 3.3.5 Add H3K27me3 signal    
 You will add the H3K37me3 profile to the above plot.    
 
-> **Exercise 6**: Generate a ScoreMatrix object with the H3K37me3 signal in a 10kb window around the TSS, make a new ScoreMatrixList with scores of H3K4me3, H3K27ac and H3K27me3 and plot these three profiles with plotMeta().  
+> **Exercise 6**:   
+>
+> 1. Generate a ScoreMatrix object with the H3K37me3 signal in a 10kb window around the TSS, 
+> 2. make a new ScoreMatrixList with scores of H3K4me3, H3K27ac and H3K27me3 (*must be in this specific order for your answer to be graded as correct due to technical reasons*)
+> 3. plot these three profiles with `plotMeta()`.  
 > 
-> * The object `bw_h3k27me3` holds the location of the H3K27me3 bigwig file.   
-> * The object `tss_window` of exercise 3a is available too.  
+> * The object `bw_h3k27me3` directs to the location of the H3K27me3 BigWig file.   
+> * The object `tss_window` of [Exercise 3a] is available again.     
 > * The scores of H3K4me3 and H3K27ac are available in resp. `scores_h3k4me3_tss` and `scores_h3k27ac_tss`.  
 
 ```{r prepare_6a, echo=FALSE}
@@ -669,7 +709,7 @@ scores_h3k4me3_h3k27ac_h3k27me3 <- ____
 # 3. Plot the average scores of these 3 marks with plotMeta()
 # define overlay=TRUE 
 # and fit the names in "profile.names=" with the order of objects in the ScoreMatrixlist object
-plotMeta(____))
+plotMeta(____, profile.names = c("H3K4me3", "H3K27ac", "H3K27me3"))))
 ````
 
 ```{r q6a_addh3k37me3-hint-1}
@@ -699,24 +739,28 @@ scores_h3k4me3_h3k27ac_h3k27me3 <- new("ScoreMatrixList", list(h3k4me3=scores_h3
 plotMeta(scores_h3k4me3_h3k27ac_h3k27me3, xcoord = c(-5000, 5000), overlay = TRUE, profile.names = .....)
 ```
 
-```{r q6a_addh3k37me3-hint-7}
-# The next hint contains a possible solution!
-```
 
-```{r q6a_addh3k37me3-solution}
-# Create H3K27me3 ScoreMatrix for the 10kb windows around the TSS.
-scores_h3k27me3_tss <- ScoreMatrix(target = bw_h3k27me3, windows = tss_window, type = 'bigWig', strand.aware =TRUE)  
+<!-- ```{r q6a_addh3k37me3-solution} -->
+<!-- # Create H3K27me3 ScoreMatrix for the 10kb windows around the TSS. -->
+<!-- scores_h3k27me3_tss <- ScoreMatrix(target = bw_h3k27me3, windows = tss_window, type = 'bigWig', strand.aware =TRUE)   -->
 
-# Create a new ScoreMatrixList object  
-scores_h3k4me3_h3k27ac_h3k27me3 <- new("ScoreMatrixList", list(h3k4me3=scores_h3k4me3_tss, h3k27ac=scores_h3k27ac_tss, h3k27me3=scores_h3k27me3_tss))
+<!-- # Create a new ScoreMatrixList object   -->
+<!-- scores_h3k4me3_h3k27ac_h3k27me3 <- new("ScoreMatrixList", list(h3k4me3=scores_h3k4me3_tss, h3k27ac=scores_h3k27ac_tss, h3k27me3=scores_h3k27me3_tss)) -->
 
-# Plot the average scores of these 3 marks with plotMeta()
-plotMeta(scores_h3k4me3_h3k27ac_h3k27me3, xcoord = c(-5000, 5000), overlay = TRUE, profile.names = c("H3K4me3", "H3K27ac", "H3K27me3"))
+<!-- # Plot the average scores of these 3 marks with plotMeta() -->
+<!-- plotMeta(scores_h3k4me3_h3k27ac_h3k27me3, xcoord = c(-5000, 5000), overlay = TRUE, profile.names = c("H3K4me3", "H3K27ac", "H3K27me3")) -->
+<!-- ``` -->
+
+
+```{r q6a_addh3k37me3-check}
+grade_result(pass_if(~identical(.result,
+                                plotMeta(scores_h3k4me3_h3k27ac_h3k27me3, xcoord = c(-5000, 5000), overlay = TRUE, profile.names = c("H3K4me3", "H3K27ac", "H3K27me3"))
+                                )))
 ```
 
 ```{r q6a_addh3k37me3_mc}
 question("What can you conclude from the above plot?",
-         answer("On average H3K27me3 scores in these windows are lower than H3K27ac scores.", correct = T),
+         answer("On average H3K27me3 scores in these windows are lower than H3K27ac scores.", correct = T, message = "This plot shows the 'average' ChIP-seq signal around the TSS but not the variation in ChIP signal among different peaks of the same mark. You will ook at these differences next, using H3K4me3 as a test case."),
          answer("H3K4me3 scores are always higher than the H3K27ac scores.", message = "These plots display the *average* scores, there might still be TSS whith only H3K27ac or with a H3K27ac signal that is higher than H3K4me3, you can't say that from this plot."),
          answer("There are more TSSs overlapping a H3K4me3 peak than TSSs overlapping a H3K27ac peak.", message = "This plot does not display how many TSS overlap with a ChIP peak."),
          answer("There are no H3K27me3 peaks overlapping TSSs used to make this plot.", message = "The H3K27me3 signal is generally broad, spanning 10s of kbs and does not reach such high scores as H3k4me3. Using this plot, we can't concusively say that H3K27me3 is absent from these promoters."),
@@ -725,10 +769,9 @@ question("What can you conclude from the above plot?",
          )
 ```
 
-These plots show the *average* ChIP-seq signal around the TSS. What they do not show is which peaks overlap and at which TSS they overlap. Neither do they reveal the range of score profiles. I.e. *"Do 90 or 50 or perhaps only 25% of H3K4me3 peaks follow this shape while the rest shows higher or lower enrichment scores?" "And if these profiles are not the same for each gene, might there be an association with gene expression levels?" "For which marks can we observe such an association and for which not?"*    
 
 ## 3.4 Signal vs gene expression  
-You will investigate the the relationship between H3K4me3 signal (as reads per million extracted from the BigWig file) in a defined window around the TSS and gene expression (as FPKM). 
+You will investigate the variation in H3K4me3 signal (as reads per million extracted from the BigWig file) in a defined window around the TSS and the relation between this signal and gene expression (as FPKM). 
 
 ### 3.4.1 Average H3K4me3 signal per gene expression quartile  
 To investigate this relationship you will:  
@@ -752,7 +795,7 @@ As the name suggests, this function does not calculate the coverage for each bp 
 <br>
 Note that this function is also useful when working with windows of varying size like genes, in those cases we set `bin.num` to 50 or 100.  
 
-> **Exercise 7a**: Calculate the average H3K4me3 signal in a window of 5kb around the TSS (code check).  
+> **Exercise 7a**: Calculate the average H3K4me3 signal in a window of 5kb around the TSS.  
 > 
 > * `tss_chr19_sample` is the GRanges object with TSS locations for which we have signal in the BigWig files.  
 > * Use `resize()` to resize the window in `tss_chr19_sample` to 5kb.  
@@ -782,7 +825,7 @@ average_h3k4me3_tss <- ScoreMatrixBin(target = bw_h3k4me3,
 
 ```{r q7a_signalfpkm-code-check}
 #when I designed the tutorial, I saved this scorematrix object so that we do not need to rerun the function in coming questions but can directly load the output. 
-#saveRDS(average_h3k4me3_tss, file = file.path("/home", "ctoenhake", "learnr.proto","inst", "extdata", "week3", "prepared_rds", "scorematrix_q6_average_scores_h3k4me3_tss_10kbwindow.rds"))
+#saveRDS(average_h3k4me3_tss, file = file.path("/home", "ctoenhake", "learnr.proto","inst", "extdata", "week3", "prepared_rds", "scorematrix_q6_average_scores_h3k4me3_tss_5kbwindow.rds"))
 
 grade_code()
 ```
@@ -790,14 +833,17 @@ grade_code()
 ### Exercise 7b  
 Next, transform the resulting 'ScoreMatrix' object to a data.frame to facilitate data manipulation with dplyr and plotting with ggplot2. You can transform:  
 
-* a 'ScoreMatrix' into a basic matrix with: `matrix_object <- as([ScoreMatrix_object], "matrix")`  
-* a matrix into data.frame with: `dataframe_object <- as.data.frame([matrix_object])`.    
+* a 'ScoreMatrix' to a basic matrix with: `matrix_object <- as([ScoreMatrix_object], "matrix")`  
+* a matrix to data.frame with: `dataframe_object <- as.data.frame([matrix_object])`.    
 
-> **Exercise 7b**: Transform the `average_h3k4me3_tss` to a data.frame.   
+> **Exercise 7b**: Transform the `average_h3k4me3_tss` to a data.frame (code check).  
+>
+> * Make sure to hit "Run Code" to view the output of the `head()` argument.  
+> * Use this output to determine the name of the variable with the H3K4me3 scores.   
 
 ```{r q7b_prepare}
 # scores from ex 5
-average_h3k4me3_tss <- readRDS(file = system.file("extdata", "week3", "prepared_rds", "scorematrix_q5_average_scores_h3k4me3_tss_10kbwindow.rds", package = "learnr.proto"))
+average_h3k4me3_tss <- readRDS(file = system.file("extdata", "week3", "prepared_rds", "scorematrix_q6_average_scores_h3k4me3_tss_10kbwindow.rds", package = "learnr.proto"))
 ```
 
 ```{r q7b_signalvsfpkm, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="q7b_prepare"}
@@ -1359,8 +1405,7 @@ grade_result(
            col = h3k4me3_cols, 
            main = "H3K4me3 signal, centered at TSS", 
            xlab = "bp (TSS = 0)")
-           )),
- correct = ""
+           ))
 )
 ```
 
@@ -1394,7 +1439,7 @@ scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3,
 h3k4me3_cols <- colorRampPalette(c("white", "red"))(10000)
 ```
 
-```{r q9_heatmap1mark, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=18. exercise.setup="prepare_q9a"}
+```{r q9_heatmap1mark, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=18, exercise.setup="prepare_q9a"}
 # plot the H3K4me3 heatmap, order by H3K4me3 signal
 heatMatrix(mat = ___, 
            xcoord = , 
@@ -1429,7 +1474,7 @@ question("Can?",
 ```
 
 ### 3.5.4 Heatmap of 1 mark ordered by gene expression   
-
+Instead of ordering the heatmap by the plotted signal, we can also order it by the expression of the corresponding gene. To do so, 
 ```{r heatmap_fpkmorder, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup = "prepare_q5"}
 # order TSS regions by gene expression from high-to-low
 tss_chr19_sample_arranged  <- sort(tss_chr19_sample, by = ~FPKM, decreasing =TRUE)
