@@ -163,14 +163,15 @@ library(genomation)
 ### Tutorial specs  
 The exercises in this tutorial are similar to those in fg2. A brief reminder:  
 
-- For some longer coding exercises, we left blanks as "___" that indicate where in the code you should fill in a function, object or variable. Make sure fill out all the blanks before Answer submission, they will otherwise result in errors.  
-- Hit `Hint` (when provided) for clues.  
-- Hit `Run Code` to test your code and preview the output.  
-- Hit `Submit Answer` (if present) to submit the code. As 'submitting' not always shows the code output, we advise to use `Run Code` first. Upon hitting `Submit Answer` and when code-checking is enabled and your submitted code is different from the solution code, R will give automatic feedback that helps you correct your code.  
+- For some longer coding exercises, we left blanks as "___" that indicate where in the code you should fill in a function, object or variable. Make sure you **fill out all the blanks before hitting "Run Code" or "Submit Answer"**. If you leave even a single "_", this will result in errors that may be difficult to interpret.  
+- Hit `Hint` (when provided) for clues. Due to technical reasons **you can't always go back to previous hints so make sure you read them well!**       
+- Hit `Run Code` to test your code and preview the output (but make sure no "_" are left).  
+- Hit `Submit Answer` (if present) to submit the code (make sure no "_" are left) for evaluation.    
+- For some complete-the-code exercises, automated code-checking is enabled. You can recognize these exercises by the addition of "(code check)" to the exercise. In these cases, R will give custom feedback that helps you correct your code.  
+- Try to keep yourself from hitting `Solution` (when provided). This is option is provided for "(code check)" exercises. Only use it when you do not understand the automatic feedback given by R.   
 - Hit `Start Over` to remove any adjustments you made and start again.   
-- Try to keep yourself from hitting `Solution` (when provided). This is option is sometimes provided when your code is evaluated. Only use it when you do not understand the automatic feedback given by R.   
 
-Although we ask for specific answers or completion of specific code, you are encouraged to test your own code and use `Run Code` and `Start Over` extensively. I.e., remove the pre-coded code and write your own code for a different graph or different summary of the data. Use `Run Code` to preview the results. Unfortunately these self-thought of codes can not be evaluated. For the evaluation you need to use our pre-coded code. Hit `Start Over` to get this pre-coded code.  
+Although we ask for specific answers or completion of specific code, you are encouraged to test your own code and use `Run Code` and `Start Over`. I.e., remove the pre-coded code and write your own code for a different graph or different summary of the data. Use `Run Code` to preview the results. Unfortunately these self-thought of codes can not be evaluated. For the evaluation you need to use our pre-coded code. Hit `Start Over` to get this pre-coded code.  
 
 #### **Used resources**   
 
@@ -216,17 +217,17 @@ question("Which function imports the H3K4me3 peaks into a GRanges object?",
 To identify the nearest TSS, you use the `distance2NearestFeature()` function:   
 
 ```{r nearestfeature_example, eval=FALSE, echo=TRUE}
-distance2NearestFeature(g.idh = [hip_peaks_in_GRanges], 
+distance2NearestFeature(g.idh = [chip_peaks_in_GRanges], 
                         tss = [TSSs_in_GRanges])  
 ```
 
 The output is a data.frame reporting for each range in the `g.idh` object:  
 
 - its nearest TSS  
-- the name of the corresponding peak and TSS  
+- the name of the corresponding peak and gene.  
 - the distance between them. 
 
-The fact that the output is a data.frame makes it easy for us to summarize the results with dplyr and ggplot2.      
+The fact that the output is a data.frame makes it easy for us to manipulate and plot the results with dplyr and ggplot2.      
 
 > **Exercise 1b**: Identify the nearest TSS for each H3K4me3 ChIP-seq peak.  
 > 
@@ -234,7 +235,7 @@ The fact that the output is a data.frame makes it easy for us to summarize the r
 - H3K4me3 peaks in monocytes are stored in `monocytes_h3k4me3`.   
 - Print the head of the resulting object to the console using `head()`.     
 
-```{r q1_distancetss, exercise =TRUE, exercise.lines = 5, exercise.eval =FALSE, error = T}
+```{r q1_distancetss, exercise =TRUE, exercise.lines = 5, exercise.eval =FALSE, error = TRUE}
 # Identify the nearest TSS for each H3K4me3 peak  
 dist_h3k4me3_to_tss <- __(g.idh = __, tss = __)
 
@@ -780,7 +781,7 @@ You will investigate the variation in H3K4me3 signal (as reads per million extra
 ### 3.4.1 Average H3K4me3 signal per gene expression quartile  
 To investigate this relationship you will:  
 
-a. Calculate the average H3K4me3 signal in a 5kb window around the TSS.  
+a. Calculate the average H3K4me3 signal in a **5kb** window around the TSS.  
 b. Convert the output of (a) in to a data.frame.  
 c. Combine the data.frame with H3K4me3 scores with those containing gene expression values for the corresponding genes.    
 d. Group genes based on their gene expression in 4 quartiles and plot the H3K4me3 signal per group in a boxplot.  
@@ -799,7 +800,7 @@ As the name suggests, this function does not calculate the coverage for each bp 
 <br>
 Note that this function is also useful when working with windows of varying size like genes, in those cases we set `bin.num` to 50 or 100.  
 
-> **Exercise 7a**: Calculate the average H3K4me3 signal in a window of 5kb around the TSS.  
+> **Exercise 7a**: Calculate the average H3K4me3 signal in a window of 5kb around the TSS (code check).  
 > 
 > * `tss_chr19_sample` is the GRanges object with TSS locations for which we have signal in the BigWig files.  
 > * Use `resize()` to resize the window in `tss_chr19_sample` to 5kb.  
@@ -815,6 +816,7 @@ average_h3k4me3_tss <- ScoreMatrixBin(target = bw_h3k4me3,
                                              bin.num = ___, 
                                              type = 'bigWig', strand.aware =TRUE)  
 ```
+
 
 ```{r q7a_signalfpkm-solution}
 # Resize the window in "tss_chr_sample" to 5001bp
@@ -840,14 +842,13 @@ Next, transform the resulting 'ScoreMatrix' object to a data.frame to facilitate
 * a 'ScoreMatrix' to a basic matrix with: `matrix_object <- as([ScoreMatrix_object], "matrix")`  
 * a matrix to data.frame with: `dataframe_object <- as.data.frame([matrix_object])`.    
 
-> **Exercise 7b**: Transform the `average_h3k4me3_tss` to a data.frame (code check).  
+> **Exercise 7b**: Transform the `average_h3k4me3_tss` to a data.frame.  
 >
-> * Make sure to hit "Run Code" to view the output of the `head()` argument.  
-> * Use this output to determine the name of the variable with the H3K4me3 scores.   
+> * Use the  output of the `head()` argument to find the name of the variable with the H3K4me3 scores.   
 
 ```{r q7b_prepare}
 # scores from ex 5
-average_h3k4me3_tss <- readRDS(file = system.file("extdata", "week3", "prepared_rds", "scorematrix_q6_average_scores_h3k4me3_tss_10kbwindow.rds", package = "learnr.proto"))
+average_h3k4me3_tss <- readRDS(file = system.file("extdata", "week3", "prepared_rds", "scorematrix_q6_average_scores_h3k4me3_tss_5kbwindow.rds", package = "learnr.proto"))
 ```
 
 ```{r q7b_signalvsfpkm, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="q7b_prepare"}
@@ -862,17 +863,36 @@ average_h3k4me3_tss_df <- as.data.frame(___)
 head(__)
 ```
 
-```{r q7b_signalvsfpkm-solution}
-# transform average_h3k4me3_tss into a matrix
+```{r q7b_signalvsfpkm-hint-1}
+# Look at the description below the exercise to determine how to complete the code
+```
+
+```{r q7b_signalvsfpkm-hint-2}
+# To transform average_h3k4me3_tss into a matrix you should use:
 scores_as_matrix <- as(average_h3k4me3_tss, "matrix")
+```
 
-# and the matrix into a data.frame 
+```{r q7b_signalvsfpkm-hint-3}
+# To transform the matrix into a data.frame you should use: 
 average_h3k4me3_tss_df <- as.data.frame(scores_as_matrix)
+```
 
-# Print the head of the resulting data.frame  
-# What is the name of the variable with the H3K4me3 scores?  
+```{r q7b_signalvsfpkm-hint-4}
+# And finally print the head of:
 head(average_h3k4me3_tss_df)
 ```
+
+<!-- ```{r q7b_signalvsfpkm-solution} -->
+<!-- # transform average_h3k4me3_tss into a matrix -->
+<!-- scores_as_matrix <- as(average_h3k4me3_tss, "matrix") -->
+
+<!-- # and the matrix into a data.frame  -->
+<!-- average_h3k4me3_tss_df <- as.data.frame(scores_as_matrix) -->
+
+<!-- # Print the head of the resulting data.frame   -->
+<!-- # What is the name of the variable with the H3K4me3 scores?   -->
+<!-- head(average_h3k4me3_tss_df) -->
+<!-- ``` -->
 
 ```{r q7b_signalvsfpkm-check}
 grade_result(
@@ -913,10 +933,10 @@ ggplot(average_h3k4me3_tss_df) +
   geom_boxplot(mapping = aes(y = H3K4me3_rpm))+
   scale_x_discrete(labels=NULL)+
   theme_bw()
-ggsave(filename= "images/boxplot_average_h3k4me3_tss_5kbwindow.png")
+#ggsave(filename= "images/boxplot_average_h3k4me3_tss_5kbwindow.png")
 ```
 
-To generate this boxplot for groups of genes grouped into four bins by gene expression level, we first combine thess H3K4me3 scores with the gene expression data into one data.frame.  
+To generate this boxplot for groups of genes grouped into four bins by gene expression level, we first combine the H3K4me3 scores with the gene expression data into one data.frame.  
 
 ### Exercise 7c  
 Join the data from `quantification_chr19_sample` and `average_h3k4me3_tss_df` to get a data.frame with gene expression values and the corresponding average H3K4me3 signal at the TSS.   
