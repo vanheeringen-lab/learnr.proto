@@ -40,7 +40,7 @@ Checking answers is done with `gradethis` package. There are (at least, as far a
 grade_result(pass_if(~identical(.result, head(distance2NearestFeature(monocytes_h3k4me3, tss_chr19)))))
 ```
 
- - You can use additional argument `correct = [text]` to customize the message displayed when the submitted answer is correct.  
+ - You can use additional argument `correct = [text]` to customize the message displayed when the submitted answer is correct.   
  - In **fg3** I realized that we can also compare to plots, eg:  
  
 ```{r q8_heatmap1mark-check, echo=TRUE, eval=FALSE}
@@ -61,6 +61,8 @@ grade_result(
   - use the chunk title `[exercise_chunk_name]-code-check` when you use `grade_code()`. 
   - provide the code solution in the chunk with title `[exercise_chunk_name]-solution`
   - this option works towards the exact code given in the solution chunk with nice feedback. **BUT** for the answer to be correct the code should really be exactly the same as the solution. Eg: head(a, 2) =/= head(a, n=2).   
+  - another **BUT**; when you want students to generate the plot and you use this method of grading, the plot won't be visualized. Work-a-round1: direct students to hit "Run Code" explicitely before or after "Submit Answer". Work-a-round2: use grade_result() instead.  
+  - another **BUT** not handy if you multiple lines of code and leave blanks. In that case, students might fill out one line and hit "Submit" but will receive weird, not-understandable feedback due to the blanks in the other lines of not-yet-corrected code. Work-a-round1: direct students to fill in *all* blanks before hitting "Submit Answer". Work-a-round2: use grade_result() instead.  
   - preferentially leave out hints for this type of answer checking.  
   - however, I still added hints to grade_code questions when there were multiple functions where they had to complete the code. This is not really optimal use of learnr. An alternative would have been to chop these questions up in smaller parts but then I would have to prepare setup chunks for each invidual, chopped-up-exercise (as I understood it).
 
