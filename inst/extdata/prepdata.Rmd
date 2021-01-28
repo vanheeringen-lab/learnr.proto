@@ -102,7 +102,7 @@ saveRDS(monocytes_combinationmatrix, file =  "data/prepared_rds/blueprint_monocy
 
 ```
 
-## chr19 - get smaller bigwig by downsampling genes   
+## chr19 - get smaller bigwig by downsampling genes and save associated tss and FPKM files    
 Problem: chip-seq bigwig files of 1 chromosome are too large  
 Aim: for 5MB per tutorial on data.  
 Possible solutions:  
@@ -191,9 +191,19 @@ for(file in bw_files){
 resize_bw(10, file, tss_chr19_sample)
 }
 
+# make quantification_chr19_sample ready for saving
 quantification_chr19_sample$expression_group <- NULL
-
-## save sliced quantification and TSSs
+quantification_chr19_sample <- quantification_chr19_sample %>% dplyr::rename(gene_id = entrezgene_id)
+  
+# make tss_chr19_sample ready for saving, thus add FPKM to TSS windows such that these intervals can be arranged by FPKM
+FPKM_tssorder<- as.vector(NA)
+for(i in 1:length(tss_chr19_sample)) {
+  FPKM_tssorder[i] <- quantification_chr19_sample[which(quantification_chr19_sample[, "gene_id"] == tss_chr19_sample$gene_id[i]),]$FPKM
+  }
+tss_chr19_sample$FPKM <- FPKM_tssorder
+rm(FPKM_tssorder)
+  
+## save sampled/sliced quantification and TSSs
 save(quantification_chr19_sample, tss_chr19_sample, file = "/home/ctoenhake/learnr.proto/inst/extdata/week3.Rdata")
 ```
 
