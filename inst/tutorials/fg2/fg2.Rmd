@@ -527,7 +527,7 @@ Notice the larger median and maximum peak size for H3K4me1 peaks compared to H3K
 
 ### 2.3.2 Plotting summaries with ggplot2  
 You will use ggplot2 and dplyr package to explore the ChIP-seq data further. You have used these packages in the year 1 course Genomics and Big Data. Use the refresher-boxes and package cheatsheets (tip: use google) when you  need a quick reminder of the basics and how-to-use the package-functions.  
-<br>
+<br> 
 
 > #### **Refresher**: ggplot2  
 <details><summary>Click here for a very brief refresher on ggplot2-ting...</summary>  
@@ -537,16 +537,16 @@ You will use ggplot2 and dplyr package to explore the ChIP-seq data further. You
 > <br>
 > To display values, map variables in the dataset to visual properties of the geom (**aesthetics**) like **size**, **color**, and **x** and **y** locations.   
 <br>
-> To build a ggplot graph you can use this template:  
-```{r ggplotexample, eval=FALSE, echo=TRUE}
-ggplot(data = <DATA>)+   # required
-  <GEOM_FUNCTION>(mapping = aes(<MAPPING>), # required
-  stat = <STAT>, position = <POSITION>)+   # not-required
-  <COORDINATE_FUNCTION>+ # not-required
-  <SCALE_FUNCTION>+ # not-required
-  <THEME_FUNCTION>+ # not-required
-  <FACET_FUNCTION> # not-required
-```
+> To build a ggplot graph you can use this template:   
+><br>
+`ggplot(data = <DATA>)+`   # required
+  `<GEOM_FUNCTION>(mapping = aes(<MAPPING>),` # required
+  `stat = <STAT>, position = <POSITION>)+`   # not-required
+  `<COORDINATE_FUNCTION>+` # not-required
+  `<SCALE_FUNCTION>+` # not-required
+  `<THEME_FUNCTION>+` # not-required
+  `<FACET_FUNCTION>` # not-required
+><br>
 > In **ggplot2** you begin with the `ggplot(data = ..)` function and add layers with `geom()` functions. Example geom functions include `geom_point()` for a scatter plot, `geom_histogram()` for a histogram, `geom_density()` for a smoothened version of the histogram, and `geom_bar()` for a barplot.  
 > <br>
 > The **geom functions** take a `mapping = aes(x = ..., y = ..., ...)` argument that defines how data from variables in the dataset are mapped to visual properties (aes for "aesthetic mapping"). Depending on the geom function, you can map variables to the x- and y-axis, to the shape of symbols, the line type of line graphs, to the fill color of symbols and more.  
