@@ -1935,7 +1935,7 @@ Observe as well that windows with high H3k27me3 signal cluster together, **clust
 ![Example of a side-by-side heatmap clustered by kmeans clustering](images/multiheatmap_h3k4me3_h3k27me3_kmeans4.png)  
 </details>
 
-### 3.5.8 A clustered heatmap with       
+### 3.5.8 A clustered heatmap with 4 marks       
 Finally, let's go ***crazy*** and make *clustered* heatmap using ChIP-seq data of 4 different histone marks: H3K4me3, H3K27ac, H3K4me1 and H3K27me3.    
 <br>
 <iframe src="https://giphy.com/embed/S5yqNNTQlEZfqQ7InC" width="384" height="215.2" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/drake-lets-go-S5yqNNTQlEZfqQ7InC">via GIPHY</a></p>
@@ -2045,14 +2045,17 @@ Try to identify the following trends in the heatmap plotted below. Can you spot 
 i. The pattern of H3K4me3 and H3K27ac signals are much alike but compared to the H3K4me3 signal, H3K27ac is less high and is found at fewer TSSs. This is in line with the average signal plot of [Exercise 4].  
 ii. Compared to the heatmap of Exercise 14b, H3K4me3 covered TSSs are now distributed over 3 clusters. Besides the H3K4me3 signal itself, clustering was influenced by the shape of the H3K4me1 signal: TSSs with relatively narrow H3K4me1 signal around the TSS (**cluster3**) are clustered separately from those with more broad H3K4me1 signal (**cluster 1**).   
 iii. H3K27me3 covered TSSs remain grouped in one cluster in this heatmap (**cluster 4**) but, as mentioned, when rerunning the code we observed that in ±10% of the cases these regions were distributed over two clusters. Sidenote: this observation also means that we should have increased the number of clusters; there are apparantly more than 4 patterns in this dataset.  
-
+>
+> Note that because we focus on a +/-5kb window  around the TSS, these heatmaps do not contain enhancer regions that are oustide this range.  
+>
 ![Example of the output of Exercise 15b](images/multiheatmap_h3k4me3_h3k27ac_h3k4me1_h3k27me3_kmeans4.png)
 </details>
 
 ## 3.6 Chromatin states   
+### Introducing ChromHMM  
 How would you annotate identified clusters in the example heatmap of Exercise 15c? Cluster 1, 3 and 4 are likely strong, weak and silenced promoters, respectively.   
 <br>
-If we would have had data of not only the TSS but of the whole gene and of H3K36me3 and H3K9me3, you would also be able to identify transcribed regions and heterochromatinized windows.   
+If we would have had data of not only the TSS but of the whole gene and of H3K36me3 and H3K9me3, you would also be able to identify transcribed regions and regions repressed not by polycomb.     
 <br>
 This is where [ChromHMM](http://compbio.mit.edu/ChromHMM/) comes in play. "**ChromHMM is software for learning and characterizing chromatin states.**"   
 <br>
@@ -2061,7 +2064,7 @@ Chromatin states are patterns of spatially re-occurring, co-localizing histone m
 ChromHMM learns the significant combinatorial and spatial patterns of chromatin marks de novo from the data. This reveals the functional elements even without looking at the sequence.   
 
 ### Exercise 16  
-ChromHMM analysis was also performed using the monocyte ChIP-seq data you have worked with. The following heatmap summarizes the different spatial combinations of marks identified:  
+ChromHMM analysis was also performed using the monocyte ChIP-seq data you have worked with (ref: [BLUEPRINT secondary analysis](http://dcc.blueprint-epigenome.eu/#/md/secondary_analysis). The following heatmap summarizes the identified spatial combinations of marks:  
 
 - Each row corresponds to a different chromatin state.    
 - Each column corresponds to a different mark.  
@@ -2074,30 +2077,37 @@ As you can see, some of the states have not (yet) been annotated (A-F). Which of
 
 State | Annotation 1 | Annotation 2 | Annotation 3 | Annotation 4    
 :--:|:----------:|:----------:|:----------:|:----------:  
-A | Heterochromatin | Repressed by polycomb | Repressed by polycomb | Repressed by polycomb       
-B | Repressed by polycomb | Heterochromatin | Heterochromatin | Heterochromatin
-C | Transcription unit | Enhancer | Transcription unit | Transcription unit
-D | Active TSS | Active enhancer | Active enhancer | Enhancer 
-E | Active enhancer | Transcription unit |  Enhancer | Active enhancer
-F | Enhancer | Active TSS | Active TSS | Active TSS  
+A | Repressed not by polycomb | Repressed by polycomb | Repressed by polycomb | Repressed by polycomb       
+B | Repressed by polycomb | Repressed not by polycomb | Repressed not by polycomb | Repressed not by polycomb
+C | Gene body | Inactive enhancer | Gene body | Gene body  
+D | Active TSS | Active enhancer | Active enhancer | Inactive enhancer 
+E | Active enhancer | Gene body |  Inactive enhancer | Active enhancer
+F | Inactive enhancer | Active TSS | Active TSS | Active TSS  
 
 <details><summary>***Click here for a hint***</summary> 
 
-- Enhancer is marked by H3K4me1 only.  
+- Inactive enhancer is marked by H3K4me1 only.  
 - Active enhancer has H3K4me1 and H3K27ac signal.  
 - Active TSS has high H3K4me3 & H3K27Ac signal.  
-- Transcribed unit is marked by H3K36me3.  
+- Gene body is marked by H3K36me3.  
 - Repressed Polycomb should have H3K27me3 signal.  
-- Heterochromatin should have high H3K9me3 signal.  
+- Repressed not by polycomb should have high H3K9me3 signal.  
 </details>  
 <br>
 
 ```{r q16_recognizing_patterns}
 question("The likely annotation is ... ",
-         answer("Annotation 1", message = "The 'Heterochromatin' state is marked by H3K9me3 and the 'Repressed by polycomb' by H3K27me3 and not the other way around."),
+         answer("Annotation 1", message = "The 'Repressed not by polycomb' state is marked by H3K9me3 and the 'Repressed by polycomb' by H3K27me3 and not the other way around."),
          answer("Annotation 2", message = "C, D and E are not correctly annotated in this one."),
          answer("Annotation 3", message = "D and E should be swapped"),
          answer("Annotation 4", correct = T),
          allow_retry = TRUE)
 ```
+
+## Finish  
+> #### Congratulations!  
+You have performed a quantitative analysis of the ChIP-seq signal at the TSS, analzyed its association with gene expression and the combinatorial patterns that occur among different histone marks at the TSS. You have completed this tutorial. Well done!   
+
+<iframe src="https://giphy.com/embed/KJCsv8KcpwHjG" width="480" height="264" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/clap-KJCsv8KcpwHjG">via GIPHY</a></p>
+
 
