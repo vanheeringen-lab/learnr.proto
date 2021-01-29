@@ -75,5 +75,9 @@ exact de code die je verwacht
 grade_code()
 ``
 
-
-* I realized later on that also plots can be given 
+# Anything else that might be worth to tell the next person working on this.    
+In prepdata.Rmd I wrote out commands I used to prepare some of the objects. Some of the raw data are too bit to include in this tutorial. They can (as for now) be found on cn45/scratch/ctoenhake/edu.  
+<br>
+All BLUEPRINT data were downlaoded from the blueprint data portal.  
+<br>
+I limited this tutorial to monocyte data of sample C000S5.  
