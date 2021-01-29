@@ -178,9 +178,10 @@ Although we ask for specific answers or completion of specific code, you are enc
 
 #### **Used resources**   
 
-- Akalin A, Franke V, Vlahovicek K, Mason C, Schubeler D (2014). “genomation: a toolkit to summarize, annotate and visualize genomic intervals.” Bioinformatics. doi: 10.1093/bioinformatics/btu775.  
-- [Genomation package vignette](http://bioconductor.org/packages/release/bioc/vignettes/genomation/inst/doc/GenomationManual.html).    
 - Data were obtained from the [BLUEPRINT data portal](http://dcc.blueprint-epigenome.eu/#/home).    
+- Akalin A, Franke V, Vlahovicek K, Mason C, Schubeler D (2014). “genomation: a toolkit to summarize, annotate and visualize genomic intervals.” Bioinformatics. doi: 10.1093/bioinformatics/btu775.  
+- [Genomation package vignette](http://bioconductor.org/packages/release/bioc/vignettes/genomation/inst/doc/GenomationManual.html).   
+- [ChromHMM Tutorial by Jason Ernst](https://www.genome.gov/Multimedia/Slides/ENCODE_ASHGTutorial_Oct2015/07_Ernst.pdf)  
 
 
 ### 3.1.1 Learning Objectives  
@@ -1347,7 +1348,7 @@ expression_and_h3k27me3 %>%
   ggplot(., mapping=aes(y = log(FPKM+1), x = h3k27me3_rpm))+  
   geom_point()+ 
   theme_bw()
-ggsave(filename= "images/scatterplot_logfpkm1_h3k27me3_tss_5kbwindow.png")
+#ggsave(filename= "images/scatterplot_logfpkm1_h3k27me3_tss_5kbwindow.png")
 ```
 
 ```{r h3k27me3_mc}
@@ -1939,6 +1940,8 @@ Finally, let's go ***crazy*** and make *clustered* heatmap using ChIP-seq data o
 <br>
 <iframe src="https://giphy.com/embed/S5yqNNTQlEZfqQ7InC" width="384" height="215.2" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/drake-lets-go-S5yqNNTQlEZfqQ7InC">via GIPHY</a></p>
 
+### Exercise 15  
+
 > **Exercise 15a:** Generate ScoreMatrix objects for H3K27ac and H3K4me1 in these windows (code check).  
 >  
 > * The object `tss_window_sorted` of [Exercise 11] is available to you.   
@@ -2046,60 +2049,55 @@ iii. H3K27me3 covered TSSs remain grouped in one cluster in this heatmap (**clus
 ![Example of the output of Exercise 15b](images/multiheatmap_h3k4me3_h3k27ac_h3k4me1_h3k27me3_kmeans4.png)
 </details>
 
-## 3.6 ChromHMM  
-How would you define the clusters identified in the clustered heatmap? In the heatmap of exercise 15c cluster 1, 3 and 4 are likely strong, weak and silenced promoters, respectively.   
+## 3.6 Chromatin states   
+How would you annotate identified clusters in the example heatmap of Exercise 15c? Cluster 1, 3 and 4 are likely strong, weak and silenced promoters, respectively.   
 <br>
-If you would additionally have data of not only the TSSs but of any region in the genome and of 
+If we would have had data of not only the TSS but of the whole gene and of H3K36me3 and H3K9me3, you would also be able to identify transcribed regions and heterochromatinized windows.   
+<br>
+This is where [ChromHMM](http://compbio.mit.edu/ChromHMM/) comes in play. "**ChromHMM is software for learning and characterizing chromatin states.**"   
+<br>
+Chromatin states are patterns of spatially re-occurring, co-localizing histone marks and (transcription) factors. that capture known genomic elements  such as promoters, enhancers, and transcribed, repressed, and repetitive regions, and can also capture novel classes or subclasses of elements (Adapted from [Ernst J & Kellis M., 2017 Nat prot](https://www.nature.com/articles/nprot.2017.124)).  
+<br>
+ChromHMM learns the significant combinatorial and spatial patterns of chromatin marks de novo from the data. This reveals the functional elements even without looking at the sequence.   
 
-, for example, H3K36me3 and H3K9me3, you would also be able to identify transcribed regions and heterochromatinezed windows. In theory, you could   
+### Exercise 16  
+ChromHMM analysis was also performed using the monocyte ChIP-seq data you have worked with. The following heatmap summarizes the different spatial combinations of marks identified:  
+
+- Each row corresponds to a different chromatin state.    
+- Each column corresponds to a different mark.  
+- The darker blue color corresponds to a greater probability of observing the corresponding mark in that state.  
+
+<br>
+![](images/emissions_12_Blueprint_release_20160816_forex16.png){width=75%}\  
+
+As you can see, some of the states have not (yet) been annotated (A-F). Which of the annotations in the table below is the correct one?  
+
+State | Annotation 1 | Annotation 2 | Annotation 3 | Annotation 4    
+:--:|:----------:|:----------:|:----------:|:----------:  
+A | Heterochromatin | Repressed by polycomb | Repressed by polycomb | Repressed by polycomb       
+B | Repressed by polycomb | Heterochromatin | Heterochromatin | Heterochromatin
+C | Transcription unit | Enhancer | Transcription unit | Transcription unit
+D | Active TSS | Active enhancer | Active enhancer | Enhancer 
+E | Active enhancer | Transcription unit |  Enhancer | Active enhancer
+F | Enhancer | Active TSS | Active TSS | Active TSS  
+
+<details><summary>***Click here for a hint***</summary> 
+
+- Enhancer is marked by H3K4me1 only.  
+- Active enhancer has H3K4me1 and H3K27ac signal.  
+- Active TSS has high H3K4me3 & H3K27Ac signal.  
+- Transcribed unit is marked by H3K36me3.  
+- Repressed Polycomb should have H3K27me3 signal.  
+- Heterochromatin should have high H3K9me3 signal.  
+</details>  
 <br>
 
-Back-analyze chromHmm output, in other words, heatmap summary of signal intensities of the different marks in chromHMM defined regions. Regions are labelled 1-12, can you, using the sig
-
-Chromatin states - re-occurring, co-localization of histone marks and factors - mapping of epigenomic marks, such as histone modifications, histone variants, regions of open chromatin, and related marks, has emerged as a powerful means to annotate genomes, to identify putative regulatory elements, and to study their changing activity across different cell types and in human disease1,2,3,4. Individual marks can be studied in isolation, either through aggregation of their genome-wide signal tracks relative to a set of predetermined annotations5, such as transcription start sites or exon boundaries, or by discovery of narrow peaks or broader domains in which the mark is present in greater frequency than that of the surrounding regions6. However, additional information can be gained by studying combinations of multiple marks in their spatial context. Such patterns, termed 'chromatin states', often capture known classes of genomic elements, such as promoters, enhancers, and transcribed, repressed, and repetitive regions7, and can also capture novel classes or subclasses of elements. (https://www.nature.com/articles/nprot.2017.124)
-
-State1.- Repressed Polycomb High signal H3K27me3 -A 
-State2.- Repressed Polycomb Low signal H3K27me3 - A
-state3.- Low signal
-State4.- Heterochromatin High Signal H3K9me3 - B
-State5.- Transcription High signal H3K36me3 - C 
-State6.- Transcription Low signal H3K36me3 -C
-State7.- Genic Enhancer High Signal H3K4me1 & H3K36me3
-State8.- Enhancer High Signal H3K4me1
-State9.- Active Enhancer High Signal H3K4me1 & H3K27Ac - D
-State10.- Distal Active Promoter (2Kb) High Signal H3K4me3 & H3K27Ac & H3K4me1 - D
-State11.- Active TSS High Signal H3K4me3 & H3K4me1 - E 
-state12.- Active TSS High Signal H3K4me3 & H3K27Ac - E
-
-### Exercise chromhmm    
-```{r chromhmm, eval =FALSE}
-#library(pheatmap)
-library(RColorBrewer)
-chromhmm_file <- system.file("extdata", "week3",  "C000S5H1_12_12_Blueprint_release_201608_dense_chr19.bed", package = "learnr.proto")
-chromhmm <- rtracklayer::import(chromhmm_file)
-# 12 states - which is what?  
-table(chromhmm$name)  
-chromhmm_list <- split(chromhmm, chromhmm$name,drop=TRUE)
-
-mono_list <- GRangesList(monocytes_list, compress =FALSE)
-
-chrommhmm_anno_list <- annotateWithFeatures(mono_list,chromhmm_list)
-heatTargetAnnotation(chrommhmm_anno_list)+
-  coord_flip()+
-  scale_fill_gradient(low = "white", high = "blue")
-  
-mat=heatTargetAnnotation(chrommhmm_anno_list,plot=FALSE)
-
-
-
-#pheatmap(mat = mat, 
-#         color = c("white", brewer.pal("Reds", n =9)),
-#         cluster_cols =FALSE)
-
-      
-#BiocManager::install("pheatmap")
-
+```{r q16_recognizing_patterns}
+question("The likely annotation is ... ",
+         answer("Annotation 1", message = "The 'Heterochromatin' state is marked by H3K9me3 and the 'Repressed by polycomb' by H3K27me3 and not the other way around."),
+         answer("Annotation 2", message = "C, D and E are not correctly annotated in this one."),
+         answer("Annotation 3", message = "D and E should be swapped"),
+         answer("Annotation 4", correct = T),
+         allow_retry = TRUE)
 ```
-
-
 
