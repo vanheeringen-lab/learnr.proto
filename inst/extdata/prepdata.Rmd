@@ -23,36 +23,42 @@ txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene
 library(stringr)
 library(plyranges)
 #BiocManager::install("biomaRt")
-library(biomaRt)
 #BiocManager::install("ComplexHeatmap")
 library(ComplexHeatmap)
 #BiocManager::install("reader") # to remove extension from bw files names --> only installed on my own mac
 #library(reader)
 ```
 
+# week 2
 
-### chr19 peaks in GRanges 
+### chr19 peaks in GRanges   
+the raw data are removed from the tutorial package and can be found on blueprint dataportal and on cn45:   
+
+- bed files were downloaded from, eg.H3K4me3: http://dcc.blueprint-epigenome.eu/#/experiments/ERX547984 ; file "Enriched regions, BED format'.  
+- select chr19 with awk:  `cat $file | awk '{OFS = "\t"} {if ($1 == "chr19") print $0}'  > $(basename $file .bed).chr19.bed`   
+- complete and chr19 limited .bed files are stored on cn45: `/scratch/ctoenhake/data/fg1_r_data/blueprint/chip_bed`  
+
 ```{r prepare monocyt data, echo = T, eval = F}
 # H3k4me1 
-mono_h3k4me1 <- rtracklayer::import("data/blueprint/chip_bed/C000S5H2.ERX547981.H3K4me1.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak")
+monocytes_h3k4me1 <- rtracklayer::import("/home/ctoenhake/learnr.proto/inst/extdata/week2/blueprint/chip_bed/C000S5H2.ERX547981.H3K4me1.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak")
 # H3K4me3  
-mono_h3k4me3 <- rtracklayer::import("data/blueprint/chip_bed/C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr19.bed", format = "narrowPeak")
+monocytes_h3k4me3 <- rtracklayer::import("/home/ctoenhake/learnr.proto/inst/extdata/week2/blueprint/chip_bed/C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150527.chr19.bed", format = "narrowPeak")
 # H3K9me3 
-mono_h3k9me3 <- rtracklayer::import("data/blueprint/chip_bed/C000S5H2.ERX547982.H3K9me3.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak")
+monocytes_h3k9me3 <- rtracklayer::import("/home/ctoenhake/learnr.proto/inst/extdata/week2/blueprint/chip_bed/C000S5H2.ERX547982.H3K9me3.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak")
 # H3K27ac 
-mono_h3k27ac <- rtracklayer::import("data/blueprint/chip_bed/C000S5H2.ERX547980.H3K27ac.bwa.GRCh38.20150527.chr19.bed", format = "narrowPeak")
+monocytes_h3k27ac <- rtracklayer::import("/home/ctoenhake/learnr.proto/inst/extdata/week2/blueprint/chip_bed/C000S5H2.ERX547980.H3K27ac.bwa.GRCh38.20150527.chr19.bed", format = "narrowPeak")
 # H3K27me3   
-mono_h3k27me3 <- rtracklayer::import("data/blueprint/chip_bed/C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak")
+monocytes_h3k27me3 <- rtracklayer::import("/home/ctoenhake/learnr.proto/inst/extdata/week2/blueprint/chip_bed/C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak")
 # H3K36me3
-mono_h3k36me3 <- rtracklayer::import("data/blueprint/chip_bed/C000S5H2.ERX547979.H3K36me3.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak")
+monocytes_h3k36me3 <- rtracklayer::import("/home/ctoenhake/learnr.proto/inst/extdata/week2/blueprint/chip_bed/C000S5H2.ERX547979.H3K36me3.bwa.GRCh38.broad.20150527.chr19.bed", format = "broadPeak")
 # create list
-mono_list  <- GRangesList(mono_h3k4me1, mono_h3k4me3, mono_h3k9me3, mono_h3k27ac, mono_h3k27me3, mono_h3k36me3)
+monocytes_list  <- GRangesList(monocytes_h3k4me1, monocytes_h3k4me3, monocytes_h3k9me3, monocytes_h3k27ac, monocytes_h3k27me3, monocytes_h3k36me3)
 # add names to each element in the list
-names(mono_list) <- c("h3k4me1", "h3k4me3", "h3k9me3", "h3k27ac", "h3k27me3", "h3k36me3")
+names(monocytes_list) <- c("h3k4me1", "h3k4me3", "h3k9me3", "h3k27ac", "h3k27me3", "h3k36me3")
 ```
 
 ```{r save prepare monocyt data, echo = T, eval = F}
-save(mono_h3k4me1, mono_h3k4me3, mono_h3k9me3, mono_h3k27ac, mono_h3k27me3, mono_h3k36me3, mono_list, file =  "data/prepared_rds/blueprint_monocyte_chr19_granges.RData")
+save(monocytes_h3k4me1, monocytes_h3k4me3, monocytes_h3k9me3, monocytes_h3k27ac, monocytes_h3k27me3, monocytes_h3k36me3, monocytes_list,  file =  "data/prepared_rds/blueprint_monocyte_chr19_granges.RData")
 ```
 
 
@@ -60,6 +66,10 @@ save(mono_h3k4me1, mono_h3k4me3, mono_h3k9me3, mono_h3k27ac, mono_h3k27me3, mono
 
 - add entrez gene id using org.Hs.eg.db package   
 - restrict to genes on chromosome 19  
+
+- File "C000S5B1.gene_quantification.rsem_grape2_crg.GRCh38.20150622.results" 
+  + was downloaded from:  http://dcc.blueprint-epigenome.eu/#/experiments/ERX157053 ; file "Transcription quantification (Genes)".  
+  + is stored on cn45: `/scratch/ctoenhake/data/fg1_r_data/blueprint/quant/C000S5B1.gene_quantification.rsem_grape2_crg.GRCh38.20150622.results`.   
 
 ```{r quantification, echo = T, eval = F}
 #BiocManager::install("org.Hs.eg.db")
@@ -91,16 +101,18 @@ saveRDS(quantification_chr19, file = "data/prepared_rds/blueprint_c000s5_gene_qu
 
 ```
 
-### chr19 Complex Heatmap object week 2  
-Used for exercises in fg2 (2021 version)  
-This function is also run by students but resulting object by several exercises and as the function takes a while, I decided to prepare the object in advance.  
-```{r, echo = T, eval = F}
-# prepare objects for upset plot in week 2
-monocytes_combinationmatrix <- make_comb_mat(mono_list) # takes a while! 
+# week 3
+the raw bigwig data are removed from the tutorial.   
 
-saveRDS(monocytes_combinationmatrix, file =  "data/prepared_rds/blueprint_monocyte_chr19_complexheatmap_combmatrix.rds")
+- bigwig files were downloaded from, eg.H3K4me3: http://dcc.blueprint-epigenome.eu/#/experiments/ERX547984 ; file "Normalized signal, BigWig format'.  
+- select chr19 with script: `/scratch/ctoenhake/data/fg1_r_data/blueprint/chip_bw/select_chr19.sh`  
+- used a bit of a work-around to get these bigwigs on passer:  
+    + copy resulting *.chr19.bw to the web accessible directory that I also used for the trackhubs `/molbiol/mb03-sdb1/mbdata/ctoenhake/edu/monocytes_data_bigwigs_chr19only`  
+    + Download file from there to my mac with curl -O [filename] .
+    + Upload these files to the learn.proto `/home/ctoenhake/learnr.proto/inst/extdata/week3/bw_chr19`  
 
-```
+After I ran the chunks to get smaller bigwig files, I removed the dir `/home/ctoenhake/learnr.proto/inst/extdata/week3/bw_chr19`, and kept `/home/ctoenhake/learnr.proto/inst/extdata/week3/bw_chr19_tss_sample`   
+
 
 ## chr19 - get smaller bigwig by downsampling genes and save associated tss and FPKM files    
 Problem: chip-seq bigwig files of 1 chromosome are too large  
@@ -190,22 +202,41 @@ resize_bw <- function(w_in_kb, f, tss){
 for(file in bw_files){
 resize_bw(10, file, tss_chr19_sample)
 }
+```
 
-# make quantification_chr19_sample ready for saving
+# chr19 - save objects in week3.Rdata
+```{r objects needed in week3}  
+# make quantification_chr19_sample (generated in chunk above) ready for saving
 quantification_chr19_sample$expression_group <- NULL
 quantification_chr19_sample <- quantification_chr19_sample %>% dplyr::rename(gene_id = entrezgene_id)
   
-# make tss_chr19_sample ready for saving, thus add FPKM to TSS windows such that these intervals can be arranged by FPKM
+# make tss_chr19_sample  (generated in chunk above)  ready for saving, thus add FPKM to TSS windows such that these intervals can be arranged by FPKM
 FPKM_tssorder<- as.vector(NA)
 for(i in 1:length(tss_chr19_sample)) {
   FPKM_tssorder[i] <- quantification_chr19_sample[which(quantification_chr19_sample[, "gene_id"] == tss_chr19_sample$gene_id[i]),]$FPKM
   }
 tss_chr19_sample$FPKM <- FPKM_tssorder
 rm(FPKM_tssorder)
-  
-## save sampled/sliced quantification and TSSs
-save(quantification_chr19_sample, tss_chr19_sample, file = "/home/ctoenhake/learnr.proto/inst/extdata/week3.Rdata")
+
+# load week2 data and restrict  to granges objects that are used
+rdata = system.file("extdata", "week2.Rdata", package = "learnr.proto")
+load(rdata)
+
+# load the txdb package which holds transcript-based gene models of hg38 genome  
+library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene 
+seqlevels(txdb) <- "chr19"
+
+# obtain tss, used to identify nearest TSS for each H3k4me3 peak
+# add column with 'name', this column is recognized by the 'distance2NearestFeature' function used in week3
+tss_chr19 <- unique(promoters(genes(txdb), upstream=100, downstream=0)) 
+tss_chr19  <- resize(tss_chr19, width = 1, fix = "end")
+tss_chr19$name <- tss_chr19$gene_id
+
+## save granges objects of peaks and sampled/sliced quantification and TSSs
+save(monocytes_h3k4me1, monocytes_h3k4me3, monocytes_h3k9me3, monocytes_h3k27ac, monocytes_h3k27me3, monocytes_h3k36me3,  tss_chr19, quantification_chr19_sample, tss_chr19_sample, file = "/home/ctoenhake/learnr.proto/inst/extdata/week3.Rdata")
 ```
+
 
 ### session Info
 ```{r session info, echo = T, eval = F}
