@@ -23,56 +23,31 @@ suppressPackageStartupMessages({
   library(testthat)   # 3.0.0 
   library(tidyverse)  # 1.3.0
   library(learnr.proto)
-  
+ 
   library(IRanges)
   library(GenomicRanges)
   library(rtracklayer)
   library(GenomicFeatures)
   library(genomation)
   library(ggthemes)
-  #library(org.Hs.eg.db)
-  
-  
-  # load the txdb package which holds transcript-based gene models of hg38 genome  
-  library(TxDb.Hsapiens.UCSC.hg38.knownGene)
-  txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene 
-  seqlevels(txdb) <- "chr19"
-  
+
   # configuration
   knitr::opts_chunk$set(echo=FALSE, message=FALSE)
   gradethis::gradethis_setup()
   
   # data accessible to all exercises
-  rdata = system.file("extdata", "week2.Rdata", package = "learnr.proto")
-  load(rdata)
-  monocytes_all <- unlist(monocytes_list)
-  monocytes_all$chip <- names(monocytes_all)
-  monocytes_list <- GRangesList(monocytes_list, compress=FALSE)
-  rm(rdata)
-  
-  # chr19_windows_1bp <- tileGenome(seqinfo(txdb), tilewidth = 10, cut.last.tile.in.chrom =TRUE)
-  tss_chr19 <- unique(promoters(genes(txdb), upstream=100, downstream=0)) 
-  tss_chr19  <- resize(tss_chr19, width = 1, fix = "end")
-  tss_chr19$name <- tss_chr19$gene_id
-  
-  # Load the sample of tss_chr19 and quantification_chr19 that correspond to the windows of which we have data in the BigWig files
-  # those those for which we have data in BigWig files, see extdata/prepdata.Rmd)
+  # see extdata/prepdata.Rmd --> section "week 3"
+  # tss_chr19_sample and quantification_chr19_sample correspond to the windows of which we have data in the BigWig files
   rdata = system.file("extdata", "week3.Rdata", package = "learnr.proto")
   load(rdata)
-  rm(rdata)
+  rm(rdata)  
 
-  # # gene quantification chromosome 19  --- NOT USED in fg3, only in fg2
-  # rdsfile <- system.file("extdata", "week2", "prepared_rds", "blueprint_c000s5_gene_quantification_chr19.rds", package = "learnr.proto")
-  # quantification_chr19 <- readRDS(rdsfile)
-  # quantification_chr19 <- quantification_chr19 %>% dplyr::rename(gene_id = entrezgene_id)
-  
   ## bw file locations, see extdata/prepdata.Rmd for how these were generated. 
   bw_h3k4me3 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_10kb.bw", package = "learnr.proto")
   bw_h3k4me1 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547981.H3K4me1.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_10kb.bw", package = "learnr.proto")
   bw_h3k27me3 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_10kb.bw", package = "learnr.proto")
   bw_h3k27ac <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547980.H3K27ac.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_10kb.bw", package = "learnr.proto")
-  bw_h3k36me3 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547979.H3K36me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_10kb.bw", package = "learnr.proto")
-  
+
   ## color palettes for heatmaps
   # color palette for h3k4me3
   colors_h3k4me3 <- colorRampPalette(c ("white", "red"))(100)
@@ -82,8 +57,6 @@ suppressPackageStartupMessages({
   colors_h3k27ac <- colorRampPalette(c ("white", "green4"))(100)
   # color palette for h3k27me3
   colors_h3k27me3 <- colorRampPalette(c ("white", "dodgerblue4"))(100)
-  # color palette for h3k36me3
-  colors_h3k36me3 <- colorRampPalette(c ("white", "brown"))(100)
 })
 ```
 
@@ -196,7 +169,7 @@ Although we ask for specific answers or completion of specific code, you are enc
 6. Plot ChIP-seq signal around a genomic feature in a heatmap figure.  
 7. Order the heatmap of (6) by gene expression.  
 8. Cluster the heatmap of (6) based on ChIP-seq signals of different marks.  
-9. Be able to annotate a ChromHMM heatmap.  
+9. Annotate the clusters identified in a ChromHMM heatmap based on histone PTM ChIP-seq data.   
   
 ## 3.2 Identify nearby TSSs  
 ### 3.2.1 Identify the nearest TSS   
@@ -382,6 +355,11 @@ question("Which of the following statments are correct? Tip: you can also use th
          allow_retry=TRUE
          )
 ```
+
+>#### **Optional exercise*:  
+<details><summary>Want to plot the distance to the nearest TSS for other marks?... :</summary>   
+In the chunk of exercise 2b, add a line of code with the `distance2NearestFeature()` function. The peaks of the other histone marks in our dataset are stored in GRanges objects: `monocytes_h3k4me1`, `monocytes_h3k27ac`, `monocytes_h3k27me3`, `monocytes_h3k9me3` or `monocytes_h3k36me3`.  
+</details>  
 
 ## 3.3 ChIP-seq signal strength     
 Distance and overlap may tell you which gene and/or regulatory element the mark is most likely associated. As we, for example, observed in fg2: the presence and absence of H3K4me3 and H3K27me3 at a gene's promoter are associated with its level of gene expression. But there is more to it!  
@@ -790,7 +768,7 @@ To investigate this relationship you will:
 
 a. Calculate the average H3K4me3 signal in a **5kb** window around the TSS.  
 b. Convert the output of (a) in to a data.frame.  
-c. Combine the data.frame with H3K4me3 scores with those containing gene expression values for the corresponding genes.    
+c. Add the gene expression values for the corresponding genes to the data.frame.    
 d. Group genes based on their gene expression in 4 quartiles and plot the H3K4me3 signal per group in a boxplot.  
 
 ### Exercise 7a  
@@ -823,7 +801,6 @@ average_h3k4me3_tss <- ScoreMatrixBin(target = bw_h3k4me3,
                                              bin.num = ___, 
                                              type = 'bigWig', strand.aware =TRUE)  
 ```
-
 
 ```{r q7a_signalfpkm-solution}
 # Resize the window in "tss_chr_sample" to 5001bp
@@ -945,7 +922,7 @@ ggplot(average_h3k4me3_tss_df) +
 #ggsave(filename= "images/boxplot_average_h3k4me3_tss_5kbwindow.png")
 ```
 
-To generate this boxplot for groups of genes grouped into four bins by gene expression level, we first combine the H3K4me3 scores with the gene expression data into one data.frame.  
+To generate this boxplot for groups of genes grouped into four bins by gene expression, you first need to add the gene expression data to your data.frame.  
 
 ### Exercise 7c  
 To investigate the relationship between H3K4me3 signal strengths and gene expression, you will plot the average H3K4me3 signal for genes grouped by quantiles of gene expression. You thus need to   
@@ -1423,6 +1400,12 @@ Plot the boxplot of exercise 7d with these colors
 <br>
 > Instead of creating the palette function, you can also define `n` immediately after calling `colorRampPalette()`, see the following example:   
 `my_palette <- colorRampPalette(c('red', 'blue'))(4)`  
+> <br>
+> Using the above function we prepared the color palettes for H3K4me3, H3K4me1, H3K27ac and H3K27me3:  
+`colors_h3k4me3 <- colorRampPalette(c ("white", "red"))(100)`
+`colors_h3k4me1 <- colorRampPalette(c ("white", "purple4"))(100)`
+`colors_h3k27ac <- colorRampPalette(c ("white", "green4"))(100)`
+`colors_h3k27me3 <- colorRampPalette(c ("white", "dodgerblue4"))(100)`
 </details>    
 
 <!-- ```{r create_colpal_example_forsaving, eval=FALSE, echo=FALSE} -->
