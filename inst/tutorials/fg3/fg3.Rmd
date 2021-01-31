@@ -37,7 +37,7 @@ suppressPackageStartupMessages({
   
   # data accessible to all exercises
   # see extdata/prepdata.Rmd --> section "week 3"
-  # tss_chr19_sample and quantification_chr19_sample correspond to the windows of which we have data in the BigWig files
+  # tss_chr19_sample and quantification_chr19_sample correspond to the windows of which we have data in the bigWig files
   rdata = system.file("extdata", "week3.Rdata", package = "learnr.proto")
   load(rdata)
   rm(rdata)  
@@ -139,10 +139,10 @@ library(genomation)
 ### Tutorial specs  
 The exercises in this tutorial are similar to those in fg2. A brief reminder:  
 
-- For some longer coding exercises, we left blanks as '___' that indicate where in the code you should fill in a function, object or variable. Make sure you **fill out all the blanks before hitting 'Run Code' or 'Submit Answer'**. If you leave even a single '_', this will result in errors that may be difficult to interpret.  
+- For some longer coding exercises, we left blanks as '\_\_\_' that indicate where in the code you should fill in a function, object or variable. Make sure you **fill out all the blanks before hitting 'Run Code' or 'Submit Answer'**. If you leave even a single '\_', this will result in errors that may be difficult to interpret.  
 - Hit `Hint` (when provided) for clues. Due to technical reasons **you can't always go back to previous hints so make sure you read them well!**       
-- Hit `Run Code` to test your code and preview the output (but make sure no '_' are left).  
-- Hit `Submit Answer` (if present) to submit the code (make sure no '_' are left) for evaluation.    
+- Hit `Run Code` to test your code and preview the output (but make sure no '\_' are left).  
+- Hit `Submit Answer` (if present) to submit the code (make sure no '\_' are left) for evaluation.    
 - For some complete-the-code exercises, automated code-checking is enabled. You can recognize these exercises by the addition of '(code check)' to the exercise. In these cases, R will give custom feedback that helps you correct your code.  
 - Try to keep yourself from hitting `Solution` (when provided). This is option is provided for '(code check)' exercises. Only use it when you do not understand the automatic feedback given by R.   
 - Hit `Start Over` to remove any adjustments you made and start again.   
@@ -163,7 +163,7 @@ Although we ask for specific answers or completion of specific code, you are enc
 > 
 1. Identify the nearest TSS to a histone ChIP-seq peak.  
 3. Plot the distribution of distances between ChIP-seq peaks and the nearest TSS.      
-2. Import coverage data from BigWig files into r.  
+2. Import coverage data from bigWig files into r.  
 4. Plot the average histone ChIP-seq signal around a genomic feature like the TSS.  
 5. Plot the relationship between the average ChIP-seq signal at the TSS and gene expression.   
 6. Plot ChIP-seq signal around a genomic feature in a heatmap figure.  
@@ -198,25 +198,17 @@ distance2NearestFeature(g.idh = [chip_peaks_in_GRanges],
                         tss = [TSSs_in_GRanges])  
 ```
 
-The output is a data.frame reporting for each range in the `g.idh` object:  
-
-- its nearest TSS  
-- the name of the corresponding peak and gene.  
-- the distance between them. 
-
-The fact that the output is a data.frame makes it easy for us to manipulate and plot the results with dplyr and ggplot2.      
-
 > **Exercise 1b**: Identify the nearest TSS for each H3K4me3 ChIP-seq peak.  
 > 
-- TSS locations are stored in object `tss_chr19`.  
 - H3K4me3 peaks in monocytes are stored in `monocytes_h3k4me3`.   
-- Print the head of the resulting object to the console using `head()`.     
+- TSS locations are stored in object `tss_chr19`.  
+- Print the first five rows of the resulting object using `head()`.     
 
 ```{r q1_distancetss, exercise =TRUE, exercise.lines = 5, exercise.eval =FALSE, error = TRUE}
 # 1. Identify the nearest TSS for each H3K4me3 peak  
 dist_h3k4me3_to_tss <- __(g.idh = __, tss = __)
 
-# 2. Show the resulting object 
+# 2. Print the first five lines of 'dist_h3k4me3_to_tss' with head()
 
 ```
 
@@ -243,11 +235,14 @@ head(dist_h3k4me3_to_tss)
 ```{r q1_distancetss-check}
 grade_result(
   pass_if(~identical(.result, head(distance2NearestFeature(monocytes_h3k4me3, tss_chr19)))),
-  correct = "Delightful! This object, 'dist_h3k4me3_to_tss' reports for each H3K4me3 peak a nearest TSS. Which variable reports the distance between the peak and its nearest TSS?"
+  correct = "This object, 'dist_h3k4me3_to_tss' is a data.frame reporting for each H3K4me3 peak its nearest TSS, the name (Entrez geneid) of the corresponding gene, and the distance between them. Which variable reports the distance?"
 )
 ```
 
-**Important to note**: there are positive and negative distances reported in `dist_h3k4me3_to_tss$dist.to.feature`. Positive values indicate that the H3K4me3 peaks is located **downstream** the TSS, negative values refer to H3K4me3 peaks located **upstream** the TSS.  
+* **Important to note1**: there are negative and positive distances reported in `dist_h3k4me3_to_tss$dist.to.feature`. Negative values indicate that the H3K4me3 peak is located **upstream** the TSS, positive values refer to H3K4me3 peaks located **downstream** the TSS.   
+* **Important to note2**: The fact that the output is a data.frame makes it easy for us to manipulate the data with dplyr and plot the results ggplot2.    
+
+<br>
 
 >#### **Optional check**:  
 <details><summary>Curious to check the matches in the genome browser? Click here for a quick how-to:</summary>   
@@ -261,12 +256,12 @@ You may want to check some of the matches. For example to check that positive di
 3. Or subset `monocytes_h3k4me3` with the given index in the 'target.index' column (805): `monocytes_h3k4me3[805]`.  
 4. Go to the UCSC Genome Browser.  
 5. Upload the monocytes trackhub (same as fg1): `http://mbdata.science.ru.nl/ctoenhake/edu/trackhub_monocytes/hub.txt`.    
-  + Go to the tab "My Data" in the top menu.  
-  + Select "Track Hubs".   
-  + In the "My hubs" tab you can paste the above URL.  
-  + You need to change the visibility of the tracks with "monocyte_H3K4me3_peaks" from "hide" to "pack". This can be done below the browser view. Remember to hit `Refresh`.  
+    + Go to the tab "My Data" in the top menu.  
+    + Select "Track Hubs".   
+    + In the "My hubs" tab you can paste the above URL.  
+    + You need to change the visibility of the tracks with "monocyte_H3K4me3_peaks" from "hide" to "pack". This can be done below the browser view. Remember to hit `Refresh`.  
 6. Navigate to the gene from step 3 or the genomic region of step 4.  
-  + In this example: `chr19:11577771-11577970`.    
+    + In this example: `chr19:11577771-11577970`.    
 7. Zoom out and observe or measure the location of the peak in relation to the TSS of the gene given in step 3. The name of the peak is given in the output of step 4.   
 8. This confirms that **positive dist.to.feature values indicate that the H3K4me3 peaks is located *downstream* the TSS**.  
 </details>  
@@ -278,7 +273,7 @@ Let's plot the reported distances between H3K4me3 peaks and their nearest TSS!
 
 > **Exercise 2a:** Print a summary of the distances reported in `dist_h3k4me3_to_tss` using the `summary()` function.
 > 
-> * Tip: Look at the output from exercise 1b to identify the variable that stores the distances.   
+> * Tip: Look at the output of exercise 1b to identify the variable that stores the distances.   
 
 ```{r prepare_q2a, echo =FALSE}
  dist_h3k4me3_to_tss <- distance2NearestFeature(monocytes_h3k4me3, tss_chr19)
@@ -296,18 +291,20 @@ dist_h3k4me3_to_tss$dist.to.feature
 
 ```{r q2a_summary-check}
 grade_result(
-  pass_if(~identical(.result,summary(dist_h3k4me3_to_tss$dist.to.feature)))
+  pass_if(~identical(.result,summary(dist_h3k4me3_to_tss$dist.to.feature))),
+  correct = "Examine the reported values, within what range of the TSS are 50% of the peaks located (1st Quartile - 3rd Quartile)?"
 )
 ```
 
 ### Exercise 2b  
 
-> **Exercise 2b:** Plot the distances from `dist_h3k4me3_to_tss` using ggplot() and geom_histogram() and answer the multiple-choice question below.     
+> **Exercise 2b:** Plot the distances from `dist_h3k4me3_to_tss` using ggplot() and geom_histogram().  
 >
-> * With the range of distances given in exercise 2a, play around with the `binwidth =` parameter in `geom_histogram()`. 
+> * In geom_histogram() observe the effect of setting the parameter `binwidth=` to 1kb, 10kb and 100kb.  
+> * Run the code and answer the multiple-choice question below.     
 
 >#### **Refresher**: histograms   
-<details><summary>Click here for a quick explainer on histograms and the importance of the bin width or bandwidth.</summary>   
+<details><summary>Click here for a quick explainer on histograms and the importance of the **binwidth**.</summary>   
 **Histograms** visualize the distribution of a single variable. Events are grouped into bins with comparable values and the number of events per bin is counted and these counts are visualized.  
 <br>
 Because histograms are made by binning the data, the bin width is a critical parameter that will affect the appearance of the graph. Choosing a bin width that is too small will result in a overly busy and peaky histogram making it difficult to discern the main trends. If the bin width is too large, then smaller features of the distribution may dissapear.  
@@ -321,7 +318,8 @@ In geom_histogram(), the bin width can be set by:
 </details>  
 
 ```{r q2b_plotdistances, exercise =TRUE, exercise.eval =FALSE, error = T, exercise.setup = "prepare_q2a"}
-# plot the distances as histogram with ggplot
+# plot the distances reported in 'dist_h3k4me3_to_tss' as histogram with ggplot
+# try binwidth of 1000, 10000 and 100000.   
 ggplot(___)+
   geom_histogram(aes(x= ___), binwidth = __)
 ```
@@ -341,14 +339,14 @@ ggplot(dist_h3k4me3_to_tss)+
 ```
 
 ```{r q2b_plotdistances-hint-4}
-# try binwidths of 10kb or 100kb, for example:
+# with binwidth=10000 (for 10kb)
 ggplot(dist_h3k4me3_to_tss)+
-  geom_histogram(aes(x=dist.to.feature), binwidth = 1000)
+  geom_histogram(aes(x=dist.to.feature), binwidth = 10000)
 ```
 
 ```{r q2b_plotdistances_mc}
 question("Which of the following statments are correct? Tip: you can also use the output of summary() of exercise 2a." ,
-         answer("Over 50% of the datapoints fall within 10kb up- or downstream the TSS", correct = T, message = "Indeed, over 50% of H3K4me3 peaks are within +/- 10kb of the TSS. But also notice the  outliers we are having: peaks are assigned to TSSs that are over 100kb away! These might be H3K4me1 peaks in enhancers that are detected to cross-reactivity of the H3K4me3 antibody. Alterantively, through chromosomal looping between enhancer and promoter, these regions might be co-immunoprecipitated with the H3K4me3 ChIP."),
+         answer("Over 50% of the datapoints fall within 10kb up- or downstream the TSS", correct = T, message = "Indeed, over 50% of H3K4me3 peaks are within +/- 10kb of the TSS. But also notice the  outliers: some peaks are assigned to TSSs that are over 100kb away! Although H3K4me3 is generally enriched at promoters, it thus also found further away from the promoter. These 'distant' H3K4me3 peaks may be truely H3K4me3 enriched sites but may also be H3K4me1 peaks in enhancers that are detected in this ChIP due to cross-reactivity of the H3K4me3 antibody. Alterantively, through chromosomal looping between enhancer and promoter, these regions might be co-immunoprecipitated with the H3K4me3 ChIP."),
          answer("Less than 50% of the datapoints fall within 10kb up- or downstream the TSS", message= "Review the output of question 2a. Take a carefull look at the 1st and 3rd Quartile values."),
          answer("A binwidth of 100kb, givs us the nicest histogram with sufficient detail but not too peaky.", message = "Try again, 100kb is a bit too large in this case."),
          answer("A binwidth of 10kb, givs us the nicest histogram with sufficient detail but not too peaky.", correct=TRUE),
@@ -356,27 +354,36 @@ question("Which of the following statments are correct? Tip: you can also use th
          )
 ```
 
->#### **Optional exercise*:  
-<details><summary>Want to plot the distance to the nearest TSS for other marks?... :</summary>   
-In the chunk of exercise 2b, add a line of code with the `distance2NearestFeature()` function. The peaks of the other histone marks in our dataset are stored in GRanges objects: `monocytes_h3k4me1`, `monocytes_h3k27ac`, `monocytes_h3k27me3`, `monocytes_h3k9me3` or `monocytes_h3k36me3`.  
+> #### **Optional exercise**:  
+<details><summary>Want to plot the distance to the nearest TSS for other marks?... (click here) :</summary>   
+>  
+* In the chunk of exercise 2b, add a line of code with the function:    
+        `my_test <- distance2NearestFeature(g.idh = [GRanges_object], tss = tss_chr19)`.    
+* The peaks of the other histone marks in our dataset are stored in GRanges objects:    
+        `monocytes_h3k4me1`, `monocytes_h3k27ac`, `monocytes_h3k27me3`, `monocytes_h3k9me3` or `monocytes_h3k36me3`.   
+* Then, plot the histogram with:    
+        `ggplot(my_test)+`  
+            `geom_histogram(aes(x=dist.to.feature), binwidth = 10000)`  
 </details>  
 
-## 3.3 ChIP-seq signal strength     
-Distance and overlap may tell you which gene and/or regulatory element the mark is most likely associated. As we, for example, observed in fg2: the presence and absence of H3K4me3 and H3K27me3 at a gene's promoter are associated with its level of gene expression. But there is more to it!  
+## 3.3 ChIP-seq signal strength   
+### 3.3.1 ChIP-seq signal introduction  
+Distance and overlap may tell you which gene the mark is most likely associated with. For example, in fg2 we observed that the presence and absence of H3K4me3 and H3K27me3 at a gene's promoter are associated with its level of gene expression. But there is more to it!  
 <br>
-Not only the presence or absence but the actual signal from ChIP-seq marks can be associated with the expression level of the gene in question. Such associations between ChIP-seq signal strength and gene expression - being it positive or negative associations - point to a functional relationship. Think of the ChIP-seq mark recruiting basal transcription factors thereby promoting transcription or - the other way around - the placing of marks by proteins recruited to the transcriptional machinery in elongation mode.  
+Not only the presence or absence but the actual signal from ChIP-seq marks can be associated with the expression level of the gene in question. Such associations between ChIP-seq signal strength and gene expression - being it positive or negative associations - point to a functional relationship. Think of the histone PTM recruiting basal transcription factors thereby promoting transcription (as is the case for H3K4me3) or - the other way around - the placing of marks by proteins recruited to the transcriptional machinery in elongation mode (as is the case for H3K36me3).  
 <br>
-In both cases you will observe a positive association between ChIP-seq signal strength and gene expression. In research, such observations (or the absence thereof) provide valuable insights in the function of a mark and can help you decide on the direction and design of follow-up experiments.   
+In both cases you will observe a positive association between ChIP-seq signal strength and gene expression. In research, such observations (or the absence thereof) provide valuable insights in the function of a mark and can help you design follow-up experiments.   
 <br>
-These relationships between signal intensity and gene expression may have already been discussed in your Epigenomics lectures. Let's look at how they look in real data.   
+Let's look at these relationships in real data.   
 
-### 3.3.1 Importing ChIP-seq signal in r   
-ChIP-seq signal can be obtained from .bam files or .BigWig files. Remember from week 1, .bam files contain records of read alignments with 1 line per read. The .BigWig files do not store individual reads but the coverage across the genome, often normalized per million mapped reads.   
+### 3.3.2 Importing ChIP-seq signal in r   
+ChIP-seq signal can be obtained from BAM files or bigWig files. Remember from week 1, BAM files contain records of read alignments with 1 line per read. The bigWig files do not store individual reads but the coverage across the genome, often normalized per million mapped reads.   
 <br>
-Not all packages and functions are compatible with both file types and the resulting plots may look slightly different in part because .bam files - as they store read information -  give you more freedom to define how coverage is calculated. You will use the data from .BigWig files today and do not need to bother with extra filtering or normalization steps.     
+Not all packages and functions are compatible with both file types and the resulting plots may look slightly different in part because BAM files - as they store read information -  give you more freedom to define how coverage is calculated. You will use the data from bigWig files today as those are provided by BLUEPRINT in contrast to BAM files.     
 <!-- REF: https://www.bioconductor.org/packages/release/bioc/vignettes/genomation/inst/doc/GenomationManual.html#4_Extraction_and_visualization_of_genomic_data   -->
 <br>
-We limited the data stored in the bigWig files to a **10kb window around the TSSs of 40% of genes (randomly selected) on chromosome 19**. This was done to reduce the size of these files (bigWig and .bam files are huge!) and speed up the tutorial a bit. We have made sure that this random selection still reflects the relationships present in the genome-wide dataset However, because of this decision you can't make plots of windows wider than 10kb.   
+We limited the data stored in the bigWig files to a **10kb window around the TSSs of 40% of genes on chromosome 19 (genes were randomly selected)**. This was done to reduce the size of these files (bigWig and BAM files are huge!) and speed up the tutorial a bit. By taking a *random* selection, the relationships present in the genome-wide dataset should till hold in the sampled dataset. However, because of this decision you can't make plots of windows wider than 10kb. Also, even with this downsampling, the files are relatively large and it may take a bit more time to run the code compared to the codes you ran in fg2 (10-20sec). So- more time for coffee ;-)!  
+
 
 ### Exercise 3  
 You will plot the average H3K4me3 ChIP-seq signal strength around the TSS.  
@@ -384,8 +391,8 @@ You will plot the average H3K4me3 ChIP-seq signal strength around the TSS.
 A trick that prevents loading complete bigWig files in your environment is to load only the the regions of interest; in this case the window around the TSS. You load the signal into r with the `ScoreMatrix()` function from the genomation package:  
 
 ```{r scorematrixcode, eval=FALSE, echo=TRUE}
-ScoreMatrix(target = [path_to_BigWig_file], 
-            windows = [GRanges_object_with_intervals_of_interest], 
+ScoreMatrix(target = [path_to_bigWig_file], 
+            windows = [GRanges_object_with_windows_of_interest],  # 'windows' can also be called 'intervals' or 'regions'
             type = "bigWig", 
             strand.aware = [TRUE/FALSE], 
             ...)
@@ -397,10 +404,10 @@ ScoreMatrix(target = [path_to_BigWig_file],
 * `...` means that there are additional, optional arguments, some of which we will come back to later on in the tutorial.  
 
   ![ScoreMatrix visual](images/genomation_scorematrix.png){width=50%}\   
-  *Modified from [GenomationManual](https://www.bioconductor.org/packages/release/bioc/vignettes/genomation/inst/doc/GenomationManual.html#1_Introduction)*
+  *Modified from the [Genomation vignette](https://www.bioconductor.org/packages/release/bioc/vignettes/genomation/inst/doc/GenomationManual.html#1_Introduction): "genomation: a toolkit for annotation and visualization of genomic data", version 2020-10-27.*
 
 <br>   
-The GRanges object `tss_chr19_sample` contains the TSSs (1bp) of which we also have data in the BigWig files. The window is currently 1bp but we want to plot the signal *around* the TSS. You thus need to resize these 1bp intervals to the window that you are interested in. You can achieve this with the `resize()` function from the GenomicRanges package:  
+The GRanges object `tss_chr19_sample` contains the TSSs (1bp) of which we also have data in the bigWig files. The window is currently 1bp but we want to plot the signal *around* the TSS. You thus need to resize these 1bp intervals to the window that you are interested in. You can achieve this with the `resize()` function from the GenomicRanges package:  
 
 ```{r resizexcode, eval=FALSE, echo=TRUE}
 resize(x = [GRanges_object], width = [desired_width], fix = ["start", "end" or "center"])
@@ -409,24 +416,40 @@ resize(x = [GRanges_object], width = [desired_width], fix = ["start", "end" or "
 * If we want a window of 20kb around the TSS, use `width = 200001` (20kb window + 1bp for the TSS itself).  
 * As we want to have a window *around* the TSS we set the `fix = "center"`.  
 
+<br>
+
 > **Exercise 3a**: Read and then run the code below to obtain the H3K4me3 signal in a 10kb window around the TSSs **and** answer the multiple-choice question below.  
 >
-> * The object `bw_h3k4me3` directs to the H3K4me3 ChIP-seq BigWig file.  
-> * Hit "Run Code" to view the structure of the resulting object.   
+> * The object `bw_h3k4me3` directs to the H3K4me3 ChIP-seq bigWig file.  
 
 ```{r q3a_h3k4me3_scores, exercise=TRUE, exercise.eval=FALSE, error=TRUE}
 # define the window size  
-window <- 10001
+window <- 10001 # 10kb + 1bp for the TSS
 
-# resize the tss interval to this window.
-tss_window <- resize(tss_chr19_sample, width = window, fix = "center")
+# resize the TSS interval to this window.
+tss_window <- ____(x = tss_chr19_sample, width = window, fix = "center")
 
-# create H3K4me3 ScoreMatrix for these intervals.
-# strand.aware=TRUE takes into account the strand of the TSS. 
-scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3, windows = tss_window, type = 'bigWig', strand.aware =TRUE)  
+# Read in H3K4me3 ChIP-seq data from bigWig file in these TSS windows
+scores_h3k4me3_tss <- ____(target = bw_h3k4me3, windows = tss_window, type = 'bigWig', strand.aware =TRUE)  
 
-# what structure is scores_h3k4me3? Hit "Run code" to view the result. 
+# What is the structure of `scores_h3k4me3_tss`?   
 str(scores_h3k4me3_tss)
+```
+
+```{r q3a_h3k4me3_scores-hint-1}
+# use this function to resize `tss_chr19_sample`
+resize()
+```
+
+```{r q3a_h3k4me3_scores-hint-2}
+# use this function to create the scorematrix:
+ScoreMatrix()
+```
+
+```{r q3a_h3k4me3_scores-check}
+grade_result(pass_if(~identical(.result, str(ScoreMatrix(target = bw_h3k4me3, 
+                                                    windows = resize(x = tss_chr19_sample, width = 10001, fix = "center"), 
+                                                    type = 'bigWig', strand.aware =TRUE)))))
 ```
 
 ```{r q3a_mc_h3k4me3_scores}
@@ -439,8 +462,8 @@ question("What is the 'class' of the resulting object 'scores_h3k4me3_tss'?",
          random_answer_order =TRUE)
 ```
 
-### 3.3.2 Plot the average H3K4me3 signal around the TSS   
-You can plot the average H3K4me3 signal stored in this ScoreMatrix with the `plotMeta()` function. This function works as follows:   
+### 3.3.3 Plot the average H3K4me3 signal around the TSS   
+You can plot the average H3K4me3 signal over this window with the `plotMeta()` function:  
 
 ```{r plotmeta_example, eval=FALSE, echo=TRUE}
 plotMeta(mat = [ScoreMatrix_object], xcoord = c([start,end]), ...)
@@ -451,17 +474,15 @@ plotMeta(mat = [ScoreMatrix_object], xcoord = c([start,end]), ...)
 
 <br>
 
-> **Exercise 3b**: Plot the H3K4me3 signal stored in "scores_h3k4me3_tss" from exercise 3a.   
->
+> **Exercise 3b**: Plot the average H3K4me3 signal around the TSS with `plotMeta()`    
+
+> * `scores_h3k4me3_tss` of exercise 3a is available.  
 > * Note that we set `xcoord = c(-5000, 5000)` for you, as our window was 10kb.  
-> * Hit "Subit Answer" to submit your code.  
-> * Hit "Run Code" to view the plot (necessary for exercise 3c).   
 
 ```{r prepare_q3b}
 tss_window <- resize(tss_chr19_sample, width = 10001, fix = "center")
 scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3, windows = tss_window, type = 'bigWig', strand.aware =TRUE) 
 ```
-
 
 ```{r q3b_h3k4me3plot, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup = "prepare_q3b"}
 # Generate a plot showing the average H3K4me3 signal over a 10kb window around the TSS
@@ -488,11 +509,10 @@ plotMeta()
 
 ```{r q3b_h3k4me3plot-check}
 grade_result(
-  pass_if(~identical(.result, plotMeta(mat = scores_h3k4me3_tss, xcoord = c(-5000, 5000))))
+  pass_if(~identical(.result, plotMeta(mat = scores_h3k4me3_tss, xcoord = c(-5000, 5000)))),
+  correct = "Clearly, we could have restricted the plot tp the region +/- 3kb the TSS as the H3K4me3 signal remains near background level outside that region."
 )
 ```
-
-Clearly, we could have restricted the plot tp the region +/- 3kb the TSS as the H3K4me3 signal remains near background level outside that region.   
 
 >**Exercise 3c**: Use the plot above to answer the following questions.    
 
@@ -501,40 +521,47 @@ quiz(caption="",
   question("Which function would you change and how, to make sure that the signal in the plot of Exercise 3b is limited to +/-3kb around the TSSs?",
          answer("Change the xcoord parameter in 'plotMeta', set it to c(-3000, 3000).", message = "Changing the xcoord parameter only changes the thickmarks on the x-axis but does not change the actual window size of the interval."),
          answer("Filter the ScoreMatrix 'scores_h3k4me3_tss' for columns c(-3000, 3000).", message = "We could filter the matrix indeed but these are not the correct columns as there are no 'negative' columns."),
-         answer("Change the width parameter in 'resize', set it to 6001.", correct = T),
-         allow_retry = T,
-         random_answer_order = T), 
-     question("Is H3K4me3 signal equally strong before and after the TSS or is there a difference?",
+         answer("Change the width parameter in 'resize', set it to 6001.", correct = TRUE),
+         allow_retry = TRUE,
+         random_answer_order = TRUE), 
+     question("Is H3K4me3 signal equally strong up- and downstream the TSS or is there a difference?",
               answer("H3K4me3 signal appears equal up- and downstream the TSS.", message = "Look at the plot, the y-axis gives the H3K4me3 signal, the TSS is located at x=0."),
               answer("H3K4me3 signal is lower downstream the TSS compared to upstream.", message = "Review what is 'upstream' and what is 'downstream'."),
-              answer("H3K4me3 signal is higher downstream the TSS compared to upstream.", correct = T, message = "Indeed, H3K4me3 signal is on average higher downstream the TSS."),
-              allow_retry = T),
+              answer("H3K4me3 signal is higher downstream the TSS compared to upstream.", correct = TRUE, message = "Indeed, H3K4me3 signal is on average higher downstream the TSS."),
+              allow_retry = TRUE),
+  question("Where, approximately, is the average H3k4me3 signal the strongest?",
+           answer("2kb upstream the TSS", message = "Review what is 'upstream' and what is 'downstream' and look carefully at the x-axis scale."),
+           answer("200bp upstream the TSS", message = "Review what is 'upstream' and what is 'downstream'."),
+           answer("At the TSS", message = "The TSS is at position '0' and at that position we actually see a dip in the H3k4me3 signal."),
+           answer("200bp downstream the TSS", correct = TRUE),
+           answer("2kb downstream the TSS", message = "Not 2kb, take a second look at the x-axis scale."),
+           allow_retry = TRUE),
      # question("What would the plot show, in case you would have set 'strand.aware=FALSE' in the 'ScoreMatrix()' function? Tip: You can adjust the code from 3a and 3b and try it.",
-     #          answer("H3K4me3 signal appearing equal up- and downstream the TSS", correct = T, message = "As TSS are randomly distributed over strands, setting strand.aware to FALSE will lead to a plot where H3K4me3 signal appears equally strong before and after the TSS while in reality it is stronger downstream the TSS."),
+     #          answer("H3K4me3 signal appearing equal up- and downstream the TSS", correct = TRUE, message = "As TSS are randomly distributed over strands, setting strand.aware to FALSE will lead to a plot where H3K4me3 signal appears equally strong before and after the TSS while in reality it is stronger downstream the TSS."),
      #          answer("H3K4me3 signal would appear lower downstream the TSS compared to upstream.", message = "Realize that randomly distributed over strands while the H3K4me3 signal around the TSS is related to the directionality."),
      #          answer("H3K4me3 signal would appear higher downstream the TSS", message = "Realize that randomly distributed over strands while the H3K4me3 signal around the TSS is related to the directionality."),
-     #          allow_retry = T),
+     #          allow_retry = TRUE),
      question("What could explain the slight decrease in signal at pos. 0?", 
-              answer("The nucleosome depleted region found at the TSS of transcribed genes.", correct = T),
+              answer("The nucleosome depleted region found at the TSS of transcribed genes.", correct = TRUE),
               answer("The binding of specific TFs at the TSS."),
               answer("The TSS itself is marked by H3K4ac instaed of H3K4me3"),
-              allow_retry = T)
+              allow_retry = TRUE)
 )
 ```
 
-### 3.3.3 Add H3K27ac signal   
+### 3.3.4 Plot average H3K27ac signal     
 Let's look at another promoter mark: does H3K27ac show the same shape and signal strength?  
 
 ### Exercise 4   
 
 > **Exercise 4**: Generate a plot of the average H3K27ac signal in a **10kb** window around the TSS.  
 > 
-> * The object `tss_window` of exercise 3a has been loaded for you.  
-> * The object `bw_h3k27ac` directs to the H3K27ac ChIP-seq BigWig file.  
+> * The object `tss_window` of exercise 3a is available.    
+> * The object `bw_h3k27ac` directs to the H3K27ac ChIP-seq bigWig file.  
 
 ```{r prepare_q4, echo=FALSE}
 # resize the tss interval to this 10kb+1bpTSS
-tss_window <- resize(tss_chr19_sample, width = 10001, fix = "center")
+tss_window <- resize(x = tss_chr19_sample, width = 10001, fix = "center")
 ```
 
 ```{r q4_h3k27ac_density, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q4"}
@@ -548,7 +575,7 @@ ___(mat = ___, xcoord = c(-5000, 5000))
 ```
 
 ```{r q4_h3k27ac_density-hint-1}
-# "target =" should direct to the BigWig file. 
+# "target =" should direct to the bigWig file. 
 ```
 
 ```{r q4_h3k27ac_density-hint-2}
@@ -593,8 +620,8 @@ question("Compared to the average score profile of H3K4me3, the H3K27ac profile 
          )
 ```
 
-### 3.3.4 Multiple profiles in one plot  
-We can observe differences and similarities between two ChIP-seq datasets with respect to the peak strength and peak shape better when we plot them in one plot. This can be achieved by generating a "ScoreMatrixList" object and providing that to the `plotMeta()` function:    
+### 3.3.5 Multiple profiles in one plot  
+We can observe differences and similarities between two ChIP-seq datasets with respect to their peak strength and peak shape better when we plot them in one plot. This can be achieved by generating a "ScoreMatrixList" object and providing that to the `plotMeta()` function:    
 
 ```{r example_scorematrixlist, echo=TRUE, eval=FALSE}
 # 1. Generate a "ScoreMatrixList" object:   
@@ -607,18 +634,20 @@ plotMeta(mat = ScoreMatrixList_object,
          profile.names = [vector of names, used in the legend])
 ```
 
+* The first argument in `new()` tells which type of object we want to make.  
+* The second argument in `new()` is a list of ScoreMatrices with a custom name for each.  
 * With `overlay=TRUE` the two density profiles are plotted in one plot.   
 * With `overlay=FALSE` the two density profiles are plotted in separate plots with the same x- and y-axis limits and scales.  
-* In `profile.names =` you can give a character vector of names, for every ScoreMatrix in the ScoreMatrixList. These names will be used for the legend.   
+* In `profile.names =` you can give a character vector of names, for every object in the ScoreMatrixList. These names will be used for the legend.   
 
 ### Exercise 5  
 
 > **Exercise 5**: Complete the code below to generate one plot with the average signal profiles of H3K4me3 and H3K27ac in a 10kb window around the TSS.  
 >
-> * The objects `scores_h3k4me3_tss` and `scores_h3k27ac_tss` of Exercise 3  ([3.3.1 Importing ChIP-seq signal in r]) and Exercise 4 ([3.3.3 Add H3K27me3 signal]) are available to you.   
+> * The objects `scores_h3k4me3_tss` and `scores_h3k27ac_tss` of Exercise 3  ([3.3.2 Importing ChIP-seq signal in r]) and Exercise 4 ([3.3.4 Plot average H3K27ac signal]) are available to you.   
 
 ```{r prepare_q5, echo=FALSE}
-tss_window <- resize(tss_chr19_sample, width = 10001, fix = "center")
+tss_window <- resize(x = tss_chr19_sample, width = 10001, fix = "center")
 # scores for h3k4me3
 scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3, windows = tss_window, type = 'bigWig', strand.aware =TRUE) 
 
@@ -660,22 +689,23 @@ grade_result(pass_if(~identical(.result,plotMeta(scores_h3k4me3_h3k27ac, xcoord 
 ```
 <br>
 
-### 3.3.5 Add H3K27me3 signal    
-### Exercise 6  
+### 3.3.6 Add H3K27me3 signal    
 So far you have examined the average enrichment of ChIP marks with very narrow peaks. Let's add a mark that showed a 'broad' ChIP peaks in the genome browser: **H3K27me3**.   
+
+### Exercise 6  
 
 > **Exercise 6**:   
 >
-> 1. Generate a ScoreMatrix object with the H3K37me3 signal in a 10kb window around the TSS, 
-> 2. make a new ScoreMatrixList with scores of H3K4me3, H3K27ac and H3K27me3 (*must be in this specific order for your answer to be graded as correct due to technical reasons*)
-> 3. plot these three profiles with `plotMeta()`.  
+> 1. Generate a ScoreMatrix object with the H3K37me3 signal in a **10kb** window around the TSS. 
+> 2. Make a new ScoreMatrixList object with scores of H3K4me3, H3K27ac and H3K27me3 (*because of technical reasons, the datasets must be in this specific order for your answer to be graded as correct*).  
+> 3. Plot these three profiles with `plotMeta()`.  
 > 
-> * The object `bw_h3k27me3` directs to the location of the H3K27me3 BigWig file.   
-> * The object `tss_window` of Exercise 3a ([3.3.1 Importing ChIP-seq signal in r]) is available again.     
+> * The object `bw_h3k27me3` directs to the location of the H3K27me3 bigWig file.   
+> * The object `tss_window` of Exercise 3a ([3.3.2 Importing ChIP-seq signal in r]) is available again.     
 > * The scores of H3K4me3 and H3K27ac are available in resp. `scores_h3k4me3_tss` and `scores_h3k27ac_tss`.  
 
 ```{r prepare_6a, echo=FALSE}
-tss_window <- resize(tss_chr19_sample, width = 10001, fix = "center")
+tss_window <- resize(x = tss_chr19_sample, width = 10001, fix = "center")
 
 # scores for h3k4me3
 scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3, windows = tss_window, type = 'bigWig', strand.aware =TRUE) 
@@ -690,13 +720,15 @@ scores_h3k27ac_tss <- ScoreMatrix(target = bw_h3k27ac, windows = tss_window, typ
 scores_h3k27me3_tss <- ScoreMatrix(target = ___, windows = ___, type = 'bigWig', strand.aware =TRUE)  
 
 # 2. Create a new ScoreMatrixList object  
-scores_h3k4me3_h3k27ac_h3k27me3 <- new("____", list(h3k4me3=__, h3k27ac=__, h3k27me3=__))
+scores_h3k4me3_h3k27ac_h3k27me3 <- new("____", list(h3k4me3=__, 
+                                                    h3k27ac=__, 
+                                                    h3k27me3=__))
 
 # 3. Plot the average scores of these 3 marks with plotMeta()
-plotMeta(mat = ____,
-         xcoord = ___,
-         overlay = ___,
-         profile.names = c("H3K4me3", "H3K27ac", "H3K27me3"))))
+___(mat = ____,
+         xcoord = c(-5000, 5000),
+         overlay = TRUE,
+         profile.names = c("H3K4me3", "H3K27ac", "H3K27me3"))
 ````
 
 ```{r q6a_addh3k37me3-hint-1}
@@ -747,7 +779,7 @@ grade_result(pass_if(~identical(.result,
 
 ```{r q6a_addh3k37me3_mc}
 question("What can you conclude from the above plot?",
-         answer("On average H3K27me3 scores in these windows are lower than H3K27ac scores.", correct = T, message = "This plot shows the 'average' ChIP-seq signal around the TSS but not the variation in ChIP signal among different peaks of the same mark. You will ook at these differences next, using H3K4me3 as a test case."),
+         answer("On average H3K27ac scores in these windows are lower than H3K4me3 scores.", correct = T, message = "This plot shows the 'average' ChIP-seq signal around the TSS but not the variation in ChIP signal among different peaks of the same mark. You will ook at these differences next, using H3K4me3 as a test case."),
          answer("H3K4me3 scores are always higher than the H3K27ac scores.", message = "These plots display the *average* scores, there might still be TSS whith only H3K27ac or with a H3K27ac signal that is higher than H3K4me3, you can't say that from this plot."),
          answer("There are more TSSs overlapping a H3K4me3 peak than TSSs overlapping a H3K27ac peak.", message = "This plot does not display how many TSS overlap with a ChIP peak."),
          answer("There are no H3K27me3 peaks overlapping TSSs used to make this plot.", message = "The H3K27me3 signal is generally broad, spanning 10s of kbs and does not reach such high scores as H3k4me3. Using this plot, we can't concusively say that H3K27me3 is absent from these promoters."),
@@ -757,10 +789,10 @@ question("What can you conclude from the above plot?",
 ```
 
 
-## 3.4 Signal vs gene expression  
+## 3.4 ChIP-seq signal vs. gene expression  
 In this section you will investigate   
 
-- the variation in H3K4me3 signal (as reads per million extracted from the BigWig file) in a defined window around the TSS;  
+- the variation in H3K4me3 signal (as reads per million extracted from the bigWig file) in a defined window around the TSS;  
 - and the relation between this signal and gene expression (as FPKM).   
 
 ### 3.4.1 Average H3K4me3 signal per gene expression quartile  
@@ -772,31 +804,32 @@ c. Add the gene expression values for the corresponding genes to the data.frame.
 d. Group genes based on their gene expression in 4 quartiles and plot the H3K4me3 signal per group in a boxplot.  
 
 ### Exercise 7a  
-To calculate the average H3K4me3 signal in a defined window around the TSS you can use a modified version of the 'ScoreMatrix' function: 
+To calculate the average H3K4me3 signal in a defined window around the TSS you can use a modified version of the `ScoreMatrix()` function you used in section 3.3: the `ScoreMatrixBin()` function.  As the name suggests, this function does not calculate the coverage for each bp in the given windows, but it will chop the windows into `n` number of **bins**. 
 
 ```{r scorematrixbincode, eval=FALSE, echo=TRUE}
-ScoreMatrixBin(target = [path to BigWig file], 
-               windows = [GRanges object with intervals of interest], 
+ScoreMatrixBin(target = [path_to_bigwig_file], 
+               windows = [GRanges_object_with_windows_of_interest], # 'windows' can also be called 'intervals' or 'regions'
                bin.num = n,
                type = "bigWig", 
                strand.aware = [TRUE/FALSE])
 ```
-As the name suggests, this function does not calculate the coverage for each bp in the given windows, but it will chop the intervals into `n` number of **bins**. The number of bins can be set with the `bin.num=` parameter. Setting this to  `bin.num=1`, will give the average signal for each window.   
+
+* The number of bins can be set with the `bin.num=` parameter. Setting this to  `bin.num=1`, will give the average signal for each window.   
+* Side note: this function is also useful when working with windows of varying size like genes, in those cases we set `bin.num` to 50 or 100.  
 <br>
-Side note: this function is also useful when working with windows of varying size like genes, in those cases we set `bin.num` to 50 or 100.  
 
 > **Exercise 7a**: Calculate the average H3K4me3 signal in a window of 5kb around the TSS (code check).  
 > 
-> * `tss_chr19_sample` is the GRanges object with TSS locations for which we have signal in the BigWig files.  
+> * `tss_chr19_sample` is the GRanges object with TSS locations for which we have signal in the bigWig files.  
 > * Use `resize()` to resize the window in `tss_chr19_sample` to 5kb.  
-> * `bw_h3k4me3` directs to the H3K4me3 ChIP-seq BigWig file.  
+> * `bw_h3k4me3` directs to the H3K4me3 ChIP-seq bigWig file.  
 
 ```{r q7a_signalfpkm, exercise=TRUE, exercise.eval=FALSE, error=TRUE}
-# Re-size the window in "tss_chr_sample" to 5001bp
-tss_chr19_sample_window <- resize(___, width = ___, fix = "center")
+# Re-size the window in "tss_chr19_sample" to 5001bp
+tss_chr19_sample_window <- resize(x = ___, width = ___, fix = "center")
 
 # Obtain the average H3K4me3 core for each window in "tss_chr19_sample_window"
-average_h3k4me3_tss <- ScoreMatrixBin(target = bw_h3k4me3, 
+average_h3k4me3_tss <- ____(target = bw_h3k4me3, 
                                              windows = ___, 
                                              bin.num = ___, 
                                              type = 'bigWig', strand.aware =TRUE)  
@@ -804,7 +837,7 @@ average_h3k4me3_tss <- ScoreMatrixBin(target = bw_h3k4me3,
 
 ```{r q7a_signalfpkm-solution}
 # Resize the window in "tss_chr_sample" to 5001bp
-tss_chr19_sample_window <- resize(tss_chr19_sample, width = 5001, fix = "center")
+tss_chr19_sample_window <- resize(x = tss_chr19_sample, width = 5001, fix = "center")
 
 # Obtain the average H3K4me3 core for each window in "tss_chr19_sample_window"
 average_h3k4me3_tss <- ScoreMatrixBin(target = bw_h3k4me3, 
@@ -885,25 +918,22 @@ grade_result(
 )
 ```
 
-<br>
-In the code below we... 
-
-* renamed the variable 'V1' to 'H3K4me3_rpm' using `rename()` from dplyr (we use the `dplyr::rename` formulation because multiple packages are loaded with a `rename()` function, this way R knows we want to use the rename function from dplyr.);  
-* added the variable 'gene_id' (obtained from the GRanges object we used in we used in the `ScoreMatrixBin()` function: `tss_chr19_smaple`).  
-
+1. Rename 'V1' to 'h3k4me3_rpm' using `dplyr::rename()`. We use `dplyr::rename` formulation because multiple packages have a `rename()` function, this way R knows we want to use the rename function from the dplyr package.  
 ```{r rename_example, echo=TRUE, eval=FALSE}
-# rename 'V1'  
 average_h3k4me3_tss_df <- as.data.frame(as(average_h3k4me3_tss, "matrix")) %>% 
-  dplyr::rename(H3K4me3_rpm = V1)
-# add 'gene_id'
-average_h3k4me3_tss_df$gene_id <- tss_chr19_sample$gene_id
+  dplyr::rename(h3k4me3_rpm = V1)
 ```
 
-We can now visualize the range of average H3K4me3 scores in this 5kb window by running: 
+2. Copy the column 'gene_id' from the object `tss_chr19_sample` to our dataframe with average H3K4me3 scores. This is possible because these objects have the same row order.  
+```{r addgeneid, echo=TRUE, eval=FALSE}
+average_h3k4me3_tss_df$gene_id <- tss_chr19_sample$gene_id
+```
+<br>
+We visualize the range of average H3K4me3 scores in this 5kb window by running: 
 ```{r h3k4me3_boxplot_example, echo=TRUE, eval=FALSE}
 ggplot(average_h3k4me3_tss_df) + 
-  geom_boxplot(mapping = aes(y = H3K4me3_rpm))+
-  scale_x_discrete(labels=NULL)+
+  geom_boxplot(mapping = aes(y = h3k4me3_rpm))+
+  scale_x_discrete(labels=NULL)+ # remove labels from the x-axis, as we have one boxplot they are not informative
   theme_bw()
 ```
 
@@ -912,68 +942,71 @@ ggplot(average_h3k4me3_tss_df) +
 # when I made the tutorial, I saved the figure. The code to make the boxplot is shown below, it is not run but the image from this chunk is shown. 
 average_h3k4me3_tss <- readRDS(file = system.file("extdata", "week3", "prepared_rds", "scorematrix_q7_average_scores_h3k4me3_tss_5kbwindow.rds", package = "learnr.proto"))
 average_h3k4me3_tss_df <- as.data.frame(as(average_h3k4me3_tss, "matrix")) 
-average_h3k4me3_tss_df <- average_h3k4me3_tss_df %>% dplyr::rename(H3K4me3_rpm = V1)
+average_h3k4me3_tss_df <- average_h3k4me3_tss_df %>% dplyr::rename(h3k4me3_rpm = V1)
 average_h3k4me3_tss_df$gene_id <- tss_chr19_sample$gene_id
 
 ggplot(average_h3k4me3_tss_df) + 
-  geom_boxplot(mapping = aes(y = H3K4me3_rpm))+
+  geom_boxplot(mapping = aes(y = h3k4me3_rpm))+
   scale_x_discrete(labels=NULL)+
   theme_bw()
 #ggsave(filename= "images/boxplot_average_h3k4me3_tss_5kbwindow.png")
 ```
 
-To generate this boxplot for groups of genes grouped into four bins by gene expression, you first need to add the gene expression data to your data.frame.  
-
 ### Exercise 7c  
-To investigate the relationship between H3K4me3 signal strengths and gene expression, you will plot the average H3K4me3 signal for genes grouped by quantiles of gene expression. You thus need to   
 
-1. Add gene expression values to `average_h3k4me3_tss_df` 
-2. Define a new categorical variable that groups genes into 4 bins of equal size. 
+To generate this boxplot for groups of genes grouped by gene expression into 4 equally sized bins (quartiles), you need to:    
+
+1. add the gene expression data to `average_h3k4me3_tss_df` and   
+2. define a new categorical variable that groups genes into quartiles.  
 
 #### Step 1. Adding gene expression values to `average_h3k4me3_tss_df`.  
-We added the gene expression values as FPKM (fragments-per-kb-per-million) to the metadata of `tss_chr19_sample`, you can see this when running `show(tss_chr19_sample)`:   
+The gene expression data are stored in the metadata of `tss_chr19_sample`:  
 ```{r show_tss_chr19_sample, eval=TRUE, echo=TRUE}
 show(tss_chr19_sample)
 ```
 
-You can thus add the variable 'FPKM' to `average_h3k4me3_tss_df` in the same way as we added the 'gene_id' (see above).  
+In exercise 7c you will add the variable 'FPKM' (fragments-per-kb-per-million) to `average_h3k4me3_tss_df`. 
 
-#### Step 2. How to define a new categorical variable that groups genes into 4 bins of equal size by gene expression.  
+#### Step 2. Defining a new categorical variable that groups genes into quartiles by gene expression.  
 You can group rows of a data.frame into groups of equal size using `ntile()` from dplyr:  
 ```{r ntile_example, echo=TRUE, eval=FALSE}
 ntile(x = [variable_to_use_for_grouping] , n = [number_of_groups])
 ```
-By running `ntile()` within `mutate()` you can define the new variable. For example, below we categorize genes into either quartiles and quintiles based on their gene expression in `quantification_chr19`:   
+By running `ntile()` within `mutate()` you can define the new variable. For example, below we categorize genes into either quartiles and quintiles based on their gene expression in `quantification_chr19_sample`:   
 ```{r ntile_example2, echo=TRUE, eval=TRUE}
 # group genes in quartiles by FPKM
+# count genes per group with group_by() and tally
 quantification_chr19_sample %>% 
   mutate(group_in_quartiles = factor(ntile(x = FPKM , n = 4))) %>% 
-  group_by( group_in_quartiles ) %>%
+  group_by( group_in_quartiles ) %>% 
   tally
 # group genes in quintiles by FPKM   
+# count genes per group with group_by() and tally
 quantification_chr19_sample %>% 
   mutate(group_in_quintiles = factor(ntile(x = FPKM , n = 5))) %>% 
   group_by( group_in_quintiles ) %>%
   tally
 ```
 
-* *Tip*: instead of printing the output of `mutate()` to the console, you can also pipe it directly into ggplot2.   
+* *Tip*: instead of printing the output of `mutate()` to the console, you can pipe it directly into ggplot2.   
 
 > **Exercise 7c**:   
 > 
 1. Add FPKM values to `average_h3k4me3_tss_df`.  
-2. Define a new categorical variable that groups genes into 4 bins of equal size based on FPKM values.   
+2. Define a new categorical variable that groups genes into quartiles based on FPKM values.   
 3. Plot the H3K4me3 signal (y-axis) for genes grouped by gene expression (FPKM) quantile (x-axis) in a boxplot using ggplot.  
 * Pipe the output of (2) into the ggplot command of step (3).  
+* Run your completed code and answer the multiple choice quetions below.  
+
+<!-- I removed the -check chunk because the plot kept being evaluated wrongly even thought it was correct.  -->
 
 ```{r q7c_prepare}
 # import scores from ex 7a
 average_h3k4me3_tss <- readRDS(file = system.file("extdata", "week3", "prepared_rds", "scorematrix_q7_average_scores_h3k4me3_tss_5kbwindow.rds", package = "learnr.proto"))
 # convert to df and rename and add variables for signal and gene_id
 average_h3k4me3_tss_df <- as.data.frame(as(average_h3k4me3_tss, "matrix")) 
-average_h3k4me3_tss_df <- average_h3k4me3_tss_df %>% dplyr::rename(H3K4me3_rpm = V1)
+average_h3k4me3_tss_df <- average_h3k4me3_tss_df %>% dplyr::rename(h3k4me3_rpm = V1)
 average_h3k4me3_tss_df$gene_id <- tss_chr19_sample$gene_id
-
 ```
 
 ```{r q7c_signalfpkm, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="q7c_prepare"}
@@ -982,15 +1015,13 @@ average_h3k4me3_tss_df$FPKM <- _____
 
 # 2. Define a new variable with mutate() and ntile() that groups genes in quartiles by FPKM values  
 # 3. pipe the output into your ggplot boxplot  
-average_h3k4me3_tss_df %>%  
+average_h3k4me3_tss_df %>%
   mutate(gene_group = factor(ntile(x = ___, n= ___))) %>% 
-  ggplot(.)+  
-  geom_boxplot(mapping=aes(x = ____, y = ___))+ 
+  ggplot(.)+
+  ___(mapping=aes(x = ___, y = h3k4me3_rpm))+
   theme_bw()+
-  labs(
-    title = "Average H3K4me3 signal at TSS per gene group.",
-    subtitle = "5kb window around the TSS, gene groups by gene expression quantiles."
-  )
+  labs(title = "Average H3K4me3 signal at TSS per gene group.",
+       subtitle = "5kb window around the TSS, gene groups by FPKM quartiles.")
 ```
 
 ```{r q7c_signalfpkm-hint-1}
@@ -1012,26 +1043,12 @@ ntile(x=FPKM, n=4)
 ```
 
 ```{r q7c_signalfpkm-hint-5}
-# In the geom_boxplot() command we want the gene_group variable on the x-axis and the H3K4me3_rpm values plotted on the y-axis
+# Use the geom_boxplot() command and put the gene_group variable on the x-axis 
 ```
 
 ```{r q7c_signalfpkm-hint-6}
 # In this case you need to use
-geom_boxplot(mapping=aes(x = gene_group, y = H3K4me3_rpm))
-```
-
-```{r q7c_signalfpkm-check}
-average_h3k4me3_tss_df$FPKM  <- tss_chr19_sample$FPKM
-grade_result(pass_if(~identical(.result, 
-                                average_h3k4me3_tss_df %>% 
-                                  mutate(gene_group = factor(ntile(x=FPKM, n=4))) %>% 
-                                  ggplot(.)+  
-                                  geom_boxplot(mapping=aes(x = gene_group, y = H3K4me3_rpm))+
-                                  theme_bw()+
-                                  labs(
-                                    title = "Average H3K4me3 signal at TSS per gene group.",
-                                    subtitle = "5kb window around the TSS, gene groups by gene expression quantiles.")
-                                )))
+geom_boxplot(mapping=aes(x = gene_group, y = h3k4me3_rpm))
 ```
 
 ```{r q7e_signalfpkm_mc}
@@ -1054,17 +1071,18 @@ quiz(caption = "",
 
 > **Exercise 7d**: Repeat the plot of exercise 7c but this time plot a scatter plot (code check).  
 >
-> * Plot H3K4me3 signal as H3K4me3_rpm on the x-axis.  
-> * Plot gene expression as log(FPKM+1) on the y-axis (because of the broad range of RNA-seq we log the FPKM values).   
-> * The object `average_h3k4me3_tss_df` of Exercise 7c is available.  
-> * You do not need to define categories as in 7d. 
+> * The object `average_h3k4me3_tss_df` of Exercise 7c is available to you.  
+> * Plot H3K4me3 signal as `h3k4me3_rpm` on the x-axis.  
+> * Plot gene expression as `log(FPKM+1)` on the y-axis (because of the broad range of RNA-seq we log the FPKM values, to prevent taking a log(0) we add 1 to all FPKM values).   
+> * Hit "Submit Answer" to get your code evaluated (but this won't return the plot).   
+> * Hit "Run Code" to view the resulting plot.  
 
 ```{r q7d_prepare}
 # import scores from ex 7a
 average_h3k4me3_tss <- readRDS(file = system.file("extdata", "week3", "prepared_rds", "scorematrix_q7_average_scores_h3k4me3_tss_5kbwindow.rds", package = "learnr.proto"))
 # convert to df and rename and add variables for signal and gene_id
 average_h3k4me3_tss_df <- as.data.frame(as(average_h3k4me3_tss, "matrix")) 
-average_h3k4me3_tss_df <- average_h3k4me3_tss_df %>% dplyr::rename(H3K4me3_rpm = V1)
+average_h3k4me3_tss_df <- average_h3k4me3_tss_df %>% dplyr::rename(h3k4me3_rpm = V1)
 average_h3k4me3_tss_df$gene_id <- tss_chr19_sample$gene_id
 average_h3k4me3_tss_df$FPKM  <- tss_chr19_sample$FPKM
 ```
@@ -1078,11 +1096,24 @@ ggplot(average_h3k4me3_tss_df, mapping=aes(x = ___, y = ___))+
        subtitle = "5kb window around the TSS")
 ```
 
+```{r q7d_signalfpkm-hint-1}
+# define x = h3k4me3_rpm
+```
+
+```{r q7d_signalfpkm-hint-2}
+# define y = log(FPKM+1)
+```
+
+```{r q7d_signalfpkm-hint-3}
+# to make a scatter plot use 
+geom_point()
+```
+
 ```{r q7d_signalfpkm-solution}
-ggplot(average_h3k4me3_tss_df, mapping=aes(y = H3K4me3_rpm, x = log(FPKM+1)))+  
+ggplot(average_h3k4me3_tss_df, mapping=aes(x = h3k4me3_rpm, y = log(FPKM+1)))+  
   geom_point()+
   theme_bw()+
-  labs(title = "Average H3K4me3 signal at TSS versus gene expression in monocytes .",
+  labs(title = "Average H3K4me3 signal at TSS versus gene expression in monocytes.",
        subtitle = "5kb window around the TSS")
 ```
 
@@ -1090,15 +1121,15 @@ ggplot(average_h3k4me3_tss_df, mapping=aes(y = H3K4me3_rpm, x = log(FPKM+1)))+
 grade_code()
 ```
 
-**Observe that the association is only a *trend* and not a 1-to-1 relationship!** Additional factors influence or are associated with gene expression levels including the presence of other marks but also the presence of TFs and post-transcriptional mechanisms.  
+Observe that the association between H3K4me3 signal and gene expression is a **trend and not a 1-to-1 relationship!** Additional factors influence gene expression levels including the presence of other marks, the presence of TFs and post-transcriptional mechanisms.   
 <br>
 
 > #### **Optional**: Adding trend lines   
-It can sometimes be hard to identify the trend based on points alone. In those cases we may wish to add a smoothing or *trend* line to the plot.      
+It can sometimes be hard to identify the trend based on points alone. In those cases we may wish to add a smoothening or *trend* line to the plot.      
 <details><summary>**Click here if you want to know how to add smoothing lines to scatter plots.**</summary>  
 Trend or smoothing lines can be added with `geom_smooth()`, which also adds a confidence interval of the smooth:   
 > <br>
-> `ggplot(average_h3k4me3_tss_df, mapping=aes(y = H3K4me3_rpm, x = log(FPKM+1)))+`    
+> `ggplot(average_h3k4me3_tss_df, mapping=aes(y = h3k4me3_rpm, x = log(FPKM+1)))+`    
 >  `geom_point()+`  
 >  `geom_smooth(fill = "blue")+` 
 >  `theme_bw()+`  
@@ -1109,7 +1140,7 @@ Trend or smoothing lines can be added with `geom_smooth()`, which also adds a co
 <br>  
 > You can use different methods to draw the trend line. For example, `methods = "lm"` fits a linear model and plots the line of best fit:    
 <br>  
-> `ggplot(average_h3k4me3_tss_df, mapping=aes(y = H3K4me3_rpm, x = log(FPKM+1)))+`     
+> `ggplot(average_h3k4me3_tss_df, mapping=aes(y = h3k4me3_rpm, x = log(FPKM+1)))+`     
 >  `geom_point()+`   
 >  `geom_smooth(method = "lm", fill = "blue")+`    
 >  `theme_bw()+`   
@@ -1123,7 +1154,7 @@ Trend or smoothing lines can be added with `geom_smooth()`, which also adds a co
 
 <!-- ```{r adding_smoothline_plotsaving, eval=FALSE, echo=FALSE} -->
 <!-- # The code to make the boxplot is shown below. When I made the tutorial, I saved the figure.  -->
-<!-- ggplot(average_h3k4me3_tss_df, mapping=aes(y = H3K4me3_rpm, x = log(FPKM+1)))+   -->
+<!-- ggplot(average_h3k4me3_tss_df, mapping=aes(y = h3k4me3_rpm, x = log(FPKM+1)))+   -->
 <!--   geom_point()+ -->
 <!--   geom_smooth(fill = "blue")+ -->
 <!--   theme_bw()+ -->
@@ -1133,7 +1164,7 @@ Trend or smoothing lines can be added with `geom_smooth()`, which also adds a co
 <!-- ``` -->
 <!-- ```{r adding_smoothlinefit_saving, eval=FALSE, echo=FALSE} -->
 <!-- # The code to make the boxplot is shown below. When I made the tutorial, I saved the figure.  -->
-<!-- ggplot(average_h3k4me3_tss_df, mapping=aes(y = H3K4me3_rpm, x = log(FPKM+1)))+   -->
+<!-- ggplot(average_h3k4me3_tss_df, mapping=aes(y = h3k4me3_rpm, x = log(FPKM+1)))+   -->
 <!--   geom_point()+ -->
 <!--   geom_smooth(method = "lm", fill = "blue")+ -->
 <!--   theme_bw()+ -->
@@ -1142,29 +1173,31 @@ Trend or smoothing lines can be added with `geom_smooth()`, which also adds a co
 <!-- #ggsave(filename= "images/scatterplot_average_h3k4me3_tss_5kbwindow_vs_fpkm_incl_lm_fitline.png") -->
 <!-- ``` -->
 
-What relationship would we observe when we took a mark associated with gene silencing?  
-
 ### 3.4.2 H3K27me3 signal vs. gene experession  
+What relationship would we observe when we took a mark associated with gene silencing?  
 
 ### Exercise 8  
 
->**Exercise 8**: Use the code from Exercise 7a, Exercise 7b, and Exercise 7c to plot the average H3K7me3 signal in a 5kb window around the TSS for genes grouped in quantile of gene expression.    
+>**Exercise 8**: Plot the average **H3K7me3** signal at the TSS by gene expression quantile.  
 > 
-> * `bw_h3k27me3` points to the H3K27me3 ChIP-seq BigWig file.  
+> * Again, take the **5kb** window around th TSS.  
+> * `bw_h3k27me3` points to the H3K27me3 ChIP-seq bigWig file.  
+> * You can copy-paste and adjust the code from Exercise 7a, Exercise 7b, and Exercise 7c.  
 
-**8a: (code check)**  
+**8a: step 1 (code check)**  
 ```{r q8a_h3k27me3, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=4}
-# Resize the window in "tss_chr19_sample" to 5kb
-tss_chr19_sample_window <- resize(tss_chr19_sample, width = ___, fix = ___)
+# 1. Resize the window in "tss_chr19_sample" to 5kb
+tss_chr19_sample_window <- ___(x = tss_chr19_sample, width = ___, fix = ___)
 ```
 
 <div id="q8a_h3k27me3-hint">
-Copy-paste-and-adjust the code of Exercise 7a   
+* Copy-paste-and-adjust the code of Exercise 7a.     
+* Remember to take a window of 5kb + 1 bp for the TSS.  
 </div>
 
 ```{r q8a_h3k27me3-solution}
 # Resize the window in "tss_chr19_sample" to 5kb
-tss_chr19_sample_window <- resize(tss_chr19_sample, width = 5001, fix = "center")
+tss_chr19_sample_window <- resize(x = tss_chr19_sample, width = 5001, fix = "center")
 ```
 
 ```{r q8a_h3k27me3-code-check}
@@ -1172,16 +1205,16 @@ grade_code()
 ```
 
 ```{r prepare_q8b}
-tss_chr19_sample_window <- resize(tss_chr19_sample, width = 5001, fix = "center")
+tss_chr19_sample_window <- resize(x = tss_chr19_sample, width = 5001, fix = "center")
 ```
 
-**8b: (code check)**  
+**8b: step 2 (code check)**  
 ```{r q8b_h3k27me3, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q8b"}
 # Obtain the average H3K27me3 core for each window in "tss_chr19_sample_window"
 average_h3k27me3_tss <- ScoreMatrixBin(target = ___,
                                        windows = ___,
                                        bin.num = ___,
-                                       type = '___', 
+                                       type = 'bigWig', 
                                        strand.aware = ___)
 
 ```
@@ -1203,15 +1236,15 @@ grade_code()
 ```
 
 ```{r prepare_q8c}
-tss_chr19_sample_window <- resize(tss_chr19_sample, width = 5001, fix = "center")
+tss_chr19_sample_window <- resize(x = tss_chr19_sample, width = 5001, fix = "center")
 average_h3k27me3_tss <- ScoreMatrixBin(target = bw_h3k27me3,windows = tss_chr19_sample_window,bin.num = 1,type = 'bigWig',strand.aware =TRUE)
 average_h3k27me3_tss_matrix <- as(average_h3k27me3_tss, "matrix")
 average_h3k27me3_tss_df <- as.data.frame(average_h3k27me3_tss_matrix)
 ```
  
-**8c: (code check)**  
+**8c: step 3 (code check)**  
 ```{r q8c_h3k27me3, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q8c"}
-# Convert the ScoreMatrix output to a data.frame 
+# Convert the output of step 8b to a data.frame 
 average_h3k27me3_tss_matrix <- as(___, "matrix")
 average_h3k27me3_tss_df <- ___
 ```
@@ -1229,7 +1262,7 @@ average_h3k27me3_tss_df <- as.data.frame(average_h3k27me3_tss_matrix)
 grade_code()
 ```
 
-**8d: (code check)**  
+**8d: step 4 (code check)**  
 ```{r q8d_h3k27me3, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q8c"}
 # and add a column with 'gene_id'
 average_h3k27me3_tss_df$gene_id <- ____
@@ -1254,7 +1287,7 @@ grade_code()
 ```
 
 ```{r prepare_q8e}
-tss_chr19_sample_window <- resize(tss_chr19_sample, width = 5001, fix = "center")
+tss_chr19_sample_window <- resize(x= tss_chr19_sample, width = 5001, fix = "center")
 average_h3k27me3_tss <- ScoreMatrixBin(target = bw_h3k27me3,windows = tss_chr19_sample_window,bin.num = 1,type = 'bigWig',strand.aware =TRUE)
 average_h3k27me3_tss_matrix <- as(average_h3k27me3_tss, "matrix")
 average_h3k27me3_tss_df <- as.data.frame(average_h3k27me3_tss_matrix)
@@ -1263,7 +1296,7 @@ average_h3k27me3_tss_df$FPKM <- tss_chr19_sample$FPKM
 average_h3k27me3_tss_df <- average_h3k27me3_tss_df %>% dplyr::rename(h3k27me3_rpm = V1)
 ```
 
-**8e: (code check)** 
+**8e: step 5 (code check)** 
 ```{r q8e_h3k27me3, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q8e"}
 # finally, plot the H3K27me3 signal (y-axis) per gene group where genes are divided in four quantiles of gene expression (x-axis) 
 average_h3k27me3_tss_df %>%  
@@ -1303,22 +1336,23 @@ mutate(gene_group = factor(ntile(x=FPKM, n=4))) # you can also leave out 'x=' an
 geom_boxplot(mapping=aes(x = gene_group, y = h3k27me3_rpm))
 ```
 
-```{r q8e_h3k27me3-check}
-grade_result(
-   pass_if(~identical(.result, 
-                      average_h3k27me3_tss_df %>% 
-                        mutate(gene_group = factor(ntile(FPKM, n=4))) %>% 
-                        ggplot(.)+
-                        geom_boxplot(mapping=aes(x = gene_group, y = h3k27me3_rpm))+
-                        theme_bw()
-                      )),
-   incorrect = "Review the code of Exercise 7c and/or use the hints.",
-   correct = "Wonderful! If we make a scatter plot of the same relation we get the following plot:..."
+```{r q8e_h3k27me3-solution}
+average_h3k27me3_tss_df %>%  
+  mutate(gene_group = factor(ntile(FPKM, n=4))) %>% 
+  ggplot(.)+  
+  geom_boxplot(mapping=aes(x = gene_group, y = h3k27me3_rpm))+ 
+  theme_bw()
+```
+
+```{r q8e_h3k27me3-code-check}
+grade_code(
+   correct = "Wonderful! Hit 'Run Code' (if you hadn't already done so) to view the plot."
 )
 ```
 
 ### 3.4.3 Scatterplot of H3K27me3 signal vs gene expression   
-
+If we make a scatter plot of the data of Exercise 8, we get the following plot:...  
+<br>
 ![](images/scatterplot_logfpkm1_h3k27me3_tss_5kbwindow.png){width=70%}\  
 ```{r prepare_scatter, echo=FALSE, eval=FALSE, fig.height=4, fig.width=6}
 # I used this chunk to prepare the plot in advance.  
@@ -1334,26 +1368,32 @@ expression_and_h3k27me3 %>%
 question("What statement best describes the relationship between H3K27me3 and gene expression? (With gene expression defined as log(FPKM+1))",
          answer("The data show a linear relationship."),
          answer("The data show an inverse linear relationship.", ),
-         answer("The data show a non-lienar relationship.", correct=TRUE, message = "Indeed. What you can clearly see in this graph is that the mere presence of H3K27me3 at the TSS translates in to gene silencing for the majority of TSSs, irrespecitve of the H3K27me3 level. We observe a couple of outliers. These may be due to the expression different transcript isoforms, expressed from a different TSS. Or TSSs marked by H3K27me3 in a fraction of the cell population."),
+         answer("The data show a non-linear relationship.", correct=TRUE, message = "Indeed. What you can clearly see in this graph is that the mere presence of H3K27me3 at the TSS translates to gene silencing for the majority of TSSs. This appears irrespecitve of the H3K27me3 level. We observe a couple of outliers. These may be due to the expression different transcript isoforms, expressed from a different TSS. Or due to TSSs marked by H3K27me3 in a fraction of the cell population."),
          allow_retry=TRUE
          )
 ```
 
 
 ## 3.5 Heatmaps  
-### 3.5.1 Introducing heatmaps  
-In fg2 (and on a per-locus basis in fg1) you observed that H3K4me3 peaks occur more often than expected at the promoter, that the presence of H3K4me3 at the promoter is associated with gene expression, but also that, at a per-bp-level, some marks co-occur more than others.  
+### 3.5.1 Intermediate summary and introducing heatmaps   
+In fg2 you observed that H3K4me3 peaks occur more often than expected at the promoter, that the presence of H3K4me3 and/or H3K27me3 at the promoter are associated with the gene's expression level; and that at a chromosome 19-wide scale\*, some combinations of marks co-occur more than others (\*this is also the case genome-wide).  
 <br>
-The average signal plots of [3.3 ChIP-seq signal strength] showed you that different marks have different *average* signals strengths and that this profile is, for some marks, directional suggesting a functional association with gene expression. This remained, however, an average signal and you also observed in the box- and scatter plots of [3.4 Signal vs gene expression] that the signal strength at the TSS can be associated with a gene's expression level, depending on the mark, although this is never a hard, 1-to-1 relationship.  
+The average signal plots of [3.3 ChIP-seq signal strength] showed you that different histone marks have different *average* signals strengths and that this profile is, for some marks, directional suggesting a functional relationship with gene expression. These plots clearly visualized the *average* signal but did not tell you anything about the variation in signal strength nor did it show a relationship with gene expression measurements.     
 <br>
-A method to summarize peak (co-)occurrence at a genomic feature like the TSS and signal strength is a heatmap. If we order this heatmap by the gene's expression level it can visualize the relationship with gene expression, if present, in a crude manner.  
+Finally, in the box- and scatter plots of [3.4 ChIP-seq signal vs. gene expression] you observed that the ChIP-seq signal strength at the TSS can be associated with a gene's expression level although this is never a hard, 1-to-1 relationship.  
 <br>
-In heatmaps of genomics data, each row represents an interval, often aligned at the genomic feature in the middle. The signal strength at each bp or within each bin is encoded by a color scale (eg. white for background signal, bright red for maximum signal).  
+
+#### Introducing heatmaps of ChIP-seq data   
+A method to summarize the (co-)occurrence ChIPped marks at a genomic feature like the TSS and signal strength, is a heatmap. In heatmaps of genomics data, each row represents an interval, often aligned at the genomic feature in the center The signal strength at each bp or within each bin is encoded by a color scale (eg. white for background signal, bright red for maximum signal).    
 <br>
-You will start by making an unordered heatmap.  
+If we order this heatmap by the gene's expression level, it can visualize the relationship with gene expression, albeit in a crude manner.   
+<br>
+Importantly, by plotting heatmaps of different histone marks side-by-side, and then clustering the rows such that similarly marked regions are grouped together, we can identify patterns of histone mark co-occurences that occur more often or less often than others (eg H3K4me3 and H3K27ac co-occurrence at the TSS).  
+<br>
+You will start by making a heatmap of 1 mark: H3K4me3 signal at the TSS.  
 
 ### 3.5.2 Heatmap of 1 mark     
-To make a heatmap of the H3K4me3 signal around the TSS, you can use the same ScoreMatrix as you used for the average signal plot in section [3.3 ChIP-seq signal strength]. To do so, use the `heatMatrix()` function:   
+To make a heatmap of the H3K4me3 signal around the TSS, you can use the same ScoreMatrix as you used for the average signal plot in section [3.3.2 Importing ChIP-seq signal in r]. But this time, use the `heatMatrix()` function for plotting:   
 
 ```{r heatmatrix_example, eval=FALSE, echo=TRUE}
 heatMatrix(mat = [ScoreMatrix_object], 
@@ -1373,7 +1413,7 @@ heatMatrix(mat = [ScoreMatrix_object],
 * `...` means that there are additional, optional arguments, some of which we will come back to soon.   
 
 > #### Background info: defining your color palette with `colorRampPalette()`  
-> <details><summary>**Click here if you want to learn more about how we made the color palettes for the heatmaps.</summary>   
+> <details><summary>**Click here** if you want to learn more about how we made the color palettes for the heatmaps.</summary>   
 > There are many R packages out there that help you generate color palettes (eg.. [RColorBrewer](https://colorbrewer2.org/#), [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html) and more see this [Comprehensive list of color palettes in r by Emil Hvitfeldt](https://github.com/EmilHvitfeldt/r-color-palettes)). We worked with the `colorRampPalette()` function for the coming heatmaps.  
 <br>
 `colorRampPalette()` takes a vector of colors as input and returns a function that you can subsequently call using the argument `n=`. This function will return a palette with `n` entries extrapolating the vector of colors given to `colorRampPalette()`.   
@@ -1390,7 +1430,7 @@ Plot the boxplot of exercise 7d with these colors
 `expression_and_h3k4me3 %>%`    
   `mutate(gene_group = factor(ntile(FPKM, n=4))) %>%`   
   `ggplot(.)+`  
-  `geom_boxplot(mapping=aes(x = gene_group, y = H3K4me3_rpm, fill = gene_group))+`  
+  `geom_boxplot(mapping=aes(x = gene_group, y = h3k4me3_rpm, fill = gene_group))+`  
   `scale_fill_manual(values = my_palette)+`  
   `theme_bw()+`  
   `labs(title = "Average H3K4me3 signal at TSS per gene group.",`  
@@ -1418,7 +1458,7 @@ Plot the boxplot of exercise 7d with these colors
 <!-- expression_and_h3k4me3 %>%   -->
 <!--   mutate(gene_group = factor(ntile(FPKM, n=4))) %>%  -->
 <!--   ggplot(.)+ -->
-<!--   geom_boxplot(mapping=aes(x = gene_group, y = H3K4me3_rpm, fill = gene_group))+ -->
+<!--   geom_boxplot(mapping=aes(x = gene_group, y = h3k4me3_rpm, fill = gene_group))+ -->
 <!--   scale_fill_manual(values = my_palette)+ -->
 <!--   theme_bw()+ -->
 <!--   labs( -->
@@ -1432,12 +1472,13 @@ Plot the boxplot of exercise 7d with these colors
 
 >**Exercise 9**: Generate a heatmap of the H3K4me3 ChIP-seq signal in a 10kb window around the TSS on a white-to-red color scale.  
 > 
-> * `bw_h3k4me3` points to the H3K4me3 ChIP-seq BigWig file.   
-> * `tss_chr19_sample` contains the TSSs of which we have data in the available BigWig files.  
+> * `tss_chr19_sample` contains the TSSs of which we have data in the available bigWig files.  
 > * Rembember that the TSSs are 1bp wide and should be resized.  
-> * Review previous exercises (eg Exercise 5, section [3.3.4 Multiple density profiles in one plot]) for how to resize your tss window and generate the ScoreMatrix object.  
+> * `bw_h3k4me3` points to the H3K4me3 ChIP-seq bigWig file.   
+> * Review previous exercises (eg Exercise 5, section [3.3.5 Multiple profiles in one plot]) for how to resize your tss window and generate the ScoreMatrix object.  
 > * We created a colorpalette for you using `colorRampPalette()`.   
-> * In case you are interested in the effect of using for example a different window size, or different color settings, you can adjust the code accordingly but then hit "Run Code".  
+> * In case you are interested in the effect of using for example a different window size, or different color settings, you can adjust the code accordingly but then hit "Run Code".    
+> * **Coffee time**: Due to the file size, it may take 10-20 sec to run this plot.  
 
 ```{r q9_heatmap1mark, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=18}
 # 1. obtain 10kb windows around the TSS (add 1 bp for the TSS itself)
@@ -1462,7 +1503,8 @@ ___(mat = ___,
 ```
 
 ```{r q9_heatmap1mark-hint-1}
-# Complete step 1 using the resize() function
+# Complete step 1 using the function 
+resize(x = ___, width = ___, fix =  "___") 
 ```
 
 ```{r q9_heatmap1mark-hint-2}
@@ -1475,7 +1517,7 @@ ___(mat = ___,
 
 ```{r q9_heatmap1mark-hint-4}
 # obtain 10kb windows around the TSS you should use
-tss_window <- resize(tss_chr19_sample, width = 10001, fix = "center")
+tss_window <- resize(x = tss_chr19_sample, width = 10001, fix = "center")
 ```
 
 ```{r q9_heatmap1mark-hint-5}
@@ -1520,7 +1562,7 @@ heatMatrix(mat =  scores_h3k4me3_tss,
 ```{r q9_heatmap1mark-check}
 grade_result(
  pass_if(~identical(.result, heatMatrix(mat = ScoreMatrix(target = bw_h3k4me3,
-                                                          windows = resize(tss_chr19_sample, width = 10001, fix = "center"),
+                                                          windows = resize(x=tss_chr19_sample, width = 10001, fix = "center"),
                                                           type = 'bigWig',strand.aware =TRUE), 
                                         col = colors_h3k4me3,
                                         xcoord = c(-5000, 5000),
@@ -1536,23 +1578,24 @@ grade_result(
 question("Are the rows (=intervals around the TSS) in this heatmap from top-to-bottom, ordered by H3K4me3 signal or gene expression of the corresponding gene?",
          answer("Yes, by H3K4me3 signal.", message = "A brigher red signal indicates a higher H3K4me3 signal, are the lines with bright red signal really all on top and those without at the bottom?"),
          answer("Yes, by gene expression of the corresponding gene.", message = "Remember, H3K4me3 signal is associated with gene expression levels and you would expect that ordering the heatmap by gene expression would reflect that if this ordering was applied."),         
-         answer("No, the rows are not ordered.", correct = T, message = "You can use the argument 'order = TRUE/FALSE' within heatMatrix() to order the heatmap by H3K4me3 signal. To order the heatmap by gene expression, we have to order the windows up front."),
+         answer("No, the rows are not ordered.", correct = T, message = "You can use the argument 'order = TRUE/FALSE' within heatMatrix() to order the heatmap by the sum of H3K4me3 signal in each row. To order the heatmap by gene expression, we have to order the windows up front."),
          allow_retry = T)
 ```
 
 ### 3.5.3 Heatmap of H3K4me3 ordered by signal  
-You can add `order=TRUE` to the `heatMatrix` function to order the rows in the heatmap by the sum of values in each row, in this case the H3K4me3 signal.  
+You will first order your heatmap by the H3K4me3 ChIP-seq signal by adding the setting `order=TRUE` to your `heatMatrix()` command.  
 
 ### Exercise 10  
 
 >**Exercise 10**: Repeat the heatmap of section [3.5.2 Heatmap of 1 mark] but this time ensure that it is ordered by H3K4me3 signal (code-check).   
-
+>
 > * `scores_h3k4me3_tss` and `colors_h3k4me3` generated in exercise 9 are available to you.  
-> * Hit "Run Code" to view your plot.  
+> * Hit "Submit Answer" to have your code checked, this won't plot the heatmap.  
+> *  
 
 ```{r prepare_q10, echo=FALSE}
 # obtain 10kb windows around the TSS you should use
-tss_window <- resize(tss_chr19_sample, width = 10001, fix = "center")
+tss_window <- resize(x = tss_chr19_sample, width = 10001, fix = "center")
 # to generate the scorematrix, you should use
 scores_h3k4me3_tss <- ScoreMatrix(target = bw_h3k4me3, 
                                   windows = tss_window, 
@@ -1588,24 +1631,49 @@ heatMatrix(mat = scores_h3k4me3_tss,
 grade_code()
 ```
 
+```{r q10_heatmap1mark_mc}
+quiz(caption="Hit `Run Code` to view the ordered heatmap and answer the following questions.",
+     question("Based on the ±top half of the heatmap, is the H3K4me3 enrichment equally broad up- and downstream the TSS?",
+              answer("H3K4me3 signal is equal in width up- and downstream the TSS.", message = "Look at the red color scale."),
+              answer("H3K4me3 signal is narrower downstream the TSS compared to upstream.", message = "Review what is 'upstream' and what is 'downstream'."),
+              answer("H3K4me3 signal is broader downstream the TSS compared to upstream.", correct = T, message = "Indeed, H3K4me3 signal is broader downatream the TSS."),
+              allow_retry = TRUE,
+              random_answer_order = TRUE),
+     question("Which percentage of TSS windows (in this heatmap) have H3K4me3 near the TSS? Choose the % that is closest to your approximation.",
+              answer("100%"),
+              answer("70%", correct = TRUE, "Thanks to the ordering by H3K4em3 signal this can be estimated."),
+              answer("30%"),
+              answer("10%"),
+              allow_retry = TRUE),
+     question("What could explain the slight decrease in signal at pos. 0?", 
+              answer("The nucleosome depleted region found at the TSS of transcribed genes.", correct = T),
+              answer("The binding of specific TFs at the TSS."),
+              answer("The TSS itself is marked by H3K4ac instaed of H3K4me3"),
+              allow_retry = TRUE,
+              random_answer_order = TRUE)
+     
+)
+```
+
+
 ### 3.5.4 Heatmap of 1 mark ordered by gene expression   
 Instead of ordering the heatmap by the plotted signal, we can also order it by the expression of the corresponding gene. To do so, we need to provide an ordered object to the `windows =` parameter in the `ScoreMatrix()` function.  
 <br>
 To order (or '*sort*') a GRanges object, you use the `sort()` function:  
 ```{r sort_granges, eval=FALSE, echo=TRUE}
-sort([GRanges_object], by = ~[variable_to_sort_on], decreasing =[TRUE/FALSE])
+sort(x = [GRanges_object], by = ~[variable_to_sort_on], decreasing =[TRUE/FALSE])
 ```
 
 ### Exercise 11  
 
 >**Exercise 11**: Sort `tss_window` by high-to-low FPKM values using the `sort()` function. The resulting object `tss_window_sorted` will be used to make the heatmap.   
 >
-> `tss_window` is the object you generated in [Exercise 9].  
+> * `tss_window` is the object you generated in [Exercise 9].  
 
 
 ```{r prepare_q11, echo=FALSE}
 # obtain 10kb windows around the TSS you should use
-tss_window <- resize(tss_chr19_sample, width = 10001, fix = "center")
+tss_window <- resize(x = tss_chr19_sample, width = 10001, fix = "center")
 # define your color palette
 colors_h3k4me3 <- colorRampPalette(c("white", "red"))(100)
 ```
@@ -1639,7 +1707,7 @@ heatMatrix(mat = scores_h3k4me3_tss, xcoord = c(-5000, 5000),
 
 ```{r q11_heatmapfpkmorder-hint-4} 
 # You should use
-tss_window_sorted  <- sort(tss_window, by = ~FPKM, decreasing =TRUE)
+tss_window_sorted  <- sort(x = tss_window, by = ~FPKM, decreasing =TRUE)
 ```
 
 <!-- ```{r q11_heatmapfpkmorder-solution} -->
@@ -1658,7 +1726,7 @@ tss_window_sorted  <- sort(tss_window, by = ~FPKM, decreasing =TRUE)
 ```{r q11_heatmapfpkmorder-check}
 grade_result(pass_if(~identical(.result,
                                 heatMatrix(mat = ScoreMatrix(target = bw_h3k4me3, 
-                                                             windows = sort(tss_window, by = ~FPKM, decreasing =TRUE),
+                                                             windows = sort(x = tss_window, by = ~FPKM, decreasing =TRUE),
                                                              type = 'bigWig', 
                                                              strand.aware =TRUE), 
                                            xcoord = c(-5000, 5000),
@@ -1666,7 +1734,7 @@ grade_result(pass_if(~identical(.result,
                                            xlab = "bp (TSS = 0)",
                                            main = "H3K4me3 signal ordered by gene expression, centered at TSS")
                                 )),
-             correct = "Absolutely fabulous! Compare this plot with the plot made in Exercise 10. Observe that ordering the regions by gene expression results in a plot that resembles - but is not identical! - to the one from exercise 10. Can you explain for yourself why these plots resemble but are not exact copies of oneanother? Tip, look at the scatterplots made at the end of exercise 7d.")
+             correct = "Compare this plot with the plot you made in Exercise 10. Observe that ordering the regions by gene expression results in a plot that resembles - but is not identical! - to the one from exercise 10. Can you explain for yourself why these plots resemble but are not exact copies of oneanother? Tip, look at the scatterplots made at the end of exercise 7d.")
 ```
 
 ### 3.5.5 Same order, different mark   
@@ -1674,30 +1742,30 @@ grade_result(pass_if(~identical(.result,
 
 > **Exercise 12**: Make a heatmap of the **H3K27me3** signal in a 10kb window around the TSS using the same (top-to-bottom) ordering of the regions as used for the heatmap of section [3.5.4 Heatmap of 1 mark ordered by gene expression] (code check). 
 
-> * `tss_window_sorted` from [Exercise 11] is available to you.  
-> * `bw_h3k27me3` points to the locations of the BigWig file of the H3K27me3 ChIP.  
+> * `tss_window_sorted` from Exercise 11 is available to you.  
+> * `bw_h3k27me3` points to the locations of the bigWig file of the H3K27me3 ChIP.  
 > * `colors_h3k27me3` is the color palette you can use in this heatmap (white-to-blue).  
 > * Hit "Run Code" to view the plot (plotting heatmaps may take 5-10 sec).  
 > * Hit "Submit Answer" to submit your code for evaluation.
 
 ```{r prepare_q12, echo=FALSE}
 # obtain 10kb windows around the TSS you should use
-tss_window <- resize(tss_chr19_sample, width = 10001, fix = "center")
+tss_window <- resize(x = tss_chr19_sample, width = 10001, fix = "center")
 # order tss_window by high-to-low FPKM values
-tss_window_sorted  <- sort(tss_window, by = ~FPKM, decreasing =TRUE)
+tss_window_sorted  <- sort(x = tss_window, by = ~FPKM, decreasing =TRUE)
 
 ```
 
 ```{r q12b_h3k27me3_heatmapfpkmorder, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q12"}
 # 1. Generate the ScoreMatrix for H3K27me3
-scores_h3k27me3_tss <- ___(target = bw_h3k27me3,
-                                   windows = tss_window_sorted,
+scores_h3k27me3_tss <- ___(target = ___,
+                                   windows = ___,
                                    type = 'bigWig',
                                    strand.aware =TRUE) 
 
 # 2. plot the heatmap for H3K27me3 signal
 ___(mat = ___,
-    col = colors_h3k27me3,
+    col = ___,
     xcoord = c(-5000, 5000),
     legend.name="rpm",winsorize=c(0,999),
     xlab = "bp (TSS = 0)",
@@ -1735,13 +1803,13 @@ heatMatrix(mat = scores_h3k27me3_tss,
 ```
 
 ```{r q12b_h3k27me3_heatmapfpkmorder-code-check}
-grade_code(correct = "That's glorious! Using the heatmaps of exercise 11 and exercise 12 we can identify sets of regions covered by either H3K4me3 or H3K27me3, by both marks or by neither of the two. To do so, you will generate heatmaps of the two marks in one go.  Let's have a look." )
+grade_code(correct = "Also hit 'Run Code' to view the heatmap." )
 ```
 
 > #### **Optional exercise** 
-<details><summary>You may want to visualize other marks as well. To do so...</summary>   
+<details><summary>You may want to visualize other marks as well. To do so... (click here)</summary>   
 >
-> * The following additional BigWig files are available to you:  
+> * The following additional bigWig files are available to you:  
 > 
 >   - `bw_h3k4me1`  
 >   - `bw_h3k27ac`  
@@ -1753,7 +1821,7 @@ grade_code(correct = "That's glorious! Using the heatmaps of exercise 11 and exe
 </details>
 
 ### 3.5.6 Heatmaps of multiple histone marks, ordered by gene expression.  
-Making heatmaps of multiple marks with the same top-to-bottom ordering of the regions, is similar to making a profile plot of the average signal of multiple marks (see [3.3.4 Multiple density profiles in one plot]).   
+Using the heatmaps of exercise 11 and exercise 12 we can identify sets of regions covered by either H3K4me3 or H3K27me3, by both marks or by neither of the two. This is easier if we plot the heatmaps side-by-side. To do so is similar to making a profile plot of the average signal of multiple marks (see [3.3.5 Multiple profiles in one plot]).   
 <br>
 Start by  making a "ScoreMatrixList" object:    
 ```{r example_scorematrixlist_repeat, echo=TRUE, eval=FALSE}
@@ -1786,12 +1854,12 @@ multiHeatMatrix(sml = [ScoreMatrixList_object],
 > 
 > * The objects `scores_h3k4me3_tss` and `scores_h3k27me3_tss` of Exercise 11 and Exercise 12 are available to you.   
 > * `colors_list` is the list of the color palettes `colors_h3k4me3` and `colors_h3k27me3`.  
-> * Hit "Run Code" to view the resulting plot (this may take 5-10sec).   
+> * 
 > * Hit "Submit answer" to submit the completed code for grading.  
 
 ```{r prepare_q13, echo=FALSE}
 # obtain 10kb windows around the TSS you should use
-tss_window <- resize(tss_chr19_sample, width = 10001, fix = "center")
+tss_window <- resize(x = tss_chr19_sample, width = 10001, fix = "center")
 # order tss_window by high-to-low FPKM values
 tss_window_sorted  <- sort(tss_window, by = ~FPKM, decreasing =TRUE)
 # scores h43k3me3
@@ -1808,7 +1876,7 @@ scores_h3k4me3_h3k27me3 <- new("ScoreMatrixList",list(h3k4me3=____, h3k27me3=___
 
 # 2. plot H3K4me3 and H3K27me3 signals in side-by-side heatmaps
 ___(sml =___,
-    col = colors_list,
+    col = ___,
     xcoord = c(-5000, 5000),
     legend.name="rpm",
     winsorize=c(0,999),
@@ -1834,22 +1902,22 @@ multiHeatMatrix(scores_h3k4me3_h3k27me3, col = colors_list, xcoord = c(-5000, 50
 
 ```{r q13a_multiheatmap-code-check}
 grade_code(
-  correct = "Awesome! You can cluster the regions such that regions with the same type and intensity of marking, are grouped together (eg regions with high H3K4me3 signal and no H3K27me3 signal could be a cluster).")
+  correct = "Make sure you also hit 'Run Code' to view the resulting heatmap (this may take 5-10sec).")
 ```
 
-### 3.5.7 Clustering side-by-side heatmaps     
-To cluster the heatmap you use the `clustfun=` parameter. Without going into detail of discussing different clustering methods (that would give us enough material for another tutorial), here is a basic template you can use for kmeans-clustering. k-means takes data points as input and groups them into k clusters.    
+### 3.5.7 Clustering side-by-side heatmaps  
+You can cluster the windows (=rows) in a heatmap such that windows with the same type and intensity of marking, are grouped together. For example regions with high H3K4me3 signal and no H3K27me3 signal could be a cluster. To cluster the heatmap you use the `clustfun=` parameter. Without going into detail of discussing different clustering methods (that would give us enough material for another tutorial), here is a basic template you can use for kmeans-clustering. k-means takes data points as input and groups them into k clusters.    
 ```{r kemansclustering, echo=TRUE, eval=FALSE}
 kmeans_function <- function(x) kmeans(x, centers = [k])$cluster
 ```
 
-* `[k]` should be replaced by an integer value and determines the number of clusters that will be generated.  
+* `[k]` should be replaced by an integer value (eg 2,3,4,6 etc.) and determines the number of clusters that will be generated.  
 
 ### Exercise 14  
 
 > **Exercise 14a**: Complete the code below to generate side-by-side heatmaps of H3K4me3 and H3K27me3 in a 10kb window around the TSS, clustered with kmeans clustering into 4 clusters (code check).   
 > 
-> * The object `scores_h3k4me3_h3k27me3` of [Exercise 13] is available to you.   
+> * The object `scores_h3k4me3_h3k27me3` of Exercise 13 is available to you.   
 > * `colors_list` is the list of the color palettes `colors_h3k4me3` and `colors_h3k27me3`.  
 > * Hit "Run Code" to view the resulting plot (this may take 5-10sec).   
 > * Hit "Submit answer" to submit the completed code for grading.  
@@ -1857,7 +1925,7 @@ kmeans_function <- function(x) kmeans(x, centers = [k])$cluster
 
 ```{r prepare_q14, echo=FALSE}
 # obtain 10kb windows around the TSS you should use
-tss_window <- resize(tss_chr19_sample, width = 10001, fix = "center")
+tss_window <- resize(x = tss_chr19_sample, width = 10001, fix = "center")
 # order tss_window by high-to-low FPKM values
 tss_window_sorted  <- sort(tss_window, by = ~FPKM, decreasing =TRUE)
 # scores h43k3me3
@@ -1902,12 +1970,12 @@ multiHeatMatrix(sml=scores_h3k4me3_h3k27me3,
 
 ```{r q14_multiheatmap-code-check}
 grade_code(
-  correct = "You should be proud!")
+  correct = "Compare your heatmap with the one in the drop-down box below.")
 ```
 
 
 > **Exercise 14b**: Identify the following clusters in your side-by-side heatmap...    
-<details><summary>***Click here***</summary>  
+<details><summary>Click here to open the drop-down box.</summary>  
 Due to technical reasons the rows are clustered slightly different, every time you run this code. Also, you will get a slightly different clustering compared to your fellow students.   
 <br>
 Nevertheless, you will probably see two clusters with relatively high H3K4me3 signals, in the plot below these are **clusters 1 and 3**. They are put into distinct clusters because:   
@@ -1930,26 +1998,26 @@ Finally, let's go ***crazy*** and make *clustered* heatmap using ChIP-seq data o
 > **Exercise 15a:** Generate ScoreMatrix objects for H3K27ac and H3K4me1 in these windows (code check).  
 >  
 > * The object `tss_window_sorted` of [Exercise 11] is available to you.   
-> * `bw_h3k27ac` and `h3k4me1` point to the locations of the respective BigWig files.   
+> * `bw_h3k27ac` and `bw_h3k4me1` point to the locations of the respective bigWig files.   
 
 ```{r prepare_q15a, echo=FALSE}
 # obtain 10kb windows around the TSS you should use
-tss_window <- resize(tss_chr19_sample, width = 10001, fix = "center")
+tss_window <- resize(x = tss_chr19_sample, width = 10001, fix = "center")
 # order tss_window by high-to-low FPKM values
 tss_window_sorted  <- sort(tss_window, by = ~FPKM, decreasing =TRUE)
 ```
 
 ```{r q15a, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q15a"}
 # 1. make the ScoreMatrix  for H3K27ac
-scores_h3k27ac_tss <- ___(target = ___, windows = tss_window_sorted, type = 'bigWig',strand.aware =TRUE)
+scores_h3k27ac_tss <- ___(target = ___, windows = ___, type = 'bigWig',strand.aware =TRUE)
 
 # 2. make the ScoreMatrix for H3K4me1
-scores_h3k4me1_tss <- ___(target = ___, windows = tss_window_sorted, type = 'bigWig',strand.aware =TRUE)
+scores_h3k4me1_tss <- ___(target = ___, windows = ___, type = 'bigWig',strand.aware =TRUE)
 ```
 
 ```{r q15a-solution}
-scores_h3k4me1_tss <- ScoreMatrix(target = bw_h3k4me1, windows = tss_window_sorted, type = 'bigWig',strand.aware =TRUE) 
 scores_h3k27ac_tss <- ScoreMatrix(target = bw_h3k27ac, windows = tss_window_sorted, type = 'bigWig',strand.aware =TRUE)
+scores_h3k4me1_tss <- ScoreMatrix(target = bw_h3k4me1, windows = tss_window_sorted, type = 'bigWig',strand.aware =TRUE) 
 ```
 
 ```{r q15a-code-check}
@@ -1966,7 +2034,7 @@ grade_code()
 
 ```{r prepare_q15b, echo=FALSE}
 # obtain 10kb windows around the TSS you should use
-tss_window <- resize(tss_chr19_sample, width = 10001, fix = "center")
+tss_window <- resize(x = tss_chr19_sample, width = 10001, fix = "center")
 # order tss_window by high-to-low FPKM values
 tss_window_sorted  <- sort(tss_window, by = ~FPKM, decreasing =TRUE)
 # scores h43k3me3
@@ -1982,7 +2050,7 @@ scores_h3k27me3_tss <- ScoreMatrix(target = bw_h3k27me3, windows = tss_window_so
 ```{r q15b, exercise =TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q15b"}
 # 1. create the ScoreMatrixList of the individual ScoreMatrix objects
 scores_list <- ___("ScoreMatrixList", list(h3k4me3=scores_h3k4me3_tss, h3k27ac=scores_h3k27ac_tss,
-                                          h3k4me1=scores_h3k4me1_tss, h3k27me3=scores_h3k27me3_tss, h3k36me3=scores_h3k36me3_tss))
+                                          h3k4me1=scores_h3k4me1_tss, h3k27me3=scores_h3k27me3_tss))
 
 # 2. place all the color palettes in a list
 colors_list <- list(colors_h3k4me3, colors_h3k27ac, colors_h3k4me1, colors_h3k27me3)
@@ -1991,9 +2059,9 @@ colors_list <- list(colors_h3k4me3, colors_h3k27ac, colors_h3k4me1, colors_h3k27
 kmeans_function <- function(x) kmeans(x, centers = ___)$cluster
 
 # 4. generate the heatmap
-____(sml=scores_list,
-                clustfun = kmeans_function,
-                col = colors_list,
+____(sml=___,
+                col = ___,
+                clustfun = ___,
                 xcoord = c(-5000, 5000),
                 legend.name="rpm",
                 xlab = "bp (TSS = 0)")
@@ -2012,19 +2080,19 @@ kmeans_function <- function(x) kmeans(x, centers = 4)$cluster
 
 # generate the heatmap
 multiHeatMatrix(sml=scores_list,
-                clustfun = kmeans_function,
                 col = colors_list,
+                clustfun = kmeans_function,
                 xcoord = c(-5000, 5000),
                 legend.name="rpm",
                 xlab = "bp (TSS = 0)")
 ```
 
 ```{r q15b-code-check}
-grade_code()
+grade_code(correct = "Compare your heatmap with the one in the drop-down box below.")
 ```
 
 > **Exercise 15c**: Compare your heatmap with this one....   
-<details><summary>***Click here***</summary> 
+<details><summary>Click here to open the drop-down box.</summary> 
 Try to identify the following trends in the heatmap plotted below. Can you spot them in your own heatmap as well? No worries if your heatmap is not identical to the one below. Due to the nature of the clustering altgorithm it outputs a slightly different pattern each time you run the code. But although the outputs are not often 100% identical, they should be similar as they are based on the same data. There is a good chance that your clusters are numbered differently. Or, in ±10% of the runs, we observed that the regions with high H3K27me3 signal were split up in two seperate clusters and you may observe that. Nevertheless, you should still be able to discern the general trends.   
 > 
 i. The pattern of H3K4me3 and H3K27ac signals are much alike but compared to the H3K4me3 signal, H3K27ac is less high and is found at fewer TSSs. This is in line with the average signal plot of [Exercise 4].  
@@ -2046,10 +2114,10 @@ This is where [ChromHMM](http://compbio.mit.edu/ChromHMM/) comes in play. "**Chr
 <br>
 Chromatin states are patterns of spatially re-occurring, co-localizing histone marks and (transcription) factors. that capture known genomic elements  such as promoters, enhancers, and transcribed, repressed, and repetitive regions, and can also capture novel classes or subclasses of elements (Adapted from [Ernst J & Kellis M., 2017 Nat prot](https://www.nature.com/articles/nprot.2017.124)).  
 <br>
-ChromHMM learns the significant combinatorial and spatial patterns of chromatin marks de novo from the data. This reveals the functional elements even without looking at the sequence.   
+ChromHMM learns the significant combinatorial and spatial patterns of chromatin marks de novo from the data. This reveals the functional elements without looking at the sequence.   
 
 ### Exercise 16  
-ChromHMM analysis was also performed using the monocyte ChIP-seq data you have worked with (ref: [BLUEPRINT secondary analysis](http://dcc.blueprint-epigenome.eu/#/md/secondary_analysis). The following heatmap summarizes the identified spatial combinations of marks:  
+ChromHMM analysis was also performed on the monocyte ChIP-seq data you have worked with (ref: [BLUEPRINT secondary analysis](http://dcc.blueprint-epigenome.eu/#/md/secondary_analysis). The following heatmap summarizes the identified spatial combinations of marks:  
 
 - Each row corresponds to a different chromatin state.    
 - Each column corresponds to a different mark.  
@@ -2093,6 +2161,7 @@ question("The likely annotation is ... ",
 > #### Congratulations!  
 You have performed a quantitative analysis of the ChIP-seq signal at the TSS, analzyed its association with gene expression and the combinatorial patterns that occur among different histone marks at the TSS. You have completed this tutorial. Well done!   
 
+<center>
 <iframe src="https://giphy.com/embed/KJCsv8KcpwHjG" width="480" height="264" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/clap-KJCsv8KcpwHjG">via GIPHY</a></p>
-
+</center>
 
