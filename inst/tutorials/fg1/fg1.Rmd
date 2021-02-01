@@ -274,7 +274,7 @@ In general for Illumina sequencing:
 
 
 > #### Background box:
-<details><summary>Here's the complete encoding of Phred scrores 0-40.</summary>
+<details><summary>Click here for the complete encoding of Phred scrores 0-40.</summary>
 ![](images/wk1_1_phred_ascii.png){width=90%}     
 >  
 *Ref: [Amixon (2013/07/01) Bioinformatics for beginners - File formats Part 2. - Short reads.](https://www.omixon.com/bioinformatics-for-beginners-file-formats-part-2-short-reads)*
@@ -323,11 +323,11 @@ If the Quality Control does not support major technical problems like a systemat
 > Use these two "Per base sequence quality" reports to answer the following questions.   
 >
 > <details><summary>Click here for example 1.</summary>
-> ![](images/wk1_3_ex1_fastqc_per_base_quality_example1.png){width=80%}\     
+> ![](images/wk1_3_ex1_fastqc_per_base_quality_example1.png){width=95%}\     
 > </details>
 > <br>
 > <details><summary>Click here for example 2.</summary>
-> ![](images/wk1_3_ex1_fastqc_per_base_quality_example2.png){width=80%}\     
+> ![](images/wk1_3_ex1_fastqc_per_base_quality_example2.png){width=95%}\     
 > </details>
 
 
@@ -340,14 +340,14 @@ quiz(
              allow_retry = TRUE,
              random_answer_order = TRUE),
     question("Of plot 1 and 2, which shows a **good per base sequence quality**?",
-             answer("report 1", correct = T, message = "These examples have been borrowed from the [FASTQC project website of the Braham Institute](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/), visit the 'Example Reports' section of their website for the complete reports."),
+             answer("report 1", correct = T, message = "These examples have been borrowed from the [FASTQC project website of the Braham Institute](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) (use right-mouse-click to open the link), visit the 'Example Reports' section of their website for the complete reports."),
              answer("report 2", message = "For a good per base quality the Phred-score should be above 28-30, see also section [1.2 Sample to raw data]"),
              allow_retry = TRUE))
 ```
 <br>
 
 > #### Background box:
-> For detailed discussion on FASTQC reports see the FASTQC website of the Babraham institute, and their tutorial on Quality Control in Sequencing Experiments [link](https://www.bioinformatics.babraham.ac.uk/training.html#sequenceqc).
+> For detailed discussion on FASTQC reports see the [FASTQC website of the Babraham institute](https://www.bioinformatics.babraham.ac.uk/training.html#sequenceqc), and their tutorial on Quality Control in Sequencing Experiments.
 
 <br>
 
@@ -472,8 +472,8 @@ Depending on your experimental set up additional steps are performed outside R. 
 
 <br>
 
-### 1.3.2 Common causes of noise and artifacts
-Artifacts and noise in your data can arise from various causes. Here's a list of common **causes**:
+### 1.3.2 Common causes of noise and artefacts
+Artefacts and noise in your data can arise from various causes. Here's a list of common **causes**:
 
 1. Synthetic DNA sequences
 2. Poor base call accuracy
