@@ -340,7 +340,7 @@ quiz(
              allow_retry = TRUE,
              random_answer_order = TRUE),
     question("Of plot 1 and 2, which shows a **good per base sequence quality**?",
-             answer("report 1", correct = T, message = "These examples have been borrowed from the [FASTQC project website of the Braham Institute](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) (use right-mouse-click to open the link), visit the 'Example Reports' section of their website for the complete reports."),
+             answer("report 1", correct = T, message = "These examples have been borrowed from the [FASTQC project website of the Braham Institute](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) (use your right-mouse-click to open the link), visit the 'Example Reports' section of their website for the complete reports."),
              answer("report 2", message = "For a good per base quality the Phred-score should be above 28-30, see also section [1.2 Sample to raw data]"),
              allow_retry = TRUE))
 ```
