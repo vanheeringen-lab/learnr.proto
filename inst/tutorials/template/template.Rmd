@@ -32,18 +32,22 @@ gradethis::gradethis_setup()
 # load(rdata)
 ```
 
-```{r timeout1, context="server"}
-# the following 2 chunks stop the tutorial
-# their purpose is to keep the server running smoothly
-
-## 1 STOP
-
+```{r stop_when_browser_closes, context="server"}
 # stop the app when the browser is closed (or refreshed*)
-# *there is **no way** to distinguish between refresh and browser (tab) closing
+#   *there is **no way** to distinguish between refresh and browser (tab) closing
 # this is required as closing the browser window prevents the timeout below from working.
 session$onSessionEnded(stopApp)
+```
 
-## 2 TIMEOUT
+```{r timeout1, context="server"}
+# The timeout chunks stop the tutorial if it has been idle for too long
+# Their purpose is to keep the server running smoothly
+
+# Method: 
+# This chunk (timeout1) sends a unique identifier "session_id" to timeout2.
+# When the session has been running idle for longer than "timeoutSec" seconds,
+# timeout2 will update shiny variable "input[[session_id]]" .
+# This signal is then be used in timeout1 to stop the session.
 
 # obtain the session's ID and send it to the javascript chunk
 isolate({
@@ -62,13 +66,6 @@ observeEvent(input[[session_id]], ignoreNULL=T, {
 ```
 
 ```{js timeout2}
-// This chunk stops the tutorial if it has been idle for too long
-
-// Situation: We need to stop inactive tutorials to prevent the server from grinding to a halt.
-// Method: this chunk will update shiny variable "input[[session_id]]" 
-//   when the session has been running idle for longer than "timeoutSec" seconds.
-// This signal is then be used by Shiny (server-side) to stop the session.
-
 $(function() {
   var timeoutSec = 10*60;  // <-- change as desired
   var idleTimer;
@@ -78,7 +75,7 @@ $(function() {
     session_id = s_id;  // assigns the variable globally
   });
 
-  // update "input[[session_id]]"
+  // update "input[[session_id]]" when called
   function onTimeout() {
     alert("Tutorial stopped due to inactivity.\nRestart to continue where you left off!")
     Shiny.setInputValue(session_id, "TRUE");
@@ -96,6 +93,20 @@ $(function() {
 
 // source 1: https://community.rstudio.com/t/keeping-track-of-idle-time-during-app-usage/1735
 // source 2: https://bookdown.org/yihui/rmarkdown/language-engines.html#javascript-and-css
+```
+
+```{js open_links_in_new_tab}
+// open all links starting with http(s) in a new tab
+$(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+
+// source: https://yihui.org/en/2018/09/target-blank/
 ```
 
 ## Chapter name

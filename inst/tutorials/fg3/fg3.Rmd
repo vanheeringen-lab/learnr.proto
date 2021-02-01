@@ -60,44 +60,42 @@ suppressPackageStartupMessages({
 })
 ```
 
-```{r timeout1, context="server"}
+```{r stop_when_browser_closes, context="server"}
+# stop the app when the browser is closed (or refreshed*)
+#   *there is **no way** to distinguish between refresh and browser (tab) closing
+# this is required as closing the browser window prevents the timeout below from working.
 session$onSessionEnded(stopApp)
+```
 
+```{r timeout1, context="server"}
+# The timeout chunks stop the tutorial if it has been idle for too long
+# Their purpose is to keep the server running smoothly
+
+# Method: 
+# This chunk (timeout1) sends a unique identifier "session_id" to timeout2.
+# When the session has been running idle for longer than "timeoutSec" seconds,
+# timeout2 will update shiny variable "input[[session_id]]" .
+# This signal is then be used in timeout1 to stop the session.
+
+# obtain the session's ID and send it to the javascript chunk
 isolate({
-  # obtain the session id
-  # source 1: https://shiny.rstudio.com/reference/shiny/latest/session.html
-  # source 2: https://stackoverflow.com/questions/18900955/get-environment-identifier-in-r
   session_id <- sub('<environment: (.*)>', '\\1', capture.output(session$userData))
-  
-  # # send the session ID to the log (indicates the tutorial is loaded)
-  # write(paste0("Session ID: ", session_id), stderr())
-  
-  # send the session ID to the javascript chunk
   session$sendCustomMessage("session_id", session_id)
 })
 
 # stop the tutorial when "input[[session_id]]" is updated
-observeEvent(input[[session_id]], ignoreNULL=TRUE, {
+observeEvent(input[[session_id]], ignoreNULL=T, {
   write(paste0("\nTutorial terminated due to inactivity.\nRestart to continue where you left off!\n"), stderr())
   stopApp()
 })
+
+# source 1: https://shiny.rstudio.com/reference/shiny/latest/session.html
+# source 2: https://stackoverflow.com/questions/18900955/get-environment-identifier-in-r
 ```
 
 ```{js timeout2}
-// This chunk stops the tutorial if it has been idle for too long
-
-// Situation: We need to stop inactive tutorials to prevent the server from grinding to a halt.
-// Problem: refreshing the tutorial and closing the browser send the same signal to shiny.
-// since we cannot distinguish the two, this signal cannot be used to stop the tutorial.
-// Solution: Use a timeout system. 
-// Method: this chunk will update shiny variable "input[[session_id]]" 
-//   when the session has been running idle for longer than "timeoutSec" seconds.
-// This signal is then be used by Shiny (server-side) to stop the session.
-
-// source1: https://community.rstudio.com/t/keeping-track-of-idle-time-during-app-usage/1735
-// source2: https://bookdown.org/yihui/rmarkdown/language-engines.html#javascript-and-css
 $(function() {
-  var timeoutSec = 20*60;
+  var timeoutSec = 20*60;  // <-- change as desired
   var idleTimer;
 
   // receive this session's ID
@@ -105,7 +103,7 @@ $(function() {
     session_id = s_id;  // assigns the variable globally
   });
 
-  // assign session ID as reactive variable "input[[session_id]]" 
+  // update "input[[session_id]]" when called
   function onTimeout() {
     alert("Tutorial stopped due to inactivity.\nRestart to continue where you left off!")
     Shiny.setInputValue(session_id, "TRUE");
@@ -116,9 +114,27 @@ $(function() {
     idleTimer = setTimeout(onTimeout, timeoutSec * 1000);
   }
   
+  // (re)set timeout upon user input
   $(document).on('shiny:message shiny:inputchanged', startIdleTimer);
 
 })();
+
+// source 1: https://community.rstudio.com/t/keeping-track-of-idle-time-during-app-usage/1735
+// source 2: https://bookdown.org/yihui/rmarkdown/language-engines.html#javascript-and-css
+```
+
+```{js open_links_in_new_tab}
+// open all links starting with http(s) in a new tab
+$(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+
+// source: https://yihui.org/en/2018/09/target-blank/
 ```
 
 ## 3.1 Introduction   
