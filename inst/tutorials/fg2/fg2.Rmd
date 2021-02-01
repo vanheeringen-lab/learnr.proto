@@ -56,9 +56,10 @@ suppressPackageStartupMessages({
   # data accessible to all exercises
   rdata = system.file("extdata", "week2.Rdata", package = "learnr.proto")
   load(rdata)
+  monocytes_list <- GRangesList(monocytes_list, compress=F) # go from compressed to simpleGRangesList
+  # make one large granges object
   monocytes_all <- unlist(monocytes_list)
   monocytes_all$chip <- names(monocytes_all)
-  monocytes_list <- GRangesList(monocytes_list, compress=F)
   
   # chr19_windows_1bp <- tileGenome(seqinfo(txdb), tilewidth = 10, cut.last.tile.in.chrom =T)
   tss_chr19 <- unique(promoters(genes(txdb), upstream=100, downstream=0)) 
@@ -1798,10 +1799,9 @@ You will make an UpSet plot, which is an elegant alternative to the VennDiagram,
 ![](images/wk2_4_complexheatmap_modes.png)/  
 [Ref](https://jokergoo.github.io/ComplexHeatmap-reference/book/upset-plot.html#input-data): *Zuguang Gu, ComplexHeatmap Complete Reference, last revised on 2020-10-27*  
 <br>
-<br>
 The `make_comb_mat([list_of_grangesobjects])` is used to detect overlapping marks:   
 ```{r makecombexample, eval=FALSE, echo=TRUE}
-monocytes_combinationmatrix <- make_comb_mat(monocytes_list) # takes a while! 
+monocytes_combinationmatrix <- make_comb_mat(monocytes_list) 
 ```
 `make_comb_mat()` returns a "combination matrix" object. Special functions can be used to view its information and filter the reported combinations:   
 
@@ -1811,6 +1811,14 @@ monocytes_combinationmatrix <- make_comb_mat(monocytes_list) # takes a while!
     + The combinations are encoded in a binary fashion of 0s and 1s.  
     + A 1 means the mark in question is present in the combination.  
     + These 0s and 1s follow the order given by set_name().   
+
+```{r makecombexample_saving, echo = F, eval = F}
+# I ran this chunk to save the combination matrix such that students do not need to run it (it takes quite a while)
+# prepare objects for upset plot in week 2
+monocytes_combinationmatrix <- make_comb_mat(monocytes_list) # takes a while! 
+
+saveRDS(monocytes_combinationmatrix, file =  "/home/ctoenhake/learnr.proto/inst/extdata/week2/prepared_rds/blueprint_monocyte_chr19_complexheatmap_combmatrix.rds")
+```
 
 
 ### Exericse 13a    
