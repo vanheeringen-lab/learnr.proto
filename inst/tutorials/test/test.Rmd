@@ -1,5 +1,5 @@
 ---
-title: "Tutorial"
+title: "feature testing"
 # progress stored in ~/.local/share/R/learnr/tutorial/storage/siebrenf/prototype/
 tutorial:
   id: "prototype"  # folder name
