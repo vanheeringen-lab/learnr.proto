@@ -36,7 +36,7 @@ the raw data are removed from the tutorial package and can be found on blueprint
 
 - bed files were downloaded from, eg.H3K4me3: http://dcc.blueprint-epigenome.eu/#/experiments/ERX547984 ; file "Enriched regions, BED format'.  
 - select chr19 with awk:  `cat $file | awk '{OFS = "\t"} {if ($1 == "chr19") print $0}'  > $(basename $file .bed).chr19.bed`   
-- complete and chr19 limited .bed files are stored on cn45: `/scratch/ctoenhake/data/fg1_r_data/blueprint/chip_bed`  
+- complete and chr19 limited .bed files are stored on cn45: `/ceph/rimlsfnwi/web_share/mbdata/ctoenhake/edu/fg1_r_data/blueprint/chip_bed`  
 
 ```{r prepare monocyt data, echo = T, eval = F}
 # H3k4me1 
@@ -69,7 +69,7 @@ save(monocytes_h3k4me1, monocytes_h3k4me3, monocytes_h3k9me3, monocytes_h3k27ac,
 
 - File "C000S5B1.gene_quantification.rsem_grape2_crg.GRCh38.20150622.results" 
   + was downloaded from:  http://dcc.blueprint-epigenome.eu/#/experiments/ERX157053 ; file "Transcription quantification (Genes)".  
-  + is stored on cn45: `/scratch/ctoenhake/data/fg1_r_data/blueprint/quant/C000S5B1.gene_quantification.rsem_grape2_crg.GRCh38.20150622.results`.   
+  + is stored on cn45: `/ceph/rimlsfnwi/web_share/mbdata/ctoenhake/edu/fg1_r_data/blueprint/quant/C000S5B1.gene_quantification.rsem_grape2_crg.GRCh38.20150622.results`.   
 
 ```{r quantification, echo = T, eval = F}
 #BiocManager::install("org.Hs.eg.db")
@@ -113,6 +113,8 @@ the raw bigwig data are removed from the tutorial.
 
 After I ran the chunks to get smaller bigwig files, I removed the dir `/home/ctoenhake/learnr.proto/inst/extdata/week3/bw_chr19`, and kept `/home/ctoenhake/learnr.proto/inst/extdata/week3/bw_chr19_tss_sample`   
 
+Raw bigwig files were relocated to:  
+`/ceph/rimlsfnwi/web_share/mbdata/ctoenhake/edu/fg1_r_data/`  
 
 ## chr19 - get smaller bigwig by downsampling genes and save associated tss and FPKM files    
 Problem: chip-seq bigwig files of 1 chromosome are too large  
