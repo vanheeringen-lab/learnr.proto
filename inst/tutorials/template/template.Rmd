@@ -1,0 +1,130 @@
+---
+title: "Title"
+tutorial:      # where learnr stores the progress
+  id: "UID"    # folder name
+  version: 0.1 # subfolder name
+output: 
+  learnr::tutorial:
+    fig_caption: no
+    progressive: true
+    allow_skip: true
+    css: ["css/custom.css", "css/print2pdf.css"]
+runtime: shiny_prerendered
+description: >
+  Multi line text can be put here
+  for your convenience.
+---
+
+
+```{r setup, include=FALSE}
+suppressPackageStartupMessages({
+  library(learnr)     # 0.10.1.9006 (github)
+  library(gradethis)  # 0.1.0.9004  (github)
+  # library(...)
+})
+
+# configuration
+knitr::opts_chunk$set(echo = FALSE)
+gradethis::gradethis_setup()
+
+# data accessible to all exercises
+# rdata = system.file("extdata", "week_n.Rdata", package = "learnr.proto")
+# load(rdata)
+```
+
+```{r stop_when_browser_closes, context="server"}
+# stop the app when the browser is closed (or refreshed*)
+#   *there is **no way** to distinguish between refresh and browser (tab) closing
+# this is required as closing the browser window prevents the timeout below from working.
+session$onSessionEnded(stopApp)
+```
+
+```{r timeout1, context="server"}
+# The timeout chunks stop the tutorial if it has been idle for too long
+# Their purpose is to keep the server running smoothly
+
+# Method: 
+# This chunk (timeout1) sends a unique identifier "session_id" to timeout2.
+# When the session has been running idle for longer than "timeoutSec" seconds,
+# timeout2 will update shiny variable "input[[session_id]]" .
+# This signal is then be used in timeout1 to stop the session.
+
+# obtain the session's ID and send it to the javascript chunk
+isolate({
+  session_id <- sub('<environment: (.*)>', '\\1', capture.output(session$userData))
+  session$sendCustomMessage("session_id", session_id)
+})
+
+# stop the tutorial when "input[[session_id]]" is updated
+observeEvent(input[[session_id]], ignoreNULL=T, {
+  write(paste0("\nTutorial terminated due to inactivity.\nRestart to continue where you left off!\n"), stderr())
+  stopApp()
+})
+
+# source 1: https://shiny.rstudio.com/reference/shiny/latest/session.html
+# source 2: https://stackoverflow.com/questions/18900955/get-environment-identifier-in-r
+```
+
+```{js timeout2}
+$(function() {
+  var timeoutSec = 10*60;  // <-- change as desired
+  var idleTimer;
+
+  // receive this session's ID
+  Shiny.addCustomMessageHandler("session_id", function(s_id) {
+    session_id = s_id;  // assigns the variable globally
+  });
+
+  // update "input[[session_id]]" when called
+  function onTimeout() {
+    alert("Tutorial stopped due to inactivity.\nRestart to continue where you left off!")
+    Shiny.setInputValue(session_id, "TRUE");
+  }
+
+  function startIdleTimer() {
+    if (idleTimer) clearTimeout(idleTimer);
+    idleTimer = setTimeout(onTimeout, timeoutSec * 1000);
+  }
+  
+  // (re)set timeout upon user input
+  $(document).on('shiny:message shiny:inputchanged', startIdleTimer);
+
+})();
+
+// source 1: https://community.rstudio.com/t/keeping-track-of-idle-time-during-app-usage/1735
+// source 2: https://bookdown.org/yihui/rmarkdown/language-engines.html#javascript-and-css
+```
+
+```{js open_links_in_new_tab}
+// open all links starting with http(s) in a new tab
+$(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+
+// source: https://yihui.org/en/2018/09/target-blank/
+```
+
+## Chapter name
+
+tutorial goes here
+
+```{js print2pdf1, context="server"}
+// the following 2 chunks print the completed sections of the tutorial to PDF
+// uses "css/print2pdf.css"
+$(document).on('shiny:inputchanged', function(event) {
+  if (event.name === 'print2pdf') {
+    window.print();
+  }
+});
+```
+
+```{r print2pdf2}
+# button can be placed anywhere in the tutorial
+# suggested at the end of the tutorial as the tutorial should be completed first
+actionButton("print2pdf", "Print page", style="opacity: .7; color: #000;")
+```
