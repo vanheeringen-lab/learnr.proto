@@ -140,17 +140,26 @@ $(function() {
 
 
 ## 2.1 Introduction
+### 2.1.1 Recap fg1    
+In **fg1** you studied the major steps involved in obtaining epigenomics data, from experiment to raw data and from raw data to normalized signal and peaks. You uploaded and inspected data of DNaseI-seq, RNA-seq and ChIP-seq of histone modifications of monocytes in the UCSC genome browser and you searched for regions with increased signal, so-called *peaks*.   
 <br>
-In week 1 we discussed the major steps involved in obtaining genomics data, from experiment to raw data to normalized signal and peaks. You examined histone PTM ChIP-, DNaseI-, and RNA-seq data of monocytes in the UCSC genome browser and searched for regions with increased signal, *peaks*. You looked at the position of these peaks in the chromosome and with respect to genes as well as the co-occurrence of different marks.   
+By browsing through the data in the UCSC genome browser, you observed that the signal of the various epigenomics datasets have different shapes. E.g. narrow and high signal mainly at the promoter for H3K4me3 versus broad shallow signal covering multiple genes for H3K9me3.   
 <br>
-These observations showed examples of marks associated with a particular functional elements (e.g. active enhancer, active promoter, silenced domains). Manual annotation of each peak region would be an overkill and dangerously subjective. 
-<br>
-**This week and next week you will perform computational analyses to annotate peaks and answer common questions including:** "*How many peaks do I have?*", "*Is this mark statistically enriched at promoters?*", "*Which and how often do marks co-occur?*","*The expression of which gene could be affected by this mark?*",  and "*What is the signal of the mark around a particular element of interest like the TSS?*"   
+In addition, you looked at the position of these peaks in the chromosome, with respect to genes as well as the co-occurrences of different marks at these sites. Lastly, you practiced in discriminating active from silenced genes based on their associated histone and DNaseI markings.    
 
-### Need help?  
-You are allocated to Breakout rooms in Zoom (or you can select one yourself). Either way, use the Breakout rooms to discuss  questions and difficulties with your peers. If you still have question, use the "raise hand" option to notify the teacher.    
+### 2.1.2 This and next week    
+You will computationally analyze the genome-wide trends in ChIP-seq data of histone modifications using R programming and answer common questions such as:  
 
-### 2.1.1 Learning Objectives  
+- *"How many peaks do I have?"*;    
+- *"Is this mark statistically enriched at promoters?"*;    
+- *"Which and how often do marks co-occur?"*;   
+- *"What is the association between the occurrence of this mark at the promoter and gene expression?"*;
+- *"What is the average signal of this mark around the TSS?"*;    
+- *"What are the different chromatin states in my cells, how often do they occur and what functional genomic element do they correspond to?"*;  
+
+A tiny side note: instead of performing the analyses genome-wide, we have restricted that dataset to chromosome 19; one of the smallest chromosomes. This was done to reduce the sizes of the files that you are woking with and thereby speed up the tutorial.  
+
+### 2.1.3 Learning Objectives  
 
 > At the end of week 2 you are able to:  
 > 
@@ -160,24 +169,36 @@ You are allocated to Breakout rooms in Zoom (or you can select one yourself). Ei
 4. Plot this overlap in a venndiagram.  
 5. Statistically test for enrichment of histone marks in a particular genomic region.  
 6. Visually compare gene expression of genes with different histone marks at their promoters.  
-7. summarise the genome-wide overlap among multiple marks in a upset plot.  
+7. Interpret the genome-wide overlap among multiple marks from an Upset plot.  
 - These refer to global learning objectives #4-#7.  
 
-#### Tutorial specs  
+### 2.1.4 Tutorial specs  
 
-- Answers will be saved each time you close your session and will be loaded if you restart the tutorial. Unless you hit `Start over` at the bottom of the table-of-contents.      
-- At the end of the tutorial you are instructed to print a pdf report of the tutorial (incl. your answers).   
-- To reserve server space to *active* running tutorials, and stop those that aren't actively used anymore, we set a time limit to 25 minutes meaning that if your tutorial has been idle for over 25 minutes, you will see the following warning "Tutorial stopped due to inactivity. Restart to continue where you left off!". When you see this warning, you should close the browser with the tutorial and restart the tutorial. Progress will be saved and once you restart the tutorial you can continue where you left.   
-- Links to reference material (not required for reading!) and used resources are formatted with `r colorize("light blue font", col = "dodgerblue")`. It is advised to open these links using the "right-mouse click \-\-\> Open in a new browser tab" strategy. If you click on the links straight away, you are directed away from the tutorial.   
-- About the exercises:  
-    * In this tutorial you will have multiple-choice and check-the-box questions like in fg1 but also **complete-the-code exercises**. The latter are sometimes evaluated on the printed object or summary (e.g a the top part of an object), in other cases, the code itself is checked. When the code is evaluated we added "(code check)" to the question. In these cases, R will give custom feedback that helps you correct your code.      
-    * For short lines of code, you have to decide which function or object to use and how to write this in code. For some longer lines of codes, we left blanks as "___" that indicate where in the code you should fill in a function, object or variable. Make sure fill out all the blanks before Answer submission, they will otherwise result in errors.  
-    * Hit `Hint` (when provided) for clues. Due to technical reasons **you can't go back to previous hints, so make sure you read them well!**        
-    * Hit `Run Code` to test your code and preview the output.  
-    * Hit `Run Code` to test your code and preview the output (but make sure no '\_' are left).  
-    * Hit `Submit Answer` (if present) to submit the code (make sure no '\_' are left) for evaluation.    
-    * Try to keep yourself from hitting `Solution` (when provided). Only use it when you do not understand the automatic feedback given by R.   
-    * Hit `Start Over` in the header of the exercise to remove any adjustments you made and start again.   
+- **Answers will be saved** each time you close your session and will be loaded if you restart the tutorial. Unless you hit `Start over` at the bottom of the table-of-contents.      
+- At the end of the tutorial you are instructed to **print a pdf report of the tutorial** (incl. your answers).   
+- To reserve server space to *active* running tutorials, and stop those that aren't actively used anymore, **we set a time limit to 25 minutes** meaning that if your tutorial has been idle for over 25 minutes, you will see the warning "Tutorial stopped due to inactivity. Restart to continue where you left off!". When you see this warning, you should close the browser with the tutorial and restart the tutorial. As progress is saved, you can continue where you left once you restart the tutorial.   
+
+- Links to reference material and used resources are formatted with `r colorize("light blue font", col = "dodgerblue")`. It is advised to open these links using the "right-mouse click \-\-\> Open in a new browser tab" strategy. If you click on the links straight away, you are directed away from the tutorial.   
+
+- Reading of references and background material **is not required and not taken into account when estimating the time-required** for this tutorial!   
+
+### 2.1.5 About the exercises  
+
+* In this tutorial you will have multiple-choice and check-the-box questions like in fg1 but also **complete-the-code exercises**. The latter are sometimes evaluated on the printed object or summary (e.g a the top part of an object), in other cases, the code itself is checked. When the code is evaluated we added "(code check)" to the question. In these cases, R will give custom feedback that helps you correct your code.      
+
+* For short lines of code, you have to decide which function or object to use and how to write this in code. For some longer lines of codes, we left blanks as "___" that indicate where in the code you should fill in a function, object or variable. Make sure fill out all the blanks before Answer submission, they will otherwise result in errors.  
+
+* Hit `Hint` (when provided) for clues. Due to technical reasons **you can't go back to previous hints, so make sure you read them well!**        
+
+* Hit `Run Code` to test your code and preview the output.  
+
+* Hit `Run Code` to test your code and preview the output (but make sure no '\_' are left).  
+
+* Hit `Submit Answer` (if present) to submit the code (make sure no '\_' are left) for evaluation.    
+
+* Try to keep yourself from hitting `Solution` (when provided). Only use it when you do not understand the automatic feedback given by R.   
+
+* Hit `Start Over` in the header of the exercise to remove any adjustments you made and start again.   
 
 Although we ask for specific answers or completion of specific code, you are encouraged to test your own code and use `Run Code` and `Start Over` extensively. I.e., remove the pre-coded code and write your own code for a different graph or different summary of the data. Use `Run Code` to preview the results. Unfortunately these self-thought of codes can not be evaluated. For the evaluation you need to use our pre-coded code. Hit `Start Over` to get this pre-coded code.  
 <br>
@@ -193,7 +214,8 @@ Although we ask for specific answers or completion of specific code, you are enc
 
 ```{r examplecode-hint}
 # use the function
-head()
+head([object_name])
+# warning: the next hint is the solution!
 ```
 
 ```{r examplecode-solution}
@@ -204,11 +226,13 @@ head(monocytes_h3k4me3)
 grade_code()
 ```
 
+### 2.1.6 Need help?  
+You are allocated to Breakout rooms in Zoom (or you can select one yourself). Either way, use the Breakout rooms to discuss questions and difficulties with your peers. If you still have question, use the "raise hand" option to notify the host of the session.     
 
 
 ## 2.2 ChIP-seq peaks in R    
 ### 2.2.1 ChIP-seq peaks can be narrow or broad     
-In genomics you often work with **interval** data. Think of peaks, genes, exons, ... any genomic region reported with the **genomic coordinates: chr, start, and end**. As we discussed in week 1, these often come in a tabular format with the basic information about the location and some other information.  
+In epigenomics you often work with **interval** data, also referred to as **windows** or **(genomic) regions**. Think of peaks, genes, exons, ... any genomic region reported with the **genomic coordinates: chr, start, and end**. As we discussed in week 1, these often come in a tabular format with the basic information about the location and some other information.  
 <br>
 Common file formats include BED format for peak files and GFF for gene annotations. In practice, peak files come in two flavors, both cohering to the BED format but with small differences in columns 6-7. These are called **narrowPeak** and **broadPeak** files.    
 <br>
@@ -260,7 +284,7 @@ object_name <- read.table("location/of/peak_file.bed")
 ```
 
 > #### Refresher:  
-> [What are data.frames? by Data Carpentry](https://datacarpentry.org/R-genomics/02-starting-with-data.html#what_are_data_frames).  
+> Follow this link for a recap on data.frames: [What are data.frames? by Data Carpentry](https://datacarpentry.org/R-genomics/02-starting-with-data.html#what_are_data_frames).  
 
 The data.frame data structure is, however, not the most efficient way to work with interval data. E.g. a simple manipulation such as shifting all reported intervals 2 bp to the right, requires you to manipulate the "start" and "end" columns at the same time.  
 <br>
@@ -283,34 +307,45 @@ library(IRanges)
 library(GenomicRanges)
 ```
 <br> 
-Here we create GRanges object called `gr` with 3 intervals on chr1:  
+Here we create GRanges object called `gr` with 4 intervals on chr1:  
 ```{r create gr, echo=TRUE, eval=TRUE}
 # create `gr`
 gr_chr1 <-  GRanges(seqnames = c("chr1"), # argument is re-used for each interval
-                    ranges = IRanges(start=c(5,10,25), width = c(13,17,6)),
-                    color = c("black", "red", "green"))
+                    ranges = IRanges(start=c(1,3,8,15), width = c(3,10,6,2)),
+                    color = c("black", "red", "green", "yellow"))  # this color will be used for plotting the ranges in the plot below.  
 # add names to `gr_chr1`
-names(gr_chr1) <- paste("interval", LETTERS[1:3], sep = "_")
+names(gr_chr1) <- paste("interval", LETTERS[1:4], sep = "_")
 # print the object:
 gr_chr1
 ```
 <br>
 When we visualize these intervals we see three 'blocks' along the horizontal axis:
 ```{r plot_gr, echo=FALSE}
-plotRanges(gr_chr1, col = gr_chr1$color)
-rm(gr_chr1)
+plotRanges(gr_chr1, col = gr_chr1$color, xlim = c(0, 20))
+#rm(gr_chr1)
 ```
 <br>
 Notice that `gr_chr1` holds 3 slots:  
 
-1. the genomic coordinates in a **GRanges** slot  
-2. 1 column as **metadata**  (metadata is data about the data)    
-3. 1 sequence from an unspecified genome in the **seqinfo** slot    
+1. the genomic coordinates in a **GRanges** slot with the variables "seqnames", "ranges" and "strand".   
+2. 1 column as **metadata**  (metadata is data about the data): "color".     
+3. 1 sequence from an unspecified genome in the **seqinfo** slot: "*1 sequence from an unspecified genome; no seqlengths*"      
 
 We will come back to these slots shortly.  
 
 ### 2.2.4 Handy functions for GRanges    
 There are several functions to retrieve and set the values in GRanges objects. Here is an image of a GRanges object called `gr` with the respective functions. You will use many of these function in this tutorial, it may therefore be handy to save this image in your Downloads ("right-mouse-click --> save image as").  
+```{r my_gr_making, eval=FALSE, echo=FALSE}
+my_gr <- GRanges(seqnames = c("chr1", "chr2", "chr3", "chr4", "chr5"), 
+              ranges = IRanges(start=c(3, 5, 13, 18, 20), width = c(5, 7, 9, 11,4)),
+              strand = c("-", "-", "-","+", "+"),
+              score = round(runif(5, 0, 106), digits = 3),
+              GC = round(runif(5, 0.35, 0.60), digits = 3))
+# add rownames:
+names(my_gr) <- paste("peak", LETTERS[1:5], sep = "_")
+my_gr
+# made screenshot of the object and added boxes to mark the different slots with functions in illustrator. Save and upload to package as png  
+```
 
 ![](images/wk2_2_GRanges_fields_my_gr.png){width=100%}   
 <br>
@@ -964,12 +999,85 @@ To identify and count overlap between two sets of GRanges objects (e.g. H3K4me3 
 overlap <- findOverlaps(query = [GRanges_object1], subject = [GRanges_object2])
 ```
 
-* the output is a `Hits` object containing the index pairings for the overlapping elements.   
-* The columns with indexes can be accessed through `queryHits(overlap_object)` and `subjectHits(overlap_object)`. These can subsequently be used to extract the corresponding peaks or regions from the objects that were used as inputs.    
+* The output `overlap` is a `Hits` object containing the indexes of the overlapping elements from the query and subject objects.    
+* The columns with indexes can be accessed through `queryHits(overlap_object)` and `subjectHits(overlap_object)`.   
+* The outcomes of `queryHits(overlap_object)` and `subjectHits(overlap_object)`can be used to extract the corresponding peaks or regions from the objects that were used as inputs (we will guide you through an example soon).    
 * If a peak in one of the inputs overlaps with multiple peaks in the other, its index will appear multiple times in the output.  
 
-### 2.4.2 Overlap promoters vs h3k4me3 peaks   
-To determine the overlap among H3K4me3 peaks and promoters, you first need to obtain promoter regions as a GRanges object. We have done that for you with the following code:  
+### 2.4.2 findOverlaps() example         
+Here we use `findOverlaps()` to find the intervals that overlap between `gr_chr1` and `my_gr` (see [2.2.3 Introducing IRanges and GRanges]):  
+```{r making_my_gr_again, eval=TRUE,echo=FALSE}
+# did not save the object in section 2.2.4 :-(
+my_gr <- GRanges(seqnames = c("chr1", "chr2", "chr3", "chr4", "chr5"), 
+              ranges = IRanges(start=c(3, 5, 13, 18, 20), width = c(5, 7, 9, 11,4)),
+              strand = c("-", "-", "-","+", "+"),
+              score = c(12.053, 65.964, 64.583, 66.078, 91.257),
+              GC= c(0.510, 0.352, 0.408, 0.517, 0.479))
+names(my_gr) <- paste("peak", LETTERS[1:5], sep = "_")
+```
+
+```{r overlap_example, eval=TRUE, echo=TRUE}
+# We place () brackets around the code to instruct R to print the output  
+# of the function on the right side of the arrow, and at the same time assign
+# the output to the new object 'my_first_overlap' on the left side of the arrow.
+
+(my_first_overlap <- findOverlaps(query = gr_chr1, subject = my_gr)) 
+
+```
+<br>
+In this case, the output tells you that:  
+
+- There are two different overlaps identified ("2 hits").  
+- The query object `gr_chr1` contained 4 intervals ("queryLength: 4").  
+- The subject object `my_gr` contained 5 intervals ("subjectLength: 5").  
+- 2 intervals in the query, in this case `gr_chr1` overlap with intervals in `my_chr`. These are the intervals with indexes [1] and [2] in `gr_chr1`.     
+- The other way around, only 1 interval in `my_gr` overlaps with intervals in `gr_chr1`. This the interval with index [1] in `my_gr`.  
+
+We can obtain the relevant intervals from `gr_chr1` and `my_gr` by running:   
+```{r example_queryhits, echo=TRUE, eval=TRUE}
+# obtain the intervals fom gr_chr1 (query) that are part of the overlap 
+indexes_query <- queryHits(my_first_overlap)
+
+# subset gr_chr1 with these indexes
+gr_chr1[indexes_query]
+```
+<br>
+And from `my_gr` by running:   
+```{r example_subjecthits, echo=TRUE, eval=TRUE}
+# obtain the overlapping intervals from my_gr (subject)
+indexes_subject <- subjectHits(my_first_overlap)
+
+# subset my_gr with these indexes
+my_gr[indexes_subject]
+```
+
+- Obviously, `my_gr` had 5 intervals, each on a different chromosome. So only the interval on chromosome 1 showed overlap with the intervals in `gr_chr1`, of which the intervals were restricted to chromosome 1.   
+- From the variable `ranges` we can see that interval_A in `gr_chr1` overlaps with the first bp of peak_A in `my_gr`; and interval_B in `gr_chr1` overlaps with the whole of peak_A in `my_gr`.  
+
+Finally, if you want to know the **number of unique intervals** that overlap you can limit the reported indexes to only the unique ones (do not report indexes more than once), subset the original GRanges object with these unique indexes, and count its length:
+```{r example_subjecthits_uniquecount, echo=TRUE, eval=TRUE}
+# obtain the overlapping intervals from my_gr (subject)
+indexes_subject <- subjectHits(my_first_overlap)
+
+# take unique indexes
+indexes_subject_unique <- unique(indexes_subject)
+
+# subset my_gr with uniuqe indexes and count the number of intervals in the resulting object
+length(my_gr[indexes_subject])
+```
+<br>
+*Side note:* in the code above, instead of running `unique()` on the indexes, you can also run it on the GRanges object with duplicate intervals and then count the length:  
+```{r example_subjecthits_uniquecount2, echo=TRUE, eval=TRUE}
+# obtain the overlapping intervals from my_gr (subject)
+indexes_subject <- subjectHits(my_first_overlap)
+
+# take relevant intervals, restrict to only unique intervals and count these  
+length(unique(my_gr[indexes_subject]))
+```
+
+
+### 2.4.3 Overlap promoters vs h3k4me3 peaks   
+You will determine the overlap among H3K4me3 peaks and promoters. To do so you first need to obtain promoter regions as a GRanges object. We have done that for you with the following code:  
 
 ```{r retrieve_genes_txdb, echo=TRUE, eval=FALSE}
 # install the txdb package
@@ -993,7 +1101,8 @@ This code:
 
 ### Exercise 6a 
 
-> **Exercise 6a:** How many promoter are stored in `promoters_chr19`?     
+> **Exercise 6a:**  
+How many promoter are stored in `promoters_chr19`?     
 
 ```{r q6a_proms, exercise=TRUE, exercise.lines=3, exercise.eval=FALSE, error=TRUE}
 #  How many regions do you have are stored in `promoters_chr19`? 
@@ -1021,8 +1130,8 @@ grade_result(
 ### Exercise 6b  
 We want to know how many of the promoters overlap with a H3K4me3 ChIP-seq peak and vice versa.    
 
-> **Exercise 6b:** Use `findOverlaps()` to determine the overlap between `monocytes_h3k4me3` (query) and  `promoters_chr19` (subject).   
-
+> **Exercise 6b:**  
+Use `findOverlaps()` to determine the overlap between `monocytes_h3k4me3` (query) and  `promoters_chr19` (subject).   
 
 
 ```{r q6b_overlap, exercise=TRUE, exercise.eval=FALSE, error=TRUE}
@@ -1049,23 +1158,24 @@ grade_result(pass_if(~identical(.result, show(findOverlaps(query = monocytes_h3k
 
 ### Exercise 6c      
 
-> **Exercise 6c:** What fraction of promoters overlaps with H3K4me3 peaks?  
+> **Exercise 6c:**   
+Complete the code below to determine the number and fraction of promoters that overlaps with H3K4me3 peaks (Code check).  
 
 ```{r prepare_exercise6}
 overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters_chr19)
 ```
 
 ```{r q6c_overlap, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_exercise6"}
-# Extract the unique promoter indexes
+# 1. Extract the unique indexes of the promoter that overlap
 unique_promoters <- unique(___(overlap))
 
-# How many of these unique promoters do you have?
+# 2. How many of these unique promoters do you have?
 unique_promoter_count <- ___(unique_promoters)
 
-# Print the resulting number
+# 3. Print the resulting number (leave this code as it is)
 unique_promoter_count
 
-# What fraction of promoters is part of the overlap?  
+# 4. What fraction of promoters is part of the overlap?  
 unique_promoter_count/__(promoters_chr19)
 ```
 
@@ -1097,6 +1207,10 @@ unique_promoters_count
 
 # What fraction of promoters is part of the overlap?  
 unique_promoters_count/length(promoters_chr19)
+```
+
+```{r q6c_overlap-code-check}
+grade_code(correct = "Now hit 'Run Code' and submit the reported values in the relevant boxes below.")
 ```
 
 ```{r q6c_overlap_textbox, echo=FALSE}
@@ -1132,7 +1246,7 @@ grade_result(
 
 This looks like a strong enrichment of this signal in promoters. Let's visualize the overlap.  
 
-### 2.4.3 Plot the overlap in a Venn diagram  
+### 2.4.4 Plot the overlap in a Venn diagram  
 To plot the overlap among promoters and H3K4me3 peaks in a Venn diagram you will use the the `draw.pairwise.venn()` function of the `VennDiagram` package. This function has three "areas"-parameters:  
 
 ```{r plotvenn_example, eval=FALSE, echo=TRUE}
@@ -1145,7 +1259,8 @@ draw.pairwise.venn(area1=[integer_value], area2=[integer_value], cross.area=[int
 
 ### Exercise 6d
 
-> **Exercise 6d:** How many h3k4me3 peaks are part of the overlap?  
+> **Exercise 6d:**   
+How many h3k4me3 peaks are part of the overlap?  
 
 ```{r q6d_overlap, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_exercise6"}
 # Extract the unique peaks
@@ -1185,9 +1300,8 @@ grade_result(
 ### Exercise 6e   
  
 > **Exercise 6e:**   
-> Complete the `draw.pairwise.venn()` code below to visualize these counts in a venn diagram (code check).
->  
-> * Hit "Run Code" to ensure that the venn diagram is plotted. 
+Complete the `draw.pairwise.venn()` code below to visualize these counts in a venn diagram (code check).
+
 
 ```{r prepare_exercise6e, echo=FALSE}
 overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters_chr19)
@@ -1209,28 +1323,31 @@ common_counts <- min(unique_promoters_count, unique_peaks_count)
 grid.newpage()
 
 # Plot the overlap in a venn diagram
-___( 
-           area1=___, # total count for area 1
-           area2=___, # total count for area 2
-           cross.area=common_counts, # count for the overlap.
-           category=c("H3K4me3", "Promoters"), 
-           fill=c("red", "gray"), 
-           cat.cex=1.2)
+___( area1=___, # total count for area 1
+    area2=___, # total count for area 2
+    cross.area=common_counts, # count for the overlap.
+    category=c("H3K4me3", "Promoters"), 
+    fill=c("red", "gray"), 
+    cat.cex=1.2)
 ```
 
 ```{r q6e_plotvenn-hint-1}
 ## Use `length()` to calculate the values for area1 and area2
 ```
+
 ```{r q6e_plotvenn-hint-2}
 # For area1 you need to count the number of peaks in 'monocytes_h3k4me3' 
 ```
+
 ```{r q6e_plotvenn-hint-3}
 # For area2 you need to count the number of promoters in 'promoters_chr19'
 ```
-```{r q6e_plotvenn-hint-2}
+
+```{r q6e_plotvenn-hint-4}
 # ie
 area1 = length(monocytes_h3k4me3)
 area2 = length(promoters_chr19)
+# WARNING: the next hint is the solution!
 ```
 
 ```{r q6e_plotvenn-solution}
@@ -1251,21 +1368,20 @@ draw.pairwise.venn(
 ```
 
 ```{r q6e_plotvenn-code-check}
-grade_code()
+grade_code(correct = "Make sure you hit 'Run Code' to plot the venn diagram. You can ignore the text message that is printed below the plot.")
 ```
 
-Next, let's test the enrichment of H3K4me3 p4eaks in promoters.    
+Now you have your visualization of the overlap among promoters and H3K4me3 peaks. Let's test the enrichment of H3K4me3 peaks in promoters.    
 
-### 2.4.4 Testing for enrichment by overlap      
-
-### Exercise 7:   
-**Is there a significant enrichment of h3k4me3 in promoters?**  
+### 2.4.5 Testing for enrichment by overlap      
+### Exercise 7   
+**Is there a significant enrichment of H3K4me3 peaks in promoters?**  
 <br>
 To answer this question, we compare the fraction of promoters with a H3K4me3 peak with the chromosome 19-wide fraction of promoters.
 <br>
-If H3K4me3 is not enriched at promoters, we would expect that the fraction of promoters with a H3K4me3 peak is in the same range as the fraction of promoters on chromosome 19. This is our **null hypothesis of no enrichment**.
+If H3K4me3 is not enriched at promoters, we would expect that the fraction of promoters with a H3K4me3 peak is in the same range as the fraction of promoters on chromosome 19. This is our **null hypothesis of no enrichment**.  
 <br>
-As some promoters may overlap we *reduced* `promoters` to non-overlapping intervals to calculate the chromosome 19-wide fraction of promoters.  We do that by running:
+As some promoters may overlap we *reduced* `promoters_chr19` to non-overlapping intervals before we calculate the chromosome 19-wide fraction of promoters:  
 ```{r fraction_promoters, echo=TRUE, eval=FALSE}
 # obtain reduced promoter regions
 promoters_chr19_reduced <- reduce(promoters_chr19)
@@ -1278,7 +1394,10 @@ promoters_metadata <- as.data.frame(mcols(promoters_chr19_reduced))
 
 ### Exercise 7a
 
-> **Exercise 7a**: Finish the code below to define the "promoter_size" variable and calculate the fraction of bps covered by `promoters_chr19_reduced` in chromosome 19 (chr19 =58617616 bp).
+> **Exercise 7a**: Finish the code below to (code check):     
+> 
+> 1. Define a new variable "promoter_size" in `promoters_metadata` with the widths of the intervals in `promoters_chr19_reduced`.  
+> 2. Calculate the fraction of bps covered by `promoters_chr19_reduced` in chromosome 19 (chr19 =58617616 bp).
 
 ```{r prepare_q7a}
 promoters_chr19_reduced <- reduce(promoters_chr19)
@@ -1287,20 +1406,39 @@ promoters_metadata <- as.data.frame(mcols(promoters_chr19_reduced))
 ```
 
 ```{r q7a_promfraction, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q7a"}
-# define the variable 'promoter_size'
+# 1. define the variable 'promoter_size'
 promoters_metadata$promoter_size <- ___(promoters_chr19_reduced)
 
-# calculate the  fraction of bps covered 'promoters_chr19_reduced`
+# 2. calculate the  fraction of bps covered 'promoters_chr19_reduced`
 promoters_metadata %>%
   summarise(total_bps = ___ ,
             fraction_chr19 = ___ /58617616)
 ```
 
 ```{r q7a_promfraction-hint-1}
-## Look back at exercise 5a
+## Look back at exercise 5a for the function you need in step 1 or use the additional hints.  
 ```
 
 ```{r q7a_promfraction-hint-2}
+## you  may want to use width() in step 1
+```
+
+```{r q7a_promfraction-hint-3}
+## define `total_bp` as the sum of `promoter_size`   
+```
+
+```{r q7a_promfraction-hint-4}
+## in other words
+total_bps = sum(promoter_size)
+```
+
+```{r q7a_promfraction-hint-5}
+# and define the fraction_chr19 as the fraction between 'total_bps' and 58617616
+```
+
+```{r q7a_promfraction-hint-6}
+## in other words
+fraction_chr19=total_bps /58617616
 ## WARNING: the next hint is the solution!
 ```
 
@@ -1314,16 +1452,12 @@ promoters_metadata %>%
             fraction_chr19=total_bps /58617616)
 ```
 
-```{r q7a_promfraction-check}
-promoters_metadata$promoter_size <- width(promoters_chr19_reduced)
-
-grade_result(pass_if(~identical(.result, promoters_metadata %>%
-  summarise(total_bps = sum(promoter_size),
-            fraction_chr19=total_bps /58617616))))
+```{r q7a_promfraction-code-check}
+grade_code(correct = "Run the code as well and submit the returend fraction in the box below." )
 ```
 
 ```{r q7a_promfraction_enterfraction, exercise=TRUE, exercise.eval=FALSE, error=TRUE}
-# enter the fraction of promoters in chromosome 19, round of to 3 decimals
+# Enter the fraction of promoters in chromosome 19, round of to 3 decimals
 
 
 ```
@@ -1334,90 +1468,101 @@ round(0.06179487,3)
 
 ```{r q7a_promfraction_enterfraction-check}
 grade_result(
-  pass_if(~identical(.result,round(0.06179487,3))))
+  pass_if(~identical(.result,round(0.06179487,3))),
+  correct = "Promoters make up 6% of this chromosome but appr. 66% of all promoters overlap with h3k4me3 peaks. This looks like a strong enrichment!")
 ```
-<br>
-Promoters make up 6% of this chromosome but appr. 66% of all promoters overlap with h3k4me3 peaks. This looks like an enrichment.
 
 ### Exercise 7b
-You can test whether the observed fraction is indeed larger than expected with a binomial test, in r we can use the function `binom.test(x, p)` for this:
+You can test whether the observed fraction is indeed larger than expected with a binomial test, in r we can use the function 
+```{r binom_test_exaple, eval=FALSE, echo=TRUE}
+binom.test(x = [integer_values_for_successes_and_failures], p = [expected_success_probability], alternative = ["two.sided"/"less"/"greater"])
+```
 
 - `x` = vector with number of successes (= number of promoters with H3K4me3 peak) and number of failures (= number of promoters without H3K4me3 peak)
-- `p` = expected probability of success, in this case the fraction of promoters in chromosome 19
-
-<br>
+- `p` = expected probability of success, in this case the fraction of promoters in chromosome 19.  
+- `alternativea` = refers to the alternative hypothesis, must be one of "two.sided" (alternative can be "enriched" or "depleted"), "greater" (alternative is testing for "enrichment") or "less" (alternative is testing for "depletion").    
 
 > *Background*: The binomial test is run when an experiment has two possible outcomes (i.e. success/failure) and you have an idea about what the probability of success is. Success in this case is overlap and our expectation is that 20% of the cases show overlap. The test calculates the probability of getting a desired outcome with a specific sample size.
 
->**Exercise 7b**: Use a binomial test to test for enrichment of H3K4me3 in promoters.
+> **Exercise 7b**: Use a binomial test to test for enrichment of H3K4me3 in promoters.   
 >
-> - Use the function `binom.test(x = c(successes, failures), p, alternative = "greater")` to call the test.
-> - Use the information from exercise 6a and 6d to calculate the number of successes and failures.
+> - Determine the number of successes and failures (step 2, 3 and 4).  
 > - Set `alternative = "greater"` because we test for *enrichment* and our alternative hypothesis is that the true probability is *larger* than the expected probability.
 
-```{r prepare_q7b}
+```{r q7b_binomtest, exercise=TRUE, exercise.eval=FALSE, error=TRUE}
+# 1. We repeat the overlap calculation from exercise 6b so that you don't have to scroll back:
 overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters_chr19)
-```
 
-<br>
-```{r q7b_binomtest, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q7b"}
-# Use the indexes from the overlap object to identify promoters with H3K4me3 peak
-promoters_with_h3k4me3 <- promoters_chr19[unique(___(overlap)) ]
+# 2. Use the indexes from the overlap object to identify promoters with H3K4me3 peak
+promoters_with_h3k4me3 <- promoters_chr19[unique(___(overlap))]
 
-# Perform negative selection using the same indexes to find promoters without H3K4me3 peak
+# 3. Perform negative selection using the same indexes to find promoters without H3K4me3 peak
 # the - sign removes the lines with the respective indexes from the original object
 promoters_without_h3k4me3 <- promoters_chr19[ -unique(___(overlap)) ]
 
-# Define the x for your test
-# hint: use the function length()
+# 4. Define the x for your test
 x_test <- c(___, ___)
 
-# Define the p for your test
-# hint: the fraction you entered above in 7a
+# 5. Define the p for your test (round to 3 decimals)
 p_test <- __
 
-# binomial test for enrichment of h3k4me3 peaks in promoters:
+# 6. Binomial test for enrichment of h3k4me3 peaks in promoters:
 binomtest_result <- binom.test(x = x_test, p = p_test, alternative = "greater" )
 
-# report the test output
+# 7. Report the test output
 binomtest_result
 ```
 
 ```{r q7b_binomtest-hint-1}
-# define x_test as
-x_test <- c(length(promoters_with_h3k4me3), length(...))
+# do you need the subjectHits() or queryHits() function in step2 and 3?  
 ```
 
 ```{r q7b_binomtest-hint-2}
-# define 
-x_test <- c(length(promoters_with_h3k4me3), length(promoters_without_h3k4me3))
+# in step 4 you also need the length() function 
 ```
 
 ```{r q7b_binomtest-hint-3}
+# eg
+x_test <- c(length(promoters_with_h3k4me3), length(...))
+```
+
+```{r q7b_binomtest-hint-4}
+# completely: 
+x_test <- c(length(promoters_with_h3k4me3), length(promoters_without_h3k4me3))
+```
+
+```{r q7b_binomtest-hint-5}
+# in step 5 you need the fraction you obtained in exercise 7a
+#
 # WARNING: the next hint contains the complete solultion!
 ```
 
 ```{r q7b_binomtest-solution}
-# Use the indexes from the overlap object to identify promoters with H3K4me3 peak
+# 1. We repeat the overlap calculation from exercise 6b so that you don't have to scroll back:
+overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters_chr19)
+
+# 2. Use the indexes from the overlap object to identify promoters with H3K4me3 peak
 promoters_with_h3k4me3 <- promoters_chr19[unique(subjectHits(overlap)) ]
 
-# Perform negative selection using the same indexes to find promoters without H3K4me3 peak
+# 3. Perform negative selection using the same indexes to find promoters without H3K4me3 peak
 # the - sign removes the lines with the respective indexes from the original object
 promoters_without_h3k4me3 <- promoters_chr19[ -unique(subjectHits(overlap)) ]
 
-# Define the x for your test
-# hint: use the function length()
+# 4. Define the x for your test
 x_test <- c(length(promoters_with_h3k4me3), length(promoters_without_h3k4me3))
 
-# Define the p for your test
-# hint: the fraction you entered above in 7a
+# 5. Define the p for your test (round to 3 decimals)
 p_test <- 0.062
 
-# binomial test for enrichment of h3k4me3 peaks in promoters:
+# 6. binomial test for enrichment of h3k4me3 peaks in promoters:
 binomtest_result <- binom.test(x = x_test, p = p_test, alternative = "greater")
 
-# report the test output
+# 7. report the test output
 binomtest_result
+```
+
+```{r q7b_binomtest-code-check}
+grade_code(correct = "Run the code as well and use the output to answer the question below.")
 ```
 
 > **Exercise 7c** Based on this test, do you conclude that H3K4me3 is enriched in promoter regions?
@@ -1429,26 +1574,31 @@ question("Is H3K4me3 enriched promoters?",
 )
 ```
 
-### 2.4.5 Overlap promoters, exons, introns and intergenic regions vs h3k4me3 peaks   
+### 2.4.6 Overlap promoters, exons, introns and intergenic regions vs h3k4me3 peaks   
 Instead of looking only at the overlap with promoters, we can also calculate the distribution of H3K4me3 peaks over various genomic features. To achieve this with functions like `findOverlaps` would require several, successive overlap analyses that would clutter up the code. Luckily, special packages have been developed for ChIP-seq analyses that perform this task. One of these packages is `genomation`. We have installed and loaded that package by:  
 ```{r genomation, eval=FALSE, echo=TRUE}
 BiocManager::install("genomation")
 library(genomation)
 ```
 <br>
-You can use the following function to calculate the peak distribution of over exons, introns, promoter, intergenic regions:    
-`annotateWithGeneParts(target = [peaks_as_GRanges], feature = [features_as_GRangesList])`  
+You can use the following function to calculate the peak distribution of over exons, introns, promoter, intergenic regions:  
+```{r annotate_genomation, echo=TRUE, eval=FALSE}
+annotateWithGeneParts(target = [peaks_as_GRanges], feature = [features_as_GRangesList])
+```
 <br>
 An important difference with the analysis above is that `annotateWithGeneParts()` uses transcript-level features. In exercise 6 and 7 we used gene-level features, ie. one promoter per gene.  `annotateWithGeneParts()` defines one promoter per transcript.  
 <br>
-The features have been loaded from gencode (downloaded from the UCSC genome browser) and read into a GRangesList object with the genomation-function `readTranscriptFeatures()`. With `up.flank` and `down.flank` we defined the up- and downstream boundaries of promoters around the TSSs.   
+The features have been loaded from gencode (downloaded from the UCSC genome browser) and read into a GRangesList object with the genomation-function `readTranscriptFeatures()`:    
 ```{r readin_gencode, echo=TRUE, eval=FALSE}
 gencode_chr19 <- readTranscriptFeatures("data/encode/gencodev32.chr19.bed", unique.prom = TRUE, up.flank = 2000, down.flank = 200) 
 ```
 
+* With the `up.flank=` and `down.flank=` parameters we defined the up- and downstream boundaries of promoters around the TSSs.    
+
 ### Exercise 8a  
 
-> **Exercise 8a**: Use annotateWithGeneParts to determine the overlap between H3K4me3 peaks and promoters, exons, introns and intergenic regions (code check).  
+> **Exercise 8a**: Use annotateWithGeneParts() to determine the overlap between H3K4me3 peaks and promoters, exons, introns and intergenic regions (code check).  
+
 
 ```{r q8a_genomationoverlap, exercise=TRUE, exercise.eval=FALSE, error=TRUE}
 # overlap of h3k4me3 with promoters, exons, introns and intergenic regions
@@ -1466,9 +1616,12 @@ grade_code()
 
 ### Exercise 8b  
 You can visualize the result with:   
-`plotTargetAnnotation(x = [annotateWithGeneParts output], main = "....")`   
+```{r plot_genomation_annotation, eval=FALSE, echo=TRUE}
+plotTargetAnnotation(x = [annotateWithGeneParts_output], main = "....")
+```   
+<br>
 
-> **Exercise 8b**: Plot the output of exercise 8a    
+> **Exercise 8b**: Plot the output of exercise 8a using plotTargetAnnotation().     
 
 ```{r prepare_q8b, echo=FALSE}
 annotation_h3k4me3 <- annotateWithGeneParts(target = monocytes_h3k4me3, feature = gencode_chr19)
@@ -1476,7 +1629,7 @@ annotation_h3k4me3 <- annotateWithGeneParts(target = monocytes_h3k4me3, feature 
 
 ```{r q8b_genomationoverlap, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q8b"}
 # visualize the output of exercise 8a
-
+____(x = ____, main = "H3K4me3 over gene parts")
 ```
 
 ```{r q8b_genomationoverlap-solution}
@@ -1484,15 +1637,40 @@ annotation_h3k4me3 <- annotateWithGeneParts(target = monocytes_h3k4me3, feature 
 plotTargetAnnotation(x = annotation_h3k4me3, main = "H3K4me3 over gene parts")
 ```
 
+```{r q8b_genomationoverlap-code-check}
+grade_code(correct = "Hit `Run Code` to view your plot.")
+```
+
 ### Exercise 8c    
 
-> **Exercise 8b**: Rerun the analysis of exercise 8a and 8b for the other marks (H3K4me1, H3K36me3, H3K27me3, H3K27ac, H3K9me3). You can use the following code section run these plots.   
+> **Exercise 8b**: Rerun the analysis of exercise 8a and 8b for the other marks (H3K4me1, H3K36me3, H3K27me3, H3K27ac, H3K9me3) in the following code sections and use your plots to anser the multiple-choice questions below (there is not "Submit Answer" option).   
 > 
-> * peak data for each dataset are loaded for you in objects "monocytes_h3k4me1", "monocytes_h3k36me3" etc.
+> * Peak data for each dataset are loaded for you in objects "monocytes_h3k27ac", "monocytes_h3k4me1", "monocytes_h3k36me3" etc.
 
 
-```{r q8c, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=12}
+```{r q8c_h3k27ac, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=4}
+# run for H3K27ac
+annotation_h3k27ac <- annotateWithGeneParts(target = ____, feature = gencode_chr19)
+plotTargetAnnotation(x = annotation_h3k27ac, main = "H3K27ac over gene parts")
+```
 
+```{r q8c_h3k36me3, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=4}
+# run for H3K36me3
+
+```
+
+```{r q8c, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=4}
+# run for H3K9me3
+
+```
+
+```{r q8c_h3k4me1, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=4}
+# run for H3K4me1
+
+```
+
+```{r q8c_h3k27me3, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=4}
+# run for H3K27me3
 
 ```
 
@@ -1534,10 +1712,10 @@ To answer this question, we first need to obtain the genes associated with the p
 
 ### Exercise 9  
 
-> **Exercise 9**: How many different genes are associated withthe H3K4me3-overlapping promoters?  
+> **Exercise 9**: How many different genes are associated with the H3K4me3-overlapping promoters?  
 >
-> * the objects `overlap` and `promoters_chr19` are loaded for you.  
-> * `promoters_chr19` has 1 metadatacolumn: "gene_id". This holds the Entrez gene id.  
+> * the objects  `promoters_chr19` (exercise 6a) and `overlap` (exercise 6b)  are loaded for you.  
+> * As we have gene-oriented promoters, we only have one promoter per gene (and you can count the number of unique promoters to answer this question).  
 
 ```{r prepare_exercise9, echo=FALSE}
 overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters_chr19)
@@ -1545,17 +1723,15 @@ overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters_chr19)
 
 ```{r q9_genesids_overlap, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_exercise9"}
 # subset for promoters that are part of the overlap with H3K4me3 in monocytes 
-promoters_with_h3k4me3  <- 
+promoters_with_h3k4me3  <- ___
 
-# convert the metadata of this object into a data.frame
-# count the length of unique gene_id's using summarise() and ndistinct()
-as.data.frame(mcols(promoters_with_h3k4me3)) %>% 
-  ___(unique_geneids = n_distinct(___) )  
+# count the number of unique promoters
+__(__(promoters_with_h3k4me3))
 ```
 
 ```{r q9_genesids_overlap-hint-1}
 ## To get the promoters with H3K4me3 overlap, subset `promoters_chr19`  with
-`subjectHits(overlap)`  
+subjectHits(overlap)
 ```
 
 ```{r q9_genesids_overlap-hint-2}
@@ -1564,11 +1740,13 @@ promoters_chr19[subjectHits(overlap)]
 ```
 
 ```{r q9_genesids_overlap-hint-3}
-## count the number of unique gene ids with
-n_distinct(gene_id)
+## obtain the unique promoters with
+unique(promoters_with_h3k4me3)
 ```
 
 ```{r q9_genesids_overlap-hint-4}
+# use for counting
+length()
 ## WARNING: the next hint is the solution!
 ```
 
@@ -1577,27 +1755,25 @@ n_distinct(gene_id)
 # subset for promoters that are part of the overlap with H3K4me3 in monocytes 
 promoters_with_h3k4me3 <- promoters_chr19[subjectHits(overlap)]
 
-# count the length of unique geneIDs in this object using summarise() and ndistinct()
-as.data.frame(mcols(promoters_with_h3k4me3)) %>% 
-  summarise(unique_geneids = n_distinct(gene_id)) 
+# count the number of unique promoters
+length(unique(promoters_with_h3k4me3))
 ```
 
 ```{r q9_genesids_overlap-check}
 grade_result(
   pass_if(~identical(.result,
-                     as.data.frame(mcols(promoters_chr19[subjectHits(overlap)])) %>% 
-  summarise(unique_geneids = n_distinct(gene_id)) 
+                     length(unique(promoters_chr19[subjectHits(overlap), "gene_id"]))
                      )))
 ```
 
 ### Exericse 10  
-Plot the expression of genes with and without H3K4me3 in their promoters. We obtained the gene expression quantification from the BLUEPRINT data portal [ref](http://dcc.blueprint-epigenome.eu/#/experiments/ERX157053) and filtered it for genes present on chromosome 19. These data are loaded in object `quantification_chr19` for you.  
+Plot the expression of genes with and without H3K4me3 in their promoters. We obtained the gene expression levels from the [BLUEPRINT data portal](http://dcc.blueprint-epigenome.eu/#/experiments/ERX157053) and filtered it for genes present on chromosome 19. These data are loaded in object `quantification_chr19` for you.  
 <br>
 
-> **Exercise 10a**: Define a new variable `h3k4me3_promoter` which groups genes based on their overlap (TRUE/FALSE) with H3K4me3 peaks (code check).   
+> **Exercise 10a**: Define a new variable `h3k4me3_promoter` in `quantification_chr19` which groups genes based on their overlap (TRUE/FALSE) with H3K4me3 peaks.   
 >
-> * First view the head of 'quantification_chr19' to identify the variable with the gene id
-> * Use dplyr mutate(h3k4me3_promoter = ....) to define the new variable
+> * 1. First view the head of 'quantification_chr19' to identify the variable with the gene id
+> * 2. Use the dplyr-function mutate(h3k4me3_promoter = ....) to define the new variable (code check).
 
 ```{r prepare_exercise10a, echo=FALSE}
 overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters_chr19)
@@ -1606,20 +1782,36 @@ promoters_with_h3k4me3 <- promoters_chr19[subjectHits(overlap)]
 
 ```{r q10_geneexpression, exercise=TRUE, exercise.eval=FALSE, error=TRUE}
 # The object quantification_chr19 holds the RNA-seq quantification for genes on chromosome 19. 
-# View the structure to identify the variable you will use in mutate. 
+# 1. View the structure to identify the variable you will use in step 2. 
 head(quantification_chr19)
 ```
 
 ```{r q10a_geneexpression, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_exercise10a"}
-# Define a new variable that identifies if a gene is present in the overlap or not.  
+# 2. Define the new variable `h3k4me3_promoter`    
 quantification_chr19_new <- quantification_chr19 %>% 
   ___(h3k4me3_promoter = ___ %in% promoters_with_h3k4me3$gene_id)
 ```
 
+```{r q10a_geneexpression-hint-1}
+# You may want to use the function 
+mutate()
+```
+
+```{r q10a_geneexpression-hint-2}
+# 2. Define the new variable `h3k4me3_promoter` using the variable you identified in step 1   
+```
+
+```{r q10a_geneexpression-hint-3}
+# ie:
+  mutate(h3k4me3_promoter = entrezgene_id %in% promoters_with_h3k4me3$gene_id)
+# the next hint is the solution!
+```
+
+
 ```{r q10a_geneexpression-solution}
-# Define a new variable that identifies if a gene is present in the overlap or not.  
+# 2. Define the new variable `h3k4me3_promoter`   
 quantification_chr19_new <- quantification_chr19 %>% 
-  mutate(h3k4me3_promoter = entrezgene_id %in% promoters_with_h3k4me3$gene_id )
+   mutate(h3k4me3_promoter = entrezgene_id %in% promoters_with_h3k4me3$gene_id)
 ```
 
 ```{r q10a_geneexpression-code-check}
@@ -1628,15 +1820,14 @@ grade_code()
 
 ### Exericse 10b  
 
-> **Exercise 10b**: Use ggplot() and geom_boxplot() to visualize the FPKM (y-axis) per 'h3k4me3_promoter' group (code check).  
->
-> Hit "Run Code" to view the resulting plot.  
+> **Exercise 10b**: Use ggplot() and geom_boxplot() to visualize the FPKM (y-axis) per 'h3k4me3_promoter' group (x-axis) (code check).  
+ 
 
 ```{r prepare_exercise10b, echo=FALSE}
 overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters_chr19)
 promoters_with_h3k4me3 <- promoters_chr19[subjectHits(overlap)]
 quantification_chr19_new <- quantification_chr19 %>% 
-  mutate(h3k4me3_promoter = entrezgene_id %in% promoters_with_h3k4me3$gene_id )
+  mutate(h3k4me3_promoter = entrezgene_id %in% promoters_with_h3k4me3$gene_id)
 ```
 
 ```{r q10b_plot_genequant, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_exercise10b"}
@@ -1653,83 +1844,116 @@ ggplot(quantification_chr19_new)+
 ```
 
 ```{r q10b_plot_genequant-code-check}
-grade_code()
+grade_code( correct = "Make sure you also hit `Run Code` to view your plot.")
 ```
 
-This doesn't look very informative. RNA-seq quantification has a broad range. We must therefore log-transoform the y-axis. 
+This doesn't look very informative, we mainly see the outliers! RNA-seq quantification has a broad range. We should therefore log-transoform the y-axis. 
 
 ### Exericse 10c  
 
-> **Exercise 10c**: Repeat the plot of 10b but lgo10-transform the y-axis (code check).  
+> **Exercise 10c**: Repeat the plot of 10b but log10-transform the FPKM values on the y-axis (code check).  
 >
-> - Add 1 to all FPKM values to prevent log10(0).  
+> - Add 1 to all FPKM values to prevent taking a log10() of 0.  
 > - Also add another 'layer', visualizing the same data but as jitter (points).  
 > - Hit "Run Code" to view the resulting plot.  
 
 ```{r q10c_plot_genequant, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_exercise10b"}
 # Repeat the plot of 9b but lgo10-transform the y-axis    
 ggplot(quantification_chr19_new)+
-  geom_boxplot(mapping = aes(x = h3k4me3_promoter, y = (FPKM+1)))+
-  geom_jitter(mapping = aes(x = h3k4me3_promoter, y = (FPKM+1)), point= 0.5, alpha = 0.6)+ # alpha makes the points transparent, ensuring that you still see the violin shape.  
-  theme_calc()+
-  scale_y_continuous(trans = "___")
+  geom_boxplot(mapping = aes(x = h3k4me3_promoter, y = ____)+
+  geom_jitter(mapping = aes(x = h3k4me3_promoter, y = ____), size = 0.75, alpha = 0.6)+ # size makes the dots smaller, alpha makes the points transparent, ensuring that you still see the boxplot. 
+  theme_calc()
 ```
 
-`r colorize("make y-axis-label log10(PPKM+1)", col = "red" )`  
+```{r q10c_plot_genequant-hint-1}
+# Incorporate the log10-transformation by adding `log()` to the y-axis variable 
+```
 
-```{r q10c_plot_genequant-solution, eval=FALSE}
+```{r q10c_plot_genequant-hint-2}
+# Eg
+log(FPKM+1)
+# make sure that you match all "(" with ")"-signs
+# The next hint is the solution!
+```
+
+```{r q10c_plot_genequant-solution}
 # Repeat the plot of 9b but log10-transform the y-axis    
 ggplot(quantification_chr19_new)+
-  geom_boxplot(mapping = aes(x = h3k4me3_promoter, y = (FPKM+1)))+
-  geom_jitter(mapping = aes(x = h3k4me3_promoter, y = (FPKM+1)), point= 0.5, alpha = 0.8)+ 
-  theme_calc()+
-  scale_y_continuous(trans = "log10")
+  geom_boxplot(mapping = aes(x = h3k4me3_promoter, y = log(FPKM+1)))+
+  geom_jitter(mapping = aes(x = h3k4me3_promoter, y = log(FPKM+1)), size = 0.75, alpha = 0.6)+ 
+  theme_calc()
 ```
 
 ```{r q10c_plot_genequant-code-check}
-grade_code()
+grade_code(correct = "Make sure you also hit `Run Code` to view your plot.")
 ```
 
-There is a clear difference in gene expression between the two gene sets with presence of H3K4me3 being associated with higher expression. H3K27me3 can also be deposited at promoters. What trend do you observe there?  
+There is a clear difference in gene expression between the two gene sets with presence of H3K4me3 being associated with higher expression although we also see genes that deviate from this trend. This can be due to the presence of other histone marks, the presence of transcription factors or even downsream, transcriptional mechanisms that control gene expression.   
 
 ### 2.5.2 Genes with H3K27me3 at their promoter   
+H3K27me3 can also be deposited at promoters. What trend do you observe there?  
+
 ### Exercise 11   
 
 > **Exercise 11**: Plot the expression of genes with and without H3K27me3 at their promoters (code check).  
 To do this, you must....  
 >  
-1. identify overlap between H3K27me3 peaks and promoters  
-2. obtain promoters that are reported in the overlap  
-3. define a new variable called "h3k27me3_promoter" in `quantification_chr19` that groups genes based on the overlap of their promoter with H3K27me3 peak. Instead of writing this into a new object, you can pipe the output data.frame immediately into step 4.    
-4. plot the FPKM per gene set.  
+1. Identify overlap between H3K27me3 peaks and promoters  
+2. Obtain promoters that are reported in the overlap  
+3. Define a new variable called "h3k27me3_promoter" in `quantification_chr19` that groups genes based on the overlap of their promoter with H3K27me3 peak. Instead of writing this into a new object, you can pipe the output data.frame immediately into step 4.    
+4. Plot the log(FPKM+1) group in 'h3k27me3_promoter' in a bpxplot.  
 * Use the previous exercises if you need hints to code these steps.  
 * Use the first chunk for testing sections of the code.  
 
-```{r q11testing, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=6}
-# If you want, you can use this chunk to test sections of your code  
-
-
-
-```
-
-
 ```{r q11_H3K27me3_prom, exercise=TRUE, exercise.eval=FALSE, error=TRUE}
-# 1. identify the overlap between monocytes_h3k27me3 and promoters_chr19
+# 1. Identify the overlap between monocytes_h3k27me3 and promoters_chr19
 overlap_h3k27me3_promoters <- ___(query = ___, subject = ___)
 
-# 2. obtain promoters that are reported in the overlap  
+# 2. Obtain promoters that are reported in the overlap  
 promoters_with_h3k27me3 <- promoters_chr19[___(overlap_h3k27me3_promoters)]
 
-# 3. define a "h3k27me3_promoter" in `quantification_chr19`, pipe the output in your ggplot command  
+# 3. Define a "h3k27me3_promoter" in `quantification_chr19`, pipe the output in your ggplot command  
 quantification_chr19 %>%  
   ___(h3k27me3_promoter = ____) %>% 
   ggplot(.) +
-  geom_boxplot(mapping = aes(x = ___, y = (FPKM+1)))+
-  geom_jitter(mapping = aes(x = ___, y = (FPKM+1)), alpha = 0.8, size = 0.5)+
-  theme_calc()+
-  scale_y_continuous(trans = "log10")
+  geom_boxplot(mapping = aes(x = ___, y = ____))+ # make sure the () match!
+  geom_jitter(mapping = aes(x = ___, y = ____), size = 0.75, alpha = 0.6)+
+  theme_calc()
 ```
 
+```{r q11_H3K27me3_prom-hint-1}
+# In step 1 you may want to use the function 
+findOverlaps()
+```
+
+```{r q11_H3K27me3_prom-hint-2}
+# I.e.
+findOverlaps(query = monocytes_h3k27me3, subject = ___)
+```
+
+```{r q11_H3K27me3_prom-hint-3}
+# And in step 2 the function subjectHits() 
+```
+
+```{r q11_H3K27me3_prom-hint-4}
+# Use mutate to define the new variable 'h3k27me3_promoter' as you did in exercise 10a
+```
+
+```{r q11_H3K27me3_prom-hint-5}
+# in exercise 10a you did:
+  mutate(h3k4me3_promoter = entrezgene_id %in% promoters_with_h3k4me3$gene_id)
+```
+
+```{r q11_H3K27me3_prom-hint-6}
+# Incorporate the log10-transformation by adding `log()` to the y-axis variable 
+```
+
+```{r q11_H3K27me3_prom-hint-7}
+# Eg
+log(FPKM+1)
+# make sure that you match all "(" with ")"-signs
+# The next hint is the solution!
+```
 
 ```{r q11_H3K27me3_prom-solution}
 # 1. identify the overlap between monocytes_h3k27me3 and promoters_chr19
@@ -1742,24 +1966,31 @@ promoters_with_h3k27me3 <- promoters_chr19[subjectHits(overlap_h3k27me3_promoter
 quantification_chr19 %>%  
   mutate(h3k27me3_promoter = entrezgene_id %in% promoters_with_h3k27me3$gene_id) %>% 
   ggplot(.) +
-  geom_boxplot(mapping = aes(x = h3k27me3_promoter, y = (FPKM+1)))+
-  geom_jitter(mapping = aes(x = h3k27me3_promoter, y = (FPKM+1)), alpha = 0.8, size = 0.5)+
-  theme_calc()+
-  scale_y_continuous(trans = "log10")
+  geom_boxplot(mapping = aes(x = h3k27me3_promoter, y = log(FPKM+1)))+
+  geom_jitter(mapping = aes(x = h3k27me3_promoter, y = log(FPKM+1)), size = 0.75, alpha = 0.6)+
+  theme_calc()
 ```
 
 ```{r q11_H3K27me3_prom-code-check}
-grade_code()
+grade_code(correct = "Make sure you also hit `Run Code` to view your plot.")
 ```
 
-This time the trend is the other way around; presence of H3K27me3 is associated with lower gene expression. H3K4me3 and H3K27me3 can also co-occur. What gene expression level is associate with promoters that have both marks?  
+This time the trend is the other way around; presence of H3K27me3 is associated with lower gene expression but also in this case it is not a hard 1-to-1 relationship but a trend.   
 
 ### 2.5.3 Bivalent promoters   
-This time you will make 4 gene sets, depending on the overlap of promoters with H3K4me3 and/or H3K27me3 peaks. 
+H3K4me3 and H3K27me3 can also co-occur. What gene expression level is associate with promoters that have both marks?    
 
-### Exercise 12a   
+This time we have to make 4 categories of genes, depending on the overlap of promoters with H3K4me3 and/or H3K27me3 peaks. We have done this for you, using the dplyr-functions `case_when()` within `mutate()` and the objects 'promoters_with_only_h3k4me3' or 'promoters_with_only_h3k27me3' of exercise 9 and 11 resp. 
 
-> **Exercise 12a**: To do this, you must define a new "promoter_mark" in `quantification_chr19` that groups genes based in 4 groups of promoters based on them being or not being reported in 'promoters_with_only_h3k4me3' or 'promoters_with_only_h3k27me3'. For this, we use `case_when()` within `mutate()` and define new category names based on the conditions as shown below.       
+```{r define_bivalent_prom, eval=FALSE, echo=TRUE}
+quantification_chr19_new <- quantification_chr19 %>%  mutate(promoter_mark = case_when(
+    entrezgene_id %in% promoters_with_h3k4me3$gene_id & entrezgene_id %in% promoters_with_h3k27me3$gene_id ~ "bivalent", 
+    entrezgene_id %in% promoters_with_h3k4me3$gene_id & !(entrezgene_id %in% promoters_with_h3k27me3$gene_id) ~ "H3K4me3_only", 
+    !(entrezgene_id %in% promoters_with_h3k4me3$gene_id) & entrezgene_id %in% promoters_with_h3k27me3$gene_id ~ "H3K27me3_only", 
+    !(entrezgene_id %in% promoters_with_h3k4me3$gene_id | entrezgene_id %in% promoters_with_h3k27me3$gene_id) ~ "no_mark") ) 
+```
+
+### Exercise 12  
 
 ```{r prepare_exercise12, echo=FALSE}
 overlap_h3k4me3_promoters <- findOverlaps(query = monocytes_h3k4me3, subject = promoters_chr19)
@@ -1767,85 +1998,68 @@ promoters_with_h3k4me3 <- promoters_chr19[subjectHits(overlap_h3k4me3_promoters)
 
 overlap_h3k27me3_promoters <- findOverlaps(query = monocytes_h3k27me3, subject = promoters_chr19)
 promoters_with_h3k27me3 <- promoters_chr19[subjectHits(overlap_h3k27me3_promoters)]
+
+quantification_chr19_new <- quantification_chr19 %>%  mutate(promoter_mark = case_when(
+    entrezgene_id %in% promoters_with_h3k4me3$gene_id & entrezgene_id %in% promoters_with_h3k27me3$gene_id ~ "bivalent", 
+    entrezgene_id %in% promoters_with_h3k4me3$gene_id & !(entrezgene_id %in% promoters_with_h3k27me3$gene_id) ~ "H3K4me3_only", 
+    !(entrezgene_id %in% promoters_with_h3k4me3$gene_id) & entrezgene_id %in% promoters_with_h3k27me3$gene_id ~ "H3K27me3_only", 
+    !(entrezgene_id %in% promoters_with_h3k4me3$gene_id | entrezgene_id %in% promoters_with_h3k27me3$gene_id) ~ "no_mark") ) 
 ```
 
-```{r q12a_bivalent_prom, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_exercise12"}
-# 1. define the variable "promoter_mark" in `quantification_chr19`
-# define the level name between the ""-signs.  
-quantification_chr19_new <- quantification_chr19 %>% mutate(
-  promoter_mark = case_when(
-    entrezgene_id %in% promoters_with_h3k4me3$gene_id & entrezgene_id %in% promoters_with_h3k27me3$gene_id ~ "____",  # promoters with both marks
-    entrezgene_id %in% promoters_with_h3k4me3$gene_id & !(entrezgene_id %in% promoters_with_h3k27me3$gene_id) ~ "____", # promoters with only h3k4me3
-    !(entrezgene_id %in% promoters_with_h3k4me3$gene_id) & entrezgene_id %in% promoters_with_h3k27me3$gene_id ~ "____", # and so forth... 
-    !(entrezgene_id %in% promoters_with_h3k4me3$gene_id | entrezgene_id %in% promoters_with_h3k27me3$gene_id) ~ "____") ) 
+> **Exercise 12a**: How many genes do we have in each category?  
 
+```{r q12a_bivalent_prom, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_exercise12"}
+____(quantification_chr19_new$___)
+```
+```{r q12a_bivalent_prom-hint-1}
+# Use the function table() to get the contingency table
 ```
 
 ```{r q12a_bivalent_prom-hint-2}
-## An example of level names would be:  
-`quantification_chr19 %>%  mutate(promoter_mark = case_when(`
-    `entrezgene_id %in% promoters_with_h3k4me3$gene_id & entrezgene_id %in% promoters_with_h3k27me3$gene_id ~ "bivalent",` 
-    `entrezgene_id %in% promoters_with_h3k4me3$gene_id & !(entrezgene_id %in% promoters_with_h3k27me3$gene_id) ~ "H3K4me3_only", `
-    `!(entrezgene_id %in% promoters_with_h3k4me3$gene_id) & entrezgene_id %in% promoters_with_h3k27me3$gene_id ~ "H3K27me3_only",` 
-    `!(entrezgene_id %in% promoters_with_h3k4me3$gene_id | entrezgene_id %in% promoters_with_h3k27me3$gene_id) ~ "no_mark") )`
+# Ie
+table(quantification_chr19_new$___)
 ```
 
 ```{r q12a_bivalent_prom-hint-3}
-## WARNING: the next hint is the solution!
+# The next hint is the solution!
 ```
 
-```{r q12a_bivalent_prom-solution}
-quantification_chr19_new <- quantification_chr19 %>%  mutate(promoter_mark = case_when(
-    entrezgene_id %in% promoters_with_h3k4me3$gene_id & entrezgene_id %in% promoters_with_h3k27me3$gene_id ~ "bivalent", 
-    entrezgene_id %in% promoters_with_h3k4me3$gene_id & !(entrezgene_id %in% promoters_with_h3k27me3$gene_id) ~ "H3K4me3_only", 
-    !(entrezgene_id %in% promoters_with_h3k4me3$gene_id) & entrezgene_id %in% promoters_with_h3k27me3$gene_id ~ "H3K27me3_only", 
-    !(entrezgene_id %in% promoters_with_h3k4me3$gene_id | entrezgene_id %in% promoters_with_h3k27me3$gene_id) ~ "no_mark") ) 
+```{r q12a_bivalent_prom-hint-4}
+table(quantification_chr19_new$promoter_mark)
 ```
 
-### Exercise 12b  
-
-> **Exercise 12b**: plot the gene expression as log10(FPKM+1) in a boxplot with extra geom_jittter, per group of genes.  
-
-```{r prepare_exercise12b, echo=FALSE}
-overlap_h3k4me3_promoters <- findOverlaps(query = monocytes_h3k4me3, subject = promoters_chr19)
-promoters_with_h3k4me3 <- promoters_chr19[subjectHits(overlap_h3k4me3_promoters)]
-
-overlap_h3k27me3_promoters <- findOverlaps(query = monocytes_h3k27me3, subject = promoters_chr19)
-promoters_with_h3k27me3 <- promoters_chr19[subjectHits(overlap_h3k27me3_promoters)]
-
-quantification_chr19_new <- quantification_chr19 %>%  mutate(promoter_mark = case_when(
-    entrezgene_id %in% promoters_with_h3k4me3$gene_id & entrezgene_id %in% promoters_with_h3k27me3$gene_id ~ "bivalent", 
-    entrezgene_id %in% promoters_with_h3k4me3$gene_id & !(entrezgene_id %in% promoters_with_h3k27me3$gene_id) ~ "H3K4me3_only", 
-    !(entrezgene_id %in% promoters_with_h3k4me3$gene_id) & entrezgene_id %in% promoters_with_h3k27me3$gene_id ~ "H3K27me3_only", 
-    !(entrezgene_id %in% promoters_with_h3k4me3$gene_id | entrezgene_id %in% promoters_with_h3k27me3$gene_id) ~ "no_mark") ) 
+```{r q12a_bivalent_prom-check}
+grade_result(pass_if(~identical(.result, table(quantification_chr19_new$promoter_mark))))
 ```
 
-```{r q12b_bivalent_prom, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_exercise12b"}
-# pipe the output into your ggplot
-  ggplot(___) +
-    geom_boxplot(mapping = aes(x = ___, y = (FKPM+1)))+
-    geom_jitter(mapping = aes(x = ___, y = (FKPM+1)), alpha = 0.8, size = 0.5)+
-    theme_calc()+
-    scale_y_continuous(trans = "log10")
+> **Exercise 12b**: Plot the gene expression as log10(FPKM+1) in a boxplot with extra geom_jittter, per group of genes and answer the question below (thus, there is no "submit answer" box).  
+
+```{r q12b_bivalent_prom, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_exercise12"}
+# Print the boxplot of the log(FPKM+1) distribution per gene group 
+___(___) +
+    ___(mapping = aes(x = ___, y = log(FPKM+1)))+
+    geom_jitter(mapping = aes(x = ___, y = log(FPKM+1)), size = 0.75, alpha = 0.6)+
+    theme_calc()
 ```
 
 ```{r q12b_bivalent_prom-solution}
 ggplot(quantification_chr19_new) +
-    geom_boxplot(mapping = aes(x = promoter_mark, y = (FPKM+1)))+
-    geom_jitter(mapping = aes(x = promoter_mark, y = (FPKM+1)), alpha = 0.8, size = 0.5)+
-    theme_calc()+
-    scale_y_continuous(trans = "log10")
+    geom_boxplot(mapping = aes(x = promoter_mark, y = log(FPKM+1)))+
+    geom_jitter(mapping = aes(x = promoter_mark, y = log(FPKM+1)), size = 0.75, alpha = 0.6)+
+    theme_calc()
 ```
 
+
+
 ```{r q12_bivalent_mc}
-question("Which of the following statments are correct?",
-         answer("There are more promoters with only H3K4me3 than with H3K4me3 combined with another mark.", message = "We have to evaluate more marks to determine whether H3K4me3 is indeed found more often by itself at a promoter than combined with another mark."),
-         answer("Gene expression is associated with different histone mark (combinations).", correct=T),
+question("Which of the following statments are supported by the table and the boxplot?",
+         answer("Gene expression is associated with different histone mark (combinations).", correct=TRUE),
          answer("H3K4me3 defines promoters.", message = "H3K4me3 does not define promoters. Promoters are defined as the regions near the TSS."),
-         answer("There are more promoters with chromatin markings than without, in chromosome 19 of monocytes.", correct=T),
-         answer("H3K4me3 is more often found at promoters than H3K27me3, in chromosome 19 of monocytes.", correct=T),
-         allow_retry=T,
-         random_answer_order=T
+         answer("There are more promoters with chromatin markings than without, in chromosome 19 of monocytes.", correct=TRUE),
+         answer("Bivalent promoters show equally low expression levels as promoters with H3K27me3 only"),
+         answer("H3K4me3 is more often found at promoters than H3K27me3, in chromosome 19 of monocytes.", correct=TRUE),
+         allow_retry=TRUE,
+         random_answer_order=TRUE
          )
 
 ```
@@ -1854,44 +2068,50 @@ question("Which of the following statments are correct?",
 **So far we have only looked at individual overlaps but chromatin states are actually defined by the combinatorial occupancy of different marks and factors. Let's analyse the chromosome19-wide overlap of the marks in our dataset and identify the occuring combinations.**  
 
 ## 2.6 Summarizing overlap among marks   
-You will make an UpSet plot, which is an elegant alternative to the VennDiagram, that visualizes the size of each detected combination. Combination in our case refers to overlap. This **size** of the combined set can be defined in various ways, depending on how you compare your regions. In the `ComplexHeatmap` package they define three 'modes' for it: distinct, intersect and union. You will work with the results from the setting 'distinct'. Below is a visual summary of these modes.   
-
-![](images/wk2_4_complexheatmap_modes.png)/  
-[Ref](https://jokergoo.github.io/ComplexHeatmap-reference/book/upset-plot.html#input-data): *Zuguang Gu, ComplexHeatmap Complete Reference, last revised on 2020-10-27*  
+You will use the `ComplexHeatmap` package to make an UpSet plot. This is an elegant alternative to the VennDiagram and visualizes the size of each detected combination. **Combination** in our case refers to overlap among peaks from histone modification ChIP-seq data.  
 <br>
-The `make_comb_mat([list_of_grangesobjects])` is used to detect overlapping marks:   
+The size of the overlap is  You will work with the results from the setting 'distinct' that identifies 
+
+>#### **Background info**: 3 modes for defining combinations     
+<details><summary> Click here for more info on the three modes as defined by the ComplexHeatmap package.</summary>
+This **size** of the combined set can be defined in various ways, depending on how you compare your regions. In the `ComplexHeatmap` package they define three 'modes' for it: distinct, intersect and union. . Below is a visual summary of these modes.   
+![](images/wk2_4_complexheatmap_modes.png){width=100}\       
+*Ref: [Zuguang Gu, ComplexHeatmap Complete Reference, last revised on 2020-10-27](https://jokergoo.github.io/ComplexHeatmap-reference/book/upset-plot.html#input-data)*    
+</details>  
+
+To detect combinations - ie overlapping peaks - you use the `make_comb_mat()` function:  
 ```{r makecombexample, eval=FALSE, echo=TRUE}
-monocytes_combinationmatrix <- make_comb_mat(monocytes_list) 
+combinationmatrix <- make_comb_mat([list_of_objects_to_be_evaluated]) 
 ```
 `make_comb_mat()` returns a "combination matrix" object. Special functions can be used to view its information and filter the reported combinations:   
 
-- set_name() prints the names of the objects from the original list  
-- set_size() prints the total number of bps covered by the intervals in each object  
-- comb_size() reports the total number of bps covered by the respective combination of intervals.  
+- `set_name()` prints the names of the objects from the original list  
+- `set_size()` prints the total number of bps covered by the intervals in each object  
+- `comb_size()` reports the total number of bps covered by the respective combination of intervals.  
     + The combinations are encoded in a binary fashion of 0s and 1s.  
     + A 1 means the mark in question is present in the combination.  
     + These 0s and 1s follow the order given by set_name().   
 
-```{r makecombexample_saving, echo = F, eval = F}
+```{r makecombexample_saving, echo = FALSE, eval = FALSE}
 # I ran this chunk to save the combination matrix such that students do not need to run it (it takes quite a while)
 # prepare objects for upset plot in week 2
 monocytes_combinationmatrix <- make_comb_mat(monocytes_list) # takes a while! 
-
-saveRDS(monocytes_combinationmatrix, file =  "/home/ctoenhake/learnr.proto/inst/extdata/week2/prepared_rds/blueprint_monocyte_chr19_complexheatmap_combmatrix.rds")
+save(monocytes_combinationmatrix, file =  "/home/ctoenhake/learnr.proto/inst/extdata/week2/prepared_rds/blueprint_monocyte_chr19_complexheatmap_combmatrix.rdata")
+rm(monocytes_combinationmatrix)
 ```
 
 
 ### Exericse 13a    
 
-> **Exercise 13a**: Examine the `monocytes_combinationmatrix` object with the obove mentioned functions.     
+> **Exercise 13a**: Examine the `monocytes_combinationmatrix` object with the obove mentioned functions and answer the multiple-choice questions below the code.     
 
-```{r prepare_exercise13a, echo=FALSE}
+```{r prepare_q13a, echo=FALSE}
 # import correct output 
-rdsfile <- system.file("extdata", "week2", "prepared_rds", "blueprint_monocyte_chr19_complexheatmap_combmatrix.rds", package = "learnr.proto")
-monocytes_combinationmatrix <- readRDS(rdsfile)
+rdatafile <- system.file("extdata", "week2", "prepared_rds", "blueprint_monocyte_chr19_complexheatmap_combmatrix.rdata", package = "learnr.proto")
+load(rdatafile)
 ```
 
-```{r q13a_upsetrplot_mark_overlap, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_exercise13a"}
+```{r q13a_upsetrplot_mark_overlap, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q13a"}
 # What are the names of the sets?
 __(monocytes_combinationmatrix)
 
@@ -1919,16 +2139,16 @@ quiz(caption ="",
               answer("H3K4me3"),
               answer("H3K36me3"),
               answer("H3K27me3"),
-              answer("H3K9me3", correct=T, message = "other marks have more peaks, but this marks spans broad domains."),
-              allow_retry=T),
+              answer("H3K9me3", correct=TRUE, message = "Other marks have more peaks, but this marks spans broad domains."),
+              allow_retry=TRUE),
      question("And which combination of marks apparantly covers most bps?",
               answer("H3K4me3 and H3K27me3"),
               answer("H3K9me3 and H3K27me3"),
               answer("H3K9me3 and H3K4me3"),
-              answer("H3K9me3 and H3K36me3", correct=T, message = "These two marks generally cover large windows in the genome. Their co-occupancy has been associated weakly transcribed genes. A large domain of H3K36me3 H3K9me3 bivalent chromatin is found at the cluster of zinc finger genes on chromosome 19 we saw in week1. (ref: 
+              answer("H3K9me3 and H3K36me3", correct=TRUE, message = "These two marks generally cover large windows in the genome. Their co-occupancy has been associated weakly transcribed genes. A large domain of H3K36me3 H3K9me3 bivalent chromatin is found at the cluster of zinc finger genes on chromosome 19 we saw in week1. (ref: 
                      Mauser et al. 2017 Epigentics and Chromatin)"),
-              allow_retry=T,
-              random_answer_order=T)
+              allow_retry=TRUE,
+              random_answer_order=TRUE)
      )
 ```
 
@@ -1940,7 +2160,7 @@ The combination H3K4me1 and H3K4me3 is the 3rd most widespread combination. This
 > **Exercise 13a**: Filter `monocytes_combinationmatrix` for combinations of 100kb and more. And plot the filtered combination matrix with `UpSet()` (code check).   
 
 
-```{r q13b_upsetrplot, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_exercise13a"}
+```{r q13b_upsetrplot, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q13a"}
 # filter monocytes_combinationmatrix for combinations covering at least 100kb
 monocytes_combmatrix_filt <- monocytes_combinationmatrix[comb_size(monocytes_combinationmatrix) > ___ ]
 
@@ -1965,7 +2185,7 @@ grade_code()
 
 > **Exercise 13c**: Run the code below, which changes the labels at the top and rightside.   
 
-```{r q13c_niceupset, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_exercise13a"}
+```{r q13c_niceupset, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q13a"}
 # filter monocytes_combinationmatrix for combinations covering at least 100kb
 monocytes_combmatrix_filt <- monocytes_combinationmatrix[comb_size(monocytes_combinationmatrix) > 100000]
 
