@@ -846,15 +846,15 @@
     },
     "learnr.dashboard": {
       "Package": "learnr.dashboard",
-      "Version": "0.4",
+      "Version": "0.5",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteUsername": "vanheeringen-lab",
       "RemoteRepo": "learnr.dashboard",
       "RemoteRef": "master",
-      "RemoteSha": "405d6eb6a89231d8a4a45886c95e4e8de1657639",
-      "Hash": "b400b669bdb087f0fe18ffbad3d1577b"
+      "RemoteSha": "a5230e7dc3e51203d00353f72ff5f8622eb82bdf",
+      "Hash": "b753dd5874ea3bec79ba14e0ea2f64df"
     },
     "lifecycle": {
       "Package": "lifecycle",
