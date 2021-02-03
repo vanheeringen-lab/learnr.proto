@@ -112,7 +112,18 @@ For this practical, you will use **monocytes data** from the [the BLUEPRINT proj
   10. Visualize the distribution of signal strength in a density plot.  
   11. Visualize the signal strength around the TSS in a clustered heatmap.   
 
-<br>  
+ 
+### Global tutorial specs  
+
+- You will run a different tutorial for each week.  
+
+- Answers will be saved for each of your sessions and will be loaded if you restart the tutorial.     
+
+- At the end of the tutorial you are instructed to print a pdf report of the tutorial (incl. your answers).   
+
+- To reserve server space to *active* running tutorials, and stop those that aren't actively used anymore, we set a time limit to 25 minutes meaning that if your tutorial has been idle for over 25 minutes, you will see the following warning "Tutorial stopped due to inactivity. Restart to continue where you left off!". When you see this warning, you should close the browser with the tutorial and restart the tutorial. Progress will be saved and once you restart the tutorial you can continue where you left.   
+
+- Finally, links to reference material (not required for reading!) and used resources are formatted with `r colorize("light blue font", col = "dodgerblue")`. Open these links using the 'right-mouse click \-\-\> Open in a new browser tab' strategy. If you click on the links straight away, you are directed away from the tutorial.   
 
 ### Structure of this computer practical    
 You will run a different tutorial for each week:   
@@ -126,18 +137,13 @@ Global learning objectives #4-6.
 **Week 3**: Visually summarize ChIP-seq signal intensity and relate the combination of signals to gene expression.   
 Global learning objectives #7-11.  
   
-The tutorials of week 2 and week 3 build upon R programming skills taught during [Genomics and Big Data](https://www.ru.nl/courseguides/science/vm/osirislinks/bp/nwi-bp031/) and a basic understanding of the R programming language is helpful. However, also without a background in R programming, you should still be able to write the code using the background information we give you, the hints provided and discussions with your pears in the break-out rooms.   
+The tutorials of week 2 and week 3 build upon R programming skills taught during [Genomics and Big Data](https://www.ru.nl/courseguides/science/vm/osirislinks/bp/nwi-bp031/) and a basic understanding of the R programming language is helpful. If you want to refresh your memory, you can revisit the tutorial [Data Analysis and Visualization in R alpha
+by the Data Carpentry contributors](https://datacarpentry.org/R-genomics/index.html) which was used to develop the computer practical of Genomics and Big Data. However, also without a background in R programming, you should still be able to write the code using the background information we give you, the hints provided and discussions with your pears in the break-out rooms. 
+<br>
 
 ### Need help?  
 You are allocated to Breakout rooms in Zoom (or you can select one yourself). Either way, use the Breakout rooms to discuss  questions and difficulties with your peers. If you still have question, use the "raise hand" option to notify the teacher.  
 
-### Global tutorial specs  
-
-- You will run a different tutorial for each week.  
-- Answers will be saved for each of your sessions and will be loaded if you restart the tutorial.     
-- At the end of the tutorial you are instructed to print a pdf report of the tutorial (incl. your answers).   
-- To reserve server space to *active* running tutorials, and stop those that aren't actively used anymore, we set a time limit to 25 minutes meaning that if your tutorial has been idle for over 25 minutes, you will see the following warning "Tutorial stopped due to inactivity. Restart to continue where you left off!". When you see this warning, you should close the browser with the tutorial and restart the tutorial. Progress will be saved and once you restart the tutorial you can continue where you left.   
-- Finally, links to reference material (not required for reading!) and used resources are formatted with `r colorize("light blue font", col = "dodgerblue")`. Open these links using the 'right-mouse click \-\-\> Open in a new browser tab' strategy. If you click on the links straight away, you are directed away from the tutorial.   
 
 ## 1.1 Introduction week 1    
 
@@ -985,7 +991,29 @@ question("Which genes are silenced by H3K27me3? (Select ALL that apply.)",
          answer("*MYOD*", correct = T),
          allow_retry = T)
 ```
-<br>
+
+
+>#### **Tip**:
+<details><summary>Save your session so that you can easily revisit the data in the UCSC genome browser (click here): </summary>
+> 
+> By saving sessions in your account you can easily revisit data that you had uploaded before. In fg2 and fg3 you might, for example, want to cross-check some of the findings from your computational analyses in the UCSC genome browser. To save your session:   
+>
+> 1. Go to "My Data" > "My sessions" > Select "Create an account" (if you didn't already had one otherwise login and continue with 5).  
+> 2. Fill out your details and activate your account through the activation email you received upon registration.    
+> 3. When you confirm your e-mail adress, you are brought to a page were you can login immediately.   
+> 4. Hit "login" and you will return to the "My Sessions" page:  
+> ![](images/wk1_4d_sessions_no_sessionsyet.png){width=100}\    
+> 
+> 5. In the section "Session management" > "Save sessions" > give your session a name in the "Save current settings as named session:" bar. For example 'blueprint_monocytes_hg38'. Or 'fg1'. Hit "Submit" to save your session.    
+> ![](images/wk1_4d_sessions_saving.png){width=100}\    
+> 
+> 6. After submitting you will see the session appear in the "My Sessions" table. You can visit the session by clicking on the session name.  
+![](images/wk1_4d_sessions_saved.png){width=100}\    
+>
+> 7. Whem you revisit the UCSC Genome Browser you can immediatly go to your sessions via the "My Data" section in the header of the homepage and select "My Sessions" > "login".   
+</details>
+
+
 
 ### 1.4.5 Recognizing blinded genomics data    
 So far you have browsed through ChIP-, DNaseI- and RNA-seq data. These tracks had the correct track names attached to them.   

@@ -182,10 +182,10 @@ Identify the nearest TSS for each H3K4me3 peak in monocytes.
 
 ```{r q1_mc_import}
 question("Which function imports the H3K4me3 peaks into a GRanges object?",
-         answer("import(\"H3K4me3.bwa.GRCh38.chr19.bed\", format = \"narrowPeak\")", correct =TRUE),
-         answer("import(\"H3K4me3.bwa.GRCh38.chr19.bed\", format = \"BED\")", message = "BED is not the right format."),
-         answer("import(\"H3K4me3.bwa.GRCh38.chr19.bed\", format = \"broadPeak\")", message = "check the file format."),
-         answer("read.table(\"H3K4me3.bwa.GRCh38.chr19.bed\", format = \"broadPeak\")", message = "read.table parses the data into a data.frame while we asked for a GRanges object."),
+         answer("import(\"h3k4me3_peaks.chr19.bed\", format = \"narrowPeak\")", correct =TRUE),
+         answer("import(\"h3k4me3_peaks.chr19.bed\", format = \"BED\")", message = "BED is not the right format."),
+         answer("import(\"h3k4me3_peaks.chr19.bed\", format = \"broadPeak\")", message = "check the file format."),
+         answer("read.table(\"h3k4me3_peaks.chr19.bed\", format = \"broadPeak\")", message = "read.table parses the data into a data.frame while we asked for a GRanges object."),
          allow_retry =TRUE,
          random_answer_order =TRUE)
 ```
@@ -2117,7 +2117,7 @@ Chromatin states are patterns of spatially re-occurring, co-localizing histone m
 ChromHMM learns the significant combinatorial and spatial patterns of chromatin marks de novo from the data. This reveals the functional elements without looking at the sequence.   
 
 ### Exercise 16  
-ChromHMM analysis was also performed on the monocyte ChIP-seq data you have worked with (ref: [BLUEPRINT secondary analysis](http://dcc.blueprint-epigenome.eu/#/md/secondary_analysis). The following heatmap summarizes the identified spatial combinations of marks:  
+ChromHMM analysis was also performed using the monocyte ChIP-seq data you have worked with and 90 other samples (ref: [BLUEPRINT secondary analysis](http://dcc.blueprint-epigenome.eu/#/md/secondary_analysis). The following heatmap summarizes the identified spatial combinations of marks:  
 
 - Each row corresponds to a different chromatin state.    
 - Each column corresponds to a different mark.  
@@ -2125,6 +2125,7 @@ ChromHMM analysis was also performed on the monocyte ChIP-seq data you have work
 
 <br>
 ![](images/emissions_12_Blueprint_release_20160816_forex16.png){width=75%}\  
+<!-- Image was downloaded from [BLUEPRINT secondary analysis](http://dcc.blueprint-epigenome.eu/#/md/secondary_analysis). Go to FTP link of ChromHmm Segmentation of ChIP-Seq data. Select 'emissions_12_Blueprint_release.ALL.20150128.png'  -->
 
 As you can see, some of the states have not (yet) been annotated (A-F). Which of the annotations in the table below is the correct one?  
 
