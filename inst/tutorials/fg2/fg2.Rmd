@@ -49,6 +49,7 @@ suppressPackageStartupMessages({
   # BiocManager::install("org.Hs.eg.db")
   
   # configuration
+  options("tutorial.storage"="local")  # save progress in ~/.local/share/R/ see https://bit.ly/3oNP3kF
   knitr::opts_chunk$set(echo=FALSE, message=F)
   gradethis::gradethis_setup()
   

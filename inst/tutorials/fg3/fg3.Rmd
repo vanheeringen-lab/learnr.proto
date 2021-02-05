@@ -32,6 +32,7 @@ suppressPackageStartupMessages({
   library(ggthemes)
 
   # configuration
+  options("tutorial.storage"="local")  # save progress in ~/.local/share/R/ see https://bit.ly/3oNP3kF
   knitr::opts_chunk$set(echo=FALSE, message=FALSE)
   gradethis::gradethis_setup()
   
