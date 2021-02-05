@@ -194,7 +194,9 @@ A tiny side note: instead of performing the analyses genome-wide, we have restri
 ### 2.1.4 Tutorial specs  
 
 - **Answers will be saved** each time you close your session and will be loaded if you restart the tutorial. Unless you hit `Start over` at the bottom of the table-of-contents.      
+
 - At the end of the tutorial you are instructed to **print a pdf report of the tutorial** (incl. your answers).   
+
 - To reserve server space to *active* running tutorials, and stop those that aren't actively used anymore, **we set a time limit to 25 minutes** meaning that if your tutorial has been idle for over 25 minutes, you will see the warning "Tutorial stopped due to inactivity. Restart to continue where you left off!". When you see this warning, you should close the browser with the tutorial and restart the tutorial. As progress is saved, you can continue where you left once you restart the tutorial.   
 
 - Links to reference material and used resources are formatted with `r colorize("light blue font", col = "dodgerblue")`. It is advised to open these links using the "right-mouse click \-\-\> Open in a new browser tab" strategy. If you click on the links straight away, you are directed away from the tutorial.   
@@ -205,7 +207,9 @@ A tiny side note: instead of performing the analyses genome-wide, we have restri
 
 * In this tutorial you will have multiple-choice and check-the-box questions like in fg1 but also **complete-the-code exercises**. The latter are sometimes evaluated on the printed object or summary (e.g a the top part of an object), in other cases, the code itself is checked. When the code is evaluated we added "(code check)" to the question. In these cases, R will give custom feedback that helps you correct your code.      
 
-* For short lines of code, you have to decide which function or object to use and how to write this in code. For some longer lines of codes, we left blanks as "___" that indicate where in the code you should fill in a function, object or variable. Make sure fill out all the blanks before Answer submission, they will otherwise result in errors.  
+* Due to technical reasons, when you hit Submit Answer of **(code check)** exercises, the output (if there is any) will not be printed. Eg a plot won't be shown. To visualize the plot, you must you use `Run Code`.  
+
+* For short lines of code, you have to decide which function or object to use and how to write this in code. For some longer lines of codes, we left blanks as '\_\_\_' that indicate where in the code you should fill in a function, object or variable. Make sure fill out all the blanks before Answer submission, they will otherwise result in errors.  
 
 * Hit `Hint` (when provided) for clues. Due to technical reasons **you can't go back to previous hints, so make sure you read them well!**        
 
