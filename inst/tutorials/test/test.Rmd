@@ -30,6 +30,7 @@ suppressPackageStartupMessages({
   #library(ggplot2)    # 3.3.2
   
   # configuration
+  options("tutorial.storage"="local")  # save progress in ~/.local/share/R/ see https://bit.ly/3oNP3kF
   knitr::opts_chunk$set(echo = FALSE)
   gradethis::gradethis_setup()
 })
