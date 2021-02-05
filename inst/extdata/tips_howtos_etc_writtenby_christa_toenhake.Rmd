@@ -75,9 +75,39 @@ exact de code die je verwacht
 grade_code()
 ``
 
+### Possible corrections for next year   
+
+* restructure fg2, took more time than fg3  
+* remove (code check) comment from exercises 
+
 # Anything else that might be worth to tell the next person working on this.    
-In prepdata.Rmd I wrote out commands I used to prepare some of the objects. Some of the raw data are too bit to include in this tutorial. They can (as for now) be found on cn45/scratch/ctoenhake/edu.  
-<br>
-All BLUEPRINT data were downlaoded from the blueprint data portal.  
-<br>
-I limited this tutorial to monocyte data of sample C000S5.  
+- In prepdata.Rmd I wrote out commands I used to prepare some of the objects. Some of the raw data are too bit to include in this tutorial. They can (as for now) be found on cn45/scratch/ctoenhake/edu.  --> now relocated to `/molbiol/mb03-sdb1/mbdata/ctoenhake/edu/`  
+
+- All BLUEPRINT data were downloaded from the blueprint data portal.  
+
+- I limited this tutorial to monocyte data of sample C000S5.  
+
+- Sometimes running `learnr.dashboard:::.setup_learnr_proto(lib="/home/ctoenhake/learnr.proto/renv/library/R-3.6/x86_64-pc-linux-gnu", pkg="/home/ctoenhake/learnr.proto")` gives at the end the error:  
+```{r example1, echo=T, eval=F}
+ DONE (learnr.proto)
+Error in validate_signal_args(.subclass) : 
+  could not find function "validate_signal_args"
+```
+    + solve by restarting R session   
+    
+- Sometimes running `learnr.dashboard::start_tutorial("fg3")` after you've installed the new/corrected tutorial in the package with `learnr.dashboard:::.setup_learnr_proto()`, hint chunks with empty functions give an error, eg:   
+```{r example2, echo=T, eval=F}
+label: q3b_h3k4me3plot-hint-3
+Quitting from lines 554-556 (fg3.Rmd) 
+Error in parse(text = x, srcfile = src) : <text>:2:1: unexpected input
+1: # eg
+2: _
+   ^
+```
+
+--> solve by restarting r and run `learnr.dashboard::start_tutorial("fg3")`  again.   
+
+
+- If you run `learnr.dashboard:::.setup_learnr_proto(lib="/home/ctoenhake/learnr.proto/renv/library/R-3.6/x86_64-pc-linux-gnu", pkg="/home/ctoenhake/learnr.proto")` and there is a fg#.html in the tutorials dir. Than that html will be loaded upon running `learnr.dashboard::start_tutorial("fg3")` instead of your updated tutorial. solve by removing the .html before installing the tutorial.
+
+
