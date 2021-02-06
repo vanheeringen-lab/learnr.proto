@@ -3,12 +3,12 @@ title: "Prepare files for week 2 and 3"
 author: "Christa Toenhake"
 date: "13/11/2020"
 output: html_document
-editor_options: 
-  chunk_output_type: inline
 ---
 
-```{r setup, include=FALSE, echo = T, eval = F}
-knitr::opts_chunk$set(, echo = TRUE)
+### Last updated 2021/02/06
+
+```{r setup, include=FALSE, echo = T}
+knitr::opts_chunk$set(echo = TRUE, eval=FALSE)
 ```
 
 ### Load libraries 
@@ -102,28 +102,27 @@ saveRDS(quantification_chr19, file = "data/prepared_rds/blueprint_c000s5_gene_qu
 ```
 
 # week 3
-the raw bigwig data are removed from the tutorial.   
+
+- Situation: need bigWig files for practical.  
+- Problem: these files are too large, will take long time before practical is loaded.   
+- Target: files to be used should not exceed 5MB (preferably for the whole package but that is too little).  
+- Failed solution1: select chromosome 19 only --> but this leaves us with bigwig files of ±20-30 MB each! Still too large.  
+- Failed solution2: work with chr21 \-\-\> files are small enough but gene expression is not representative for genome wide  
+- Successfull solution3: Random select 40% of genes from chr19 based on quantification quartiles and used these to select regions in bigwig file.    
+
+### How I obtained the bigwig files used in this script (covering chgr19 only):  
 
 - bigwig files were downloaded from, eg.H3K4me3: http://dcc.blueprint-epigenome.eu/#/experiments/ERX547984 ; file "Normalized signal, BigWig format'.  
 - select chr19 with script: `/scratch/ctoenhake/data/fg1_r_data/blueprint/chip_bw/select_chr19.sh`  
 - used a bit of a work-around to get these bigwigs on passer:  
-    + copy resulting *.chr19.bw to the web accessible directory that I also used for the trackhubs `/molbiol/mb03-sdb1/mbdata/ctoenhake/edu/monocytes_data_bigwigs_chr19only`  
+    + copy resulting *.chr19.bw to the web accessible directory that I also used for the trackhubs `/ceph/rimlsfnwi/web_share/mbdata/ctoenhake/edu/fg1_r_data/blueprint/chip_bw`  
     + Download file from there to my mac with curl -O [filename] .
     + Upload these files to the learn.proto `/home/ctoenhake/learnr.proto/inst/extdata/week3/bw_chr19`  
 
 After I ran the chunks to get smaller bigwig files, I removed the dir `/home/ctoenhake/learnr.proto/inst/extdata/week3/bw_chr19`, and kept `/home/ctoenhake/learnr.proto/inst/extdata/week3/bw_chr19_tss_sample`   
 
-Raw bigwig files were relocated to:  
-`/ceph/rimlsfnwi/web_share/mbdata/ctoenhake/edu/fg1_r_data/`  
 
 ## chr19 - get smaller bigwig by downsampling genes and save associated tss and FPKM files    
-Problem: chip-seq bigwig files of 1 chromosome are too large  
-Aim: for 5MB per tutorial on data.  
-Possible solutions:  
-
-1. Select chr19, only 20kb +/- TSS sites \-\-\> files remain too large   
-2. Work with chr21 \-\-\> files are small enough but gene expression is not representative for genome wide  
-3. Random select subsample of genes from chr19 based on quantification quartiles and used these to select regions in bigwig file.    
 
 ```{r step 1 chr19 subsample per gene expression quantile, eval = F}
 # Important parameter: the chosen proportion of genes
@@ -207,7 +206,7 @@ resize_bw(10, file, tss_chr19_sample)
 ```
 
 # chr19 - save objects in week3.Rdata
-```{r objects needed in week3}  
+```{r objects needed in week3, eval =FALSE, echo=TRUE}  
 # make quantification_chr19_sample (generated in chunk above) ready for saving
 quantification_chr19_sample$expression_group <- NULL
 quantification_chr19_sample <- quantification_chr19_sample %>% dplyr::rename(gene_id = entrezgene_id)
@@ -241,7 +240,7 @@ save(monocytes_h3k4me1, monocytes_h3k4me3, monocytes_h3k9me3, monocytes_h3k27ac,
 
 
 ### session Info
-```{r session info, echo = T, eval = F}
+```{r session info, echo = T, eval = T}
 sessionInfo()
 
 ```
