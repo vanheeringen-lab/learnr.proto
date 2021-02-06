@@ -157,8 +157,6 @@ $(function() {
 // source: https://yihui.org/en/2018/09/target-blank/
 ```
 
-
-
 ## 2.1 Introduction
 ### 2.1.1 Recap fg1    
 In **fg1** you studied the major steps involved in obtaining epigenomics data, from experiment to raw data and from raw data to normalized signal and peaks. You uploaded and inspected data of DNaseI-seq, RNA-seq and ChIP-seq of histone modifications of monocytes in the UCSC genome browser and you searched for regions with increased signal, so-called *peaks*.   
@@ -2087,6 +2085,85 @@ question("Which of the following statments are supported by the table and the bo
          )
 
 ```
+
+As you can see, the specific combination of histone marks at the promoter can be functionally associated with a different output in gene expression levels. Let's not restrict our analysis to 2 marks but examine the occurrence at the promoter of all the different marks in our dataset.  
+
+## 2.6 Quantify and visualize overlap among > 4 marks   
+### Upset plots  
+An [UpSet plot](https://jku-vds-lab.at/tools/upset/) is an elegant alternative to the VennDiagram when you want to visualize the intersection among more than 3 sets (also see this [commentary in Nature Methods 2014 by Alexander Lex & Nils Gehlenborg](https://www.nature.com/articles/nmeth.3033)). It combines  
+
+- UpSet plots the intersections of a set as a matrix, with barplots that visualize (a) the size of the individual sets, and (b) the size of the detected intersections.  
+- Additional attributes of the intersections can be added to the bottom or sides of the plots, which we will do as well.  
+
+ref: 
+<br>
+There are several R packages with functions to make an UpSet. You will use the one from the `ComplexHeatmap` package, see [here](https://jokergoo.github.io/ComplexHeatmap-reference/book/) for the complete reference book of this package. We installed and loaded the package for you by running:  
+```{r complexheatmap, echo=TRUE, eval=FALSE}
+BiocManager::install("ComplexHeatmap")
+library(ComplexHeatmap)
+```
+<br>
+
+```{r upset_marks_at_promoters}
+overlap_all <- lapply(monocytes_list, function(x) promoters_chr19[unique(subjectHits(findOverlaps(query = x , subject = promoters_chr19)))]$gene_id)
+names(overlap_all) <- names(monocytes_list)
+m1 = make_comb_mat(overlap_all, universal_set =  promoters_chr19$gene_id)
+UpSet(m1,
+      comb_order = order(comb_size(m1), decreasing =  TRUE),
+      set_order = order(set_size(m1), decreasing = FALSE),
+      #comb_col = brewer.pal("Set1", n=7)[comb_degree(m1)]
+      )
+
+## use plot to set threshold:
+barplot(sort(comb_size(m1)))
+abline(h = 40, lwd =2, col = "red")
+abline(h = 50, lwd =2, col = "black")
+abline(h = 60, lwd =2, col = "blue")
+
+## upset of filtered matrix
+m2 <- m1[comb_size(m1) >40]
+UpSet(m2,
+      comb_order = order(comb_size(m2), decreasing =  TRUE),
+      set_order = order(set_size(m2), decreasing = FALSE),
+      )
+
+m3 <- m1[comb_size(m1) >60]
+UpSet(m3,
+      comb_order = order(comb_size(m3), decreasing =  TRUE),
+      set_order = order(set_size(m3), decreasing = FALSE),
+      )
+
+## add average gene expression as boxplot below the combinations
+comb_sets <- lapply(comb_name(m3), function(nm) extract_comb(m3, nm))
+
+comb_sets = lapply(comb_sets, function(gr) {
+    # we just randomly generate dist_to_tss and mean_meth
+    gr$dist_to_tss = abs(rnorm(length(gr), mean = runif(1, min = 500, max = 2000), sd = 1000))
+    gr$mean_meth = abs(rnorm(length(gr), mean = 0.1, sd = 0.1))
+    gr
+
+
+bottom_annotation = HeatmapAnnotation(
+        dist_to_tss = anno_boxplot(lapply(comb_sets, function(gr) gr$dist_to_tss), outline = FALSE),
+        mean_meth = sapply(comb_sets, function(gr) mean(gr$mean_meth)),
+        annotation_name_side = "left"
+
+
+monocytes_combmatrix_sets <- lapply(monocytes_combmatrix_sets, function(gr) {
+	gr$dist_to_tss <- mcols(distanceToNearest(gr, tss_chr19))[,1]
+	gr$nearby_tss_geneid <- tss_chr19[subjectHits(distanceToNearest(gr, tss_chr19))]$gene_id
+	gr
+})        
+        
+bottom_annotation = HeatmapAnnotation(
+        dist_to_tss = anno_boxplot(lapply(monocytes_combmatrix_sets, function(gr) gr$dist_to_tss), outline = FALSE),
+        label = anno_text(LETTERS[1:length(monocytes_combmatrix_sets)], rot = 0),
+        annotation_name_side = "left",
+        height = unit(4, "cm")
+
+
+```
+
 
 
 **So far we have only looked at individual overlaps but chromatin states are actually defined by the combinatorial occupancy of different marks and factors. Let's analyze the chromosome19-wide overlap of the marks in our dataset and identify the occurring combinations.**  
