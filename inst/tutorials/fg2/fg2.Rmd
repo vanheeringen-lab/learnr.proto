@@ -36,7 +36,6 @@ suppressPackageStartupMessages({
   library(ggthemes)
   library(org.Hs.eg.db)
 
-
   # load the txdb package which holds transcript-based gene models of hg38 genome  
   library(TxDb.Hsapiens.UCSC.hg38.knownGene)
   txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene 
@@ -184,10 +183,10 @@ A tiny side note: instead of performing the analyses genome-wide, we have restri
 1. Import ChIP-seq peaks into a GRanges object in r.  
 2. Perform exploratory data analysis on GRanges objects with ChIP-seq peaks using plyranges and ggplot. 
 3. Detect and count overlap between two GRanges objects.    
-4. Plot this overlap in a venndiagram.  
+4. Plot this overlap in a Venn diagram.  
 5. Statistically test for enrichment of histone marks in a particular genomic region.  
-6. Visually compare gene expression of genes with different histone marks at their promoters.  
-7. Interpret the genome-wide overlap among multiple marks from an Upset plot.  
+6. Compare gene expression of genes with different histone marks at their promoters.  
+7. Identify the different combinations of histone marks that can be found at promoters along with their frequency.  
 - These refer to global learning objectives #4-#7.  
 
 ### 2.1.4 Tutorial specs  
@@ -475,8 +474,7 @@ quiz(caption = "",
 )
 ```
 
-### Briefly summarizing  
-You have the following information in your object `monocytes_h3k4me3`:  
+#### Briefly summarizing the information in `monocytes_h3k4me3`     
 
 Column | Section in GRanges object | Variable | Description   
 :--|:---|:---|:------      
@@ -582,29 +580,19 @@ grade_result(
 )
 ```
 
-```{r quiz_peakgranges}
-quiz(caption = "", 
-    question("What are the median peak sizes for H3K4me3 and H3K4me1 ChIP-seq peaks in the current dataset? (in monocytes, restricted to chromosome19)",
-             answer("median H3K4me3 peak = 879.5 bp", correct=T),
-             answer("median H3K4me3 peak = 1662 bp"),
-             answer("median H3K4me3 peak = 1198.6 bp"),   
-             answer("median H3K4me3 peak = 2642 bp"),
-             answer("median H3K4me1 peak = 879.5 bp"),
-             answer("median H3K4me1 peak = 1662 bp", correct=T),
-             answer("median H3K4me1 peak = 1198.6 bp"),   
-             answer("median H3K4me1 peak = 2642 bp"), 
-             allow_retry=TRUE),
-    question("And what are the widths of the *largest* peaks in the current H3K4me3 and H3K27me1 ChIP-seq datasets of monocytes?",
-             answer("largest H3K4me3 peak = 8237 bp", message = "8237 bp is the width of the largest H3K27ac peak on chr19" ),
-             answer("largest H3K4me3 peak = 12705 bp", correct=T),
-             answer("largest H3K4me3 peak = 73112 bp", message = "73112 bp is the width of the largest H3K36me3 peak on chr19" ),   
-             answer("largest H3K4me1 peak = 32063 bp", correct=T ),
-             answer("largest H3K4me1 peak = 86201 bp", message = "86201 bp is the width of the largest H3K27me3 peak on chr19"),
-             answer("largest H3K4me1 peak = 136766 bp", message = "136766 bp is the width of the largest H3K9me3 peak on chr19"),
-             allow_retry=TRUE))
-```
 <br>
 Notice the larger median and maximum peak size for H3K4me1 peaks compared to H3K4me3 peaks. This is related to H3K4me3 having having **narrow** peaks of enrichment (enrichment restricted to a relatively small region with high  scores) and H3K4me1 **broad** enrichment profiles (enrichment covering a broad region).   
+
+> #### **In summary**, marks with narrow and with broad peaks 
+><details><summary>Click here to view the summary...</summary>  
+>  
+> Histone modifications with narrow peak shape in ChIP-seq | Histone modifications with broad peak shape in ChIP-seq      
+> :-- |:--  
+H3K27ac | H3K27me3   
+H3K4me3 | H3K36me3  
+H3K9/14ac | H3K9me3  
+H2A.Zac | H3K4me1  
+</details>  
 
 ### 2.3.2 Plotting summaries with ggplot2  
 You will use ggplot2 and dplyr package to explore the ChIP-seq data further. You have used these packages in the year 1 course Genomics and Big Data. Use the refresher-boxes and package cheatsheets (tip: use google) when you  need a quick reminder of the basics and how-to-use the package-functions.  
@@ -750,152 +738,17 @@ ggplot(data = monocytes_metadata)+
 
 ```{r q3c_barplotpeakcount-code-check}
 grade_code(
-  correct = "Hit Run Code to view your plot. For which marks do you observe the most peaks? And for which the fewest number of peaks? Did they, in the genome browser, show a sharp peaks or broad domains of enrichment?"
+  correct = "Hit Run Code to view your plot. For which marks do you observe the most peaks? And for which the fewest number of peaks?"
 )
 ```
 
-<br>
-The range of peak counts can tell you whether your experiment and peak calling performed as expected. If they show extremely high or low values, it is likely something is off with your experiment (something you should have already noted in the Genome Browser). It can also function as an extra control step to check that the complete peakfiles are imported in R (and no strange things happened to your files along the way). Or give you insights in the occurrence of a newly characterized factor or the function of a known factor in a new system.     
-<br>
-In this case, the number of peaks is correct and you can continue with the analysis. 
-<br>
-
-### Exercise 4   
-Visualize the differences in peak size between the different marks in a boxplot.  
-
-> **Exercise 4a**: Add the 'peak_size' variable to `monocytes_metadata`. This new variable holds the peak widths (code check).  
-> 
-* Remember, to add new columns to GRanges objects you can use: `granges_object$new_variable <- variable_calculation`.    
-
-```{r prepare-addpeaksize, echo=FALSE}
-monocytes_metadata <- as.data.frame(mcols(monocytes_all))
+```{r q3c_barplotpeakcount_mc}
+question("Mark has the most peaks on chromosome 19 and which the fewest?",
+         answer("H3K4me1 the most, H3K9me3 the fewest."),
+         answer("H3K27ac the most, H3K9me3 the fewest.", correct=TRUE, message = "The range of peak counts can tell you whether your experiment and peak calling performed as expected. If they show extremely high or low values, it is likely something is off with your experiment (something you should have already noted in the Genome Browser). It can also function as an extra control step to check that the complete peakfiles are imported in R (and no strange things happened to your files along the way). Or give you insights in the occurrence of a newly characterized factor or the function of a known factor in a new system. In this case, the number of peaks is correct and you can continue with the analysis."),
+         answer("H3K4me3 the most, H3K36me3 the fewest."),
+         allow_retry=TRUE, random_answer_order = TRUE)
 ```
-
-```{r addpeaksize, exercise=TRUE, exercise.lines=3, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q4b"}
-# add variable 'peak_size' to monocytes_metadata with the width of the peaks from monocytes_all 
-
-
-```
-
-```{r addpeaksize-hint-1}
-# to obtain peak sizes, use the function
-width() 
-# WARNING: the next hint is the solution!
-```
-
-```{r addpeaksize-solution}
-monocytes_metadata$peak_size <- width(monocytes_all)
-```
-
-```{r addpeaksize-code-check}
-grade_code()
-```
-
-> **Exercise 4b**: Plot the peak size distribution as a boxplot (code check).   
-> 
-> * Make sure to hit "Run Code" to show the plot in the console.   
-> * Look in the ggplot2 refresher or ggplot cheatsheet to identify the geom function that will give you a boxplot.      
-
-```{r prepare_q4b}
-monocytes_metadata <- as.data.frame(mcols(monocytes_all))
-monocytes_metadata$peak_size <- width(monocytes_all)
-```
-
-```{r plotpeaksize, exercise=TRUE, exercise.lines=5, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q4b"}
-# plot the peak_size per chip as boxplot
-__(data = __)+
-  __(mapping = aes(x = __, y = __), fill = "gray")+
-  theme_bw()
-```
-
-```{r plotpeaksize-hint-1}
-## Use 
-ggplot(data = monocytes_metadata)
-```
-
-```{r plotpeaksize-hint-2}
-# Look at the ggplot refresher or cheatsheet to identify the geom_ function that will give you a boxplot
-```
-
-```{r plotpeaksize-hint-3}
-# x should hold the variable identifying the chip 
-# y the peak sizes (you defined in 4a)
-```
-
-```{r plotpeaksize-hint-4}
-# The next hint is the solution!
-```
-
-```{r plotpeaksize-solution}
-ggplot(data = monocytes_metadata)+
-  geom_boxplot(mapping = aes(x = chip, y = peak_size), fill = "gray")+
-  theme_bw()
-```
-
-```{r plotpeaksize-code-check}
-grade_code( 
-  correct = "Also make sure you hit `Run Code` to view your plot.")
-```
-
-> **Exercise 4c**: This doesn't look very informative, we mainly see the outliers! Let's log10-transform the y-axis by adding a line with `scale_y_continuous(trans = "log10")` to the code of exercise 4b (code check):   
-
-```{r plotpeaksizelog, exercise=TRUE, exercise.lines=6, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q4b"}
-# plot the peak_size per chip as boxplot, log10-transform the y-axis
-
-```
-
-```{r plotpeaksizelog-hint-1}
-# You can copy paste the code from exercise 4b
-```
-
-```{r plotpeaksizelog-hint-2}
-# Write a "+" after 'theme_bw() to ensure that the line you add is taken along as an extra layer.  
-# WARNING: the next hint is the solution!
-```
-
-```{r plotpeaksizelog-solution}
-ggplot(data = monocytes_metadata)+
-  geom_boxplot(mapping = aes(x = chip, y = peak_size), fill = "gray")+
-  theme_bw()+
-  scale_y_continuous(trans = "log10")
-```
-
-```{r plotpeaksizelog-code-check}
-grade_code(
-  correct = "Also make sure you hit `Run Code` to view your plot. Different histone modifications show different 'shapes' of enrichment. H3K4me3 has 'narrow' peaks that can reach high enrichment values. H3K4me1 on the other hand has more lower levels of enrichment that cover wider regions. H3K9me3 is another mark that covers broad regions of enrichment. Remember the family of zinc-finger genes covered by H3K9me3 in the genome browser."
-)
-```
-
-
-```{r q_broad_vs_narrow}
-quiz(caption = "Use the boxplot above.", 
-     question("Which other 3 ChIP-seq dataset has/have broad peak shapes besides H3K4me1?",
-         answer("H3K27ac"),
-         answer("H3K36me3", correct=T),
-         answer("H3K27me3", correct=T),
-         answer("H3K9me3", correct=T),
-         allow_retry=TRUE),
-     question("Which datasat also has narrow peak shapes (like H3K4me3)?",
-         answer("H3K27ac", correct=T),
-         answer("3K36me3"),
-         answer("H3K27me3"),
-         answer("H3K9me3"),
-         allow_retry=TRUE,
-         message = "You could have gotten this information from the [BLUEPRINT ChIP-Seq Analysis Pipeline description](http://dcc.blueprint-epigenome.eu/#/md/chip_seq_grch38) (remember: FAIR principles!). Under the section **Peak Calling** you can read that peak calling was performed with MACS2 and that the -broad flag was added depending on the mark in question." )
-)
-```
-<br>
-
-> #### **In summary**, marks with narrow and with broad peaks 
-><details><summary>Click here to view the summary...</summary>  
->  
-> Histone modifications with narrow peak shape in ChIP-seq | Histone modifications with broad peak shape in ChIP-seq      
-> :-- |:--  
-H3K27ac | H3K27me3   
-H3K4me3 | H3K36me3  
-H3K9/14ac | H3K9me3  
-H2A.Zac | H3K4me1  
-</details>  
 
 ### 2.3.3 Explore total peak area with dplyr & ggplot  
 In this section you will visualize the fraction that each ChIP-seq peak set covers in total on chromosome 19.  
@@ -918,9 +771,38 @@ Function | Purpose | Example on GRanges
 See also the [dplyr cheatsheet](https://rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)  
 </details>  
 
-### Exercise 5a  
+### Exercise 4  
 
-> **Exercise 5a**: Finish the code below using `group_by()` and `summarise()` to calculate the fraction of bps covered by each ChIP-seq peak dataset (code check).   
+> **Exercise 4a**: Add the 'peak_size' variable to `monocytes_metadata`. This new variable holds the peak widths (code check).   
+> 
+> * Remember, to add new columns to GRanges objects you can use: `granges_object$new_variable <- variable_calculation`.    
+
+```{r prepare_q4a, echo=FALSE}
+monocytes_metadata <- as.data.frame(mcols(monocytes_all))
+```
+
+```{r addpeaksize, exercise=TRUE, exercise.lines=3, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q4a"}
+# add variable 'peak_size' to monocytes_metadata with the width of the peaks from monocytes_all 
+
+
+```
+
+```{r addpeaksize-hint-1}
+# to obtain peak sizes, use the function
+width() 
+# WARNING: the next hint is the solution!
+```
+
+```{r addpeaksize-solution}
+monocytes_metadata$peak_size <- width(monocytes_all)
+```
+
+```{r addpeaksize-code-check}
+grade_code()
+```
+
+
+> **Exercise 4b**: Finish the code below using `group_by()` and `summarise()` to calculate the fraction of bps covered by each ChIP-seq peak dataset (code check).   
 > 
 > To do so ..  
 > 
@@ -928,12 +810,12 @@ See also the [dplyr cheatsheet](https://rstudio.com/wp-content/uploads/2015/02/d
 > 2. Then, calculate the total number of bps covered by each peak dataset as 'total_bps'. Use the 'peak_size' variable you defined in exercise 4a.        
 > 3. Laslty, calculate what fraction this is of chromosome 19 (=total 58617616 bp).   
 
-```{r prepare_p5a}
+```{r prepare_q4b}
 monocytes_metadata <- as.data.frame(mcols(monocytes_all))
 monocytes_metadata$peak_size <- width(monocytes_all)
 ```
 
-```{r summarisewidth, exercise=TRUE, exercise.lines=6, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_p5a"}
+```{r summarisewidth, exercise=TRUE, exercise.lines=6, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q4b"}
 # calculate the total number of bps covered by each chipseq dataset
 # and as a fraction of total bps in chromosome 19
 monocytes_metadata %>% 
@@ -967,14 +849,14 @@ monocytes_metadata %>% group_by(chip) %>%
 grade_code()
 ```
 
-### Exercise 5b  
+### Exercise 5  
 
-> **Exercise 5b**: To plot the `fraction_chr19` as bar chart, pipe the output of exercise 5a into ggplot (code check).  
+> **Exercise 5**: To plot the `fraction_chr19` as bar chart, pipe the output of exercise 5 into ggplot (code check).  
 > 
 > * We instruct the barplot function to plot the actual values (in contrast to counting the occurrences of each value as in exercise 3) with: `stat = "identity"`.  
 > * Hit "Run Code" to plot the plot in the console.  
 
-```{r plotsummarisewidth, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_p5a"}
+```{r plotsummarisewidth, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q4b"}
 # plot the fraction covered in a bar chart
 monocytes_metadata %>%  group_by(chip) %>% 
   summarise(total_bps = sum(peak_size),  
@@ -1000,7 +882,7 @@ grade_code()
 ```
 
 ```{r mcsummarisedwidth}
-question("Which type of peaks covers relativeley more bp in chromosome 19?",
+question("Which type of peaks (broad or narrow) covers relativeley more bp in chromosome 19?",
          answer("narrow peak ChIP-seq peak datasets"),
          answer("broad domain ChIP-seq peak datasets", correct=T),
          allow_retry=T)
@@ -1119,7 +1001,7 @@ This code:
 1. Loads the `TxDb.Hsapiens.UCSC.hg38.knownGene` database package. Which holds the coordinates of all transcripts for known genes defined in human genome release 38 by the UCSC genome browser. Besides the transcript coordinates, it also stores the genomic coordinates of TSSs, exons, introns, UTRs and genes.   
 2. Extract promoter regions with the `promoters()` function. This function outputs a GRanges object with intervals around the TSS.  
 3. By default, `promoters()` works on transcripts but we are often more interested in promoters of genes therefore we add the `genes()` function.  
-4. We define promoters as 2kb upstream and 0.2 kb downstream the TSS.  
+4. **We define promoters as 2kb upstream and 0.2 kb downstream the TSS**.  
 
 ### Exercise 6a 
 
@@ -1663,74 +1545,13 @@ plotTargetAnnotation(x = annotation_h3k4me3, main = "H3K4me3 over gene parts")
 grade_code(correct = "Hit `Run Code` to view your plot.")
 ```
 
-### Exercise 8c    
-
-> **Exercise 8b**: Rerun the analysis of exercise 8a and 8b for the other marks (H3K4me1, H3K36me3, H3K27me3, H3K27ac, H3K9me3) in the following code sections and use your plots to anser the multiple-choice questions below (there is not "Submit Answer" option).   
-> 
-> * Peak data for each dataset are loaded for you in objects "monocytes_h3k27ac", "monocytes_h3k4me1", "monocytes_h3k36me3" etc.
-
-
-```{r q8c_h3k27ac, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=4}
-# run for H3K27ac
-annotation_h3k27ac <- annotateWithGeneParts(target = ____, feature = gencode_chr19)
-plotTargetAnnotation(x = annotation_h3k27ac, main = "H3K27ac over gene parts")
-```
-
-```{r q8c_h3k36me3, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=4}
-# run for H3K36me3
-
-```
-
-```{r q8c, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=4}
-# run for H3K9me3
-
-```
-
-```{r q8c_h3k4me1, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=4}
-# run for H3K4me1
-
-```
-
-```{r q8c_h3k27me3, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=4}
-# run for H3K27me3
-
-```
-
-```{r q8c_bivalent_mc}
-quiz(caption ="", 
-     question("Which mark is harldy found in intergenic regions?",
-              answer("H3K4me3"),
-              answer("H3K36me3", correct = T),
-              answer("H3K27me3"),
-              answer("H3K9me3"),
-              allow_retry = T),
-     question("For which three marks 50% or more of the peaks are overlapping with promoters, according to these analysis?",
-              answer("H3K4me3", correct = T),
-              answer("H3K4me1", correct = T),
-              answer("H3K36me3"),
-              answer("H3K27me3"),
-              answer("H3K9me3"),
-              answer("H3K27ac", correct = T),
-              allow_retry = T,
-              random_answer_order = T),
-     question("Which 2 marks have the 25% or more of peaks overlapping with intergenic regions?",
-              answer("H3K4me3"),
-              answer("H3K4me1"),
-              answer("H3K36me3"),
-              answer("H3K27me3", correct = T),
-              answer("H3K9me3", correct = T),
-              answer("H3K27ac"),
-              allow_retry = T,
-              random_answer_order = T))
-```     
-
-Realize that this transcript-oriented analyses gives you slightly different results compared to the gene-centered one in exercise 8a and 8b. For now, we will stick to the gene-centered values and look at how the presence of histone marks at the TSS is related to the expression of the downstream gene.  
+Realize that this transcript-oriented analyses gives you slightly different results compared to the gene-centered one in exercise 6 and 7. For now, we will stick to the gene-centered values and look at how the presence of histone marks at the TSS is related to the expression of the downstream gene.  
 
 ## 2.5 Association with gene expression   
 ### 2.5.1 Genes with H3K4me3 at their promoter  
 Can we observe a difference in gene expression between genes with and without H3K4me3 in their promoters?
 <br>
-To answer this question, we first need to obtain the genes associated with the promoters that have a H3K4me3 peak. To do so, we can use the indexes from the overlap object (exercise 6) to subset the original `promoters_chr19` object and extract the corresponding geneIDs.
+To answer this question, we first need to obtain the genes associated with the promoters that have a H3K4me3 peak. To do so, we can use the indexes from the overlap object (exercise 6) to subset the original `promoters_chr19` object and extract the corresponding gene IDs.
 
 ### Exercise 9  
 
@@ -2086,16 +1907,19 @@ question("Which of the following statments are supported by the table and the bo
 
 ```
 
-As you can see, the specific combination of histone marks at the promoter can be functionally associated with a different output in gene expression levels. Let's not restrict our analysis to 2 marks but examine the occurrence at the promoter of all the different marks in our dataset.  
+`r colorize("As you can see, the specific combination of histone marks at the promoter can be functionally associated with a different output in gene expression levels. Let's not restrict our analysis to 2 marks but examine the occurrence at the promoter of all the different marks in our dataset.", "red")`   
 
-## 2.6 Quantify and visualize overlap among > 4 marks   
-### Upset plots  
-An [UpSet plot](https://jku-vds-lab.at/tools/upset/) is an elegant alternative to the VennDiagram when you want to visualize the intersection among more than 3 sets (also see this [commentary in Nature Methods 2014 by Alexander Lex & Nils Gehlenborg](https://www.nature.com/articles/nmeth.3033)). It combines  
+## 2.6 Promoters with combinations of histone marks  
+### 2.6.1 Taking the old road: the Venn diagram strategy    
+What if we want to quantify and plot **all the different combinations** of histone marks that are present at the promoters in our dataset? As we have ChIP-seq data of 6 different histone marks, we could theoretically detect 0, 1 or any combination of 2 to 6 marks resulting in 64 different outcomes! How could we ever visualize those results clearly? A Venn diagram based on 6 datasets is extremely difficult to read. See this example of the genes found in the genome of 6 different crop species:    
+<br>
+![](images/wk2_6_venn_6set_banana.png){width=50%}\    
+*Ref: [D’Hont, A., Denoeud, F., Aury, JM. et al. The banana (Musa acuminata) genome and the evolution of monocotyledonous plants. Nature 488, 213–217 (2012)](https://doi.org/10.1038/nature11241)*  
 
-- UpSet plots the intersections of a set as a matrix, with barplots that visualize (a) the size of the individual sets, and (b) the size of the detected intersections.  
-- Additional attributes of the intersections can be added to the bottom or sides of the plots, which we will do as well.  
-
-ref: 
+### 2.6.2 The new kid on the block: Upset plot  
+[UpSet plots](https://jku-vds-lab.at/tools/upset/) are an elegant alternative to the Venn diagram. Especially for cases when you want to visualize the intersection among more than 3 "sets" (also see this [commentary in Nature Methods 2014 by Alexander Lex & Nils Gehlenborg](https://www.nature.com/articles/nmeth.3033)).   
+<br>
+An UpSet depicts the detected intersections  (or 'combinations') as a matrix with barplots on the top and right side that show respectively the size of the combination and the size of the original sets ([here](https://jku-vds-lab.at/tools/upset/) you find the UpSet-version of the banana-Venn diagram shown above).   
 <br>
 There are several R packages with functions to make an UpSet. You will use the one from the `ComplexHeatmap` package, see [here](https://jokergoo.github.io/ComplexHeatmap-reference/book/) for the complete reference book of this package. We installed and loaded the package for you by running:  
 ```{r complexheatmap, echo=TRUE, eval=FALSE}
@@ -2103,219 +1927,411 @@ BiocManager::install("ComplexHeatmap")
 library(ComplexHeatmap)
 ```
 <br>
+Two functions are important to make an UpSet plot: `make_comb_mat()` and `UpSet()`. With `make_comb_mat()` you prepare a so-called "combination matrix" that summarizes the number of elements that overlap among the provided sets. With `UpSet()` you plot the UpSet plot of the combination matrix.  
+```{r make_comb_example, eval=FALSE, echo=TRUE}
+# Generate the combination matrix
+my_combination_matrix <- make_comb_mat([the_input_sets_as_list], ...)
 
-```{r upset_marks_at_promoters}
-overlap_all <- lapply(monocytes_list, function(x) promoters_chr19[unique(subjectHits(findOverlaps(query = x , subject = promoters_chr19)))]$gene_id)
-names(overlap_all) <- names(monocytes_list)
-m1 = make_comb_mat(overlap_all, universal_set =  promoters_chr19$gene_id)
-UpSet(m1,
-      comb_order = order(comb_size(m1), decreasing =  TRUE),
-      set_order = order(set_size(m1), decreasing = FALSE),
-      #comb_col = brewer.pal("Set1", n=7)[comb_degree(m1)]
-      )
+# Generate the UpSet plot
+UpSet(m = [combination_matrix], set_order = ... , comb_order = ... ,...)
+```
 
-## use plot to set threshold:
-barplot(sort(comb_size(m1)))
-abline(h = 40, lwd =2, col = "red")
-abline(h = 50, lwd =2, col = "black")
-abline(h = 60, lwd =2, col = "blue")
+* The object `[the_input_sets_as_list]` should be a list of sets. Each set in this list should have a name attached to it.    
+* In `m =` you provide the matrix generated by `make_comb_matrix()`.  
+* With `set_order =` you can set a custom order to the sets, these are by default depicted in rows and with a barplot to the right of the matrix.  
+* With `comb_order =` you can do the same for the combinations (depicted in the columns with a barplot at the top of the plot).  
 
-## upset of filtered matrix
-m2 <- m1[comb_size(m1) >40]
-UpSet(m2,
-      comb_order = order(comb_size(m2), decreasing =  TRUE),
-      set_order = order(set_size(m2), decreasing = FALSE),
-      )
+Let's look at an example to clarify this further.  
 
+### 2.6.3 UpSet plot example  
+Here we generated 3 'sets' of letters sampled from the alphabet and we visualize the overlap among the sets with a Venn diagram and an UpSet plot.  
+
+```{r set_example, eval=FALSE, echo=TRUE}
+# generate set 'set_a', 'set_b' and 'set_c'
+set_a <- sample(letters, 5)
+set_b <- sample(letters, 10)
+set_c <- sample(letters, 15)
+# print the sets  
+set_a
+set_b
+set_c
+```
+![](images/wk2_6_set_example.png){width=50%}\   
+<br>
+The aim is to visualize the overlap among the sets. So how many letters are common to all 3 sets, how many to 2 and how many letters are unique to 1 of the sets?  
+<br>
+First, we plot the overlap among the sets using a Venn diagram:   
+```{r set_example_venn, eval=FALSE, echo=TRUE, fig.height=4, fig.width=4}
+## make Venn diagram
+# call a new plotting area
+grid.newpage()
+
+# Plot the overlap in a Venn diagram
+draw.triple.venn( 
+   area1=length(set_a),
+   area2=length(set_b), 
+   area3=length(set_c),
+   n12 = sum(set_a %in% set_b),   # The size of the intersection between 'set_a' and 'set_b'
+   n23 = sum(set_b %in% set_c),   # The size of the intersection between 'set_b' and 'set_c'
+   n13 = sum(set_a %in% set_c),   # The size of the intersection between 'set_a' and 'set_c'
+   n123 = sum(set_a[set_a %in% set_b] %in% set_c),  # The size of the intersection between 'set_a', 'set_b' and 'set_c'
+   category=c("A", "B", "C"), 
+   fill=c("red", "green", "blue"), 
+   cat.cex=1.2)
+```
+![](images/wk2_6_set_example_venn.png){width=50%}\   
+<br>  
+Next, we plot the same data in an UpSet plot:  
+```{r set_example_upset, eval=FALSE, echo=TRUE, fig.height=4, fig.width=6}
+## Make UpSet plot
+# make a combination matrix (required for Upset plot)
+my_combination_matrix <- make_comb_mat(list(A = set_a, B = set_b, C = set_c))
+
+# plot the matrix of combinations
+UpSet(my_combination_matrix,
+      set_order = order(set_size(my_combination_matrix)))
+```
+![](images/wk2_6_set_example_upset.png)\   
+<br>
+
+- The matrix in the center depicts the sets and combinations.     
+    + Each row represents a set (A, B or C).  
+    + The detected combinations are visualized by a connector line within one column across the different rows.  
+    + The sets (=rows) where the connector line contains a dot are included in the combination.   
+- The barplot on top of the matrix shows how many letters are common among the respective combination.   
+    + Example 1: the first column tells you that 1 letter is found in all sets.  
+    + Example 2: the second column tells you that 1 letter is common among set A and B. And so forth.  
+- The barplot to the right of the matrix shows the sizes of the original sets.  
+
+In contrast to the Venn diagram you can easily identify the biggest combination and which sets it involves using the Upset plot.   
+
+```{r upsetexample_mc}
+ quiz(caption = "",
+      question("What is the size of the biggest combination in the example UpSet plot, depicted above?",
+              answer("2"),
+              answer("6", message = "This is the size of the letters unique to set C"),
+              answer("7", correct = TRUE),
+              answer("15", message = "This is the size of the biggest original set (set C)"),
+              allow_retry=TRUE),
+      question("Which sets are involved in this biggest combination?",
+               answer("set A and set B"),
+               answer("set A and set C"),
+               answer("set B and set C", correct = TRUE),
+               answer("set A, set B and set C"), 
+               allow_retry=TRUE)
+ )
+```
+
+### 2.6.4 Your UpSet plot  
+Now, let's return to our question. We want to quantify and visualize the combination of histone marks at promoters (in this case limited to promoters of chromosome 19).   
+
+### Exercise 13  
+You'll first need to obtain the combination matrix. In this case, that will be a list of 6 sets, one for each mark. Each set will have gene IDs that correspond to the genes on which promoter the mark is found. To get these sets you will use `findOverlaps()` and `subjectHits()` the get the indexes of the relevant promoters. You will then use these indexes to subset the `promoters_chr19` object which has the gene IDs in the column "gene_id" in the metadata.  
+<br>
+Instead of repeating this procedure for each object, we have written a function that includes all these steps. This function:  
+
+1. identifies the overlap among a GRanges object given by the parameter `gr_peaks` and `promoters_chr19`;    
+2. extracts the unique indexes of `promoters_chr19` that are part of the overlap;    
+3. extracts the corresponding promoters from `promoters_chr19` with these indexes;
+4. writes the corresponding gene IDs to a new object;  
+5. outputs this object with gene IDs.  
+
+```{r ex_13_function, echo=TRUE, eval=FALSE}
+get_geneids <- function(gr_peaks) {
+  overlap <- findOverlaps(query = gr_peaks , subject = promoters_chr19) # step 1
+  unique_indexes <- unique(subjectHits(overlap)) # step 2
+  promoter_selection <- promoters_chr19[unique_indexes] # step 3 
+  gene_id_selection <- promoter_selection$gene_id # step 4
+  return(gene_id_selection) # step 5 
+}
+```
+<br>
+This function `get_geneids()` is a "custom" function (in other words, we wrote it ourselves). It takes as input one object, defined by the `gr_peaks =` parameter. This should be a GRanges object with ChIP-seq peaks.  It outputs a vector of gene IDs corresponding to the genes on which promoters the mark is found.  
+<br>
+You can use the `lapply()` function to apply a function to a each item in a list and return the output of each calculation again as a list:  
+```{r lapply_example, echo=TRUE, eval=FALSE}
+output_list <- lapply(X = [input_list], FUN = [function_to_apply])
+```
+
+> **Exercise 13a**: Apply `get_geneids()` to each item in `monocytes_list`. Write the output to `geneids_per_mark`.  
+> 
+> * `monocytes_list` is a list of all GRanges objects with peak data of all the different histone marks we have (H3K4me1, H3K4me3, H3K9me3, H3K27ac, H3K27me3, H3K36me3).  
+
+```{r prep_q13a}
+get_geneids <- function(gr_peaks) {
+  overlap <- findOverlaps(query = gr_peaks , subject = promoters_chr19)  # identify the overlap among x and promoters_chr19
+  unique_indexes <- unique(subjectHits(overlap)) # extract the unique indexes of promoters_chr19 with overlap
+  promoter_selection <- promoters_chr19[unique_indexes] # extract the corresponding promoters
+  gene_id_selection <- promoter_selection$gene_id # write the corresponding gene ids to a new object  
+  return(gene_id_selection) # return only the gene ids
+}
+```
+
+```{r q13a_upset, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prep_q13a"}
+# Apply 'get_geneids()' to 'monocytes_list'
+geneids_per_mark <- ___(X =  ____ FUN = ___)
+```
+
+```{r q13a_upset-hint-1}
+# You need to use lapply() here
+```
+
+```{r q13a_upset-hint-2}
+# eg: geneids_per_mark <- lapply(X = monocytes_list, __)
+```
+
+```{r q13a_upset-hint-3}
+# and set the FUN parameter as
+FUN = get_geneids
+```
+
+```{r q13a_upset-solution}
+geneids_per_mark <- lapply(X = monocytes_list, FUN = get_geneids)
+```
+
+```{r q13a_upset-code-check}
+grade_code()
+```
+
+> **Exercise 13b**: Generate the combination matrix of `geneids_per_mark`.  
+
+```{r prep_q13b}
+get_geneids <- function(gr_peaks) {
+  overlap <- findOverlaps(query = gr_peaks , subject = promoters_chr19)  # identify the overlap among x and promoters_chr19
+  unique_indexes <- unique(subjectHits(overlap)) # extract the unique indexes of promoters_chr19 with overlap
+  promoter_selection <- promoters_chr19[unique_indexes] # extract the corresponding promoters
+  gene_id_selection <- promoter_selection$gene_id # write the corresponding gene ids to a new object  
+  return(gene_id_selection) # return only the gene ids
+}
+geneids_per_mark <- lapply(X = monocytes_list, FUN = get_geneids)
+```
+
+```{r q13b_upset, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prep_q13b"}
+# Obtain the combination matrix of 'geneids_per_mark'
+my_combination_matrix <- ___(____)
+```
+
+```{r q13b_upset-hint-1}
+# Review section 2.6.2 to identify the function you need.  
+```
+
+```{r q13b_upset-solution}
+my_combination_matrix <- make_comb_mat(geneids_per_mark)
+```
+
+```{r q13b_upset-code-check}
+grade_code()
+```
+
+### Exercise 14  
+You can make an UpSet pot with the combination matrix you just made.  
+
+> **Exercise 14**: Plot the UpSet plot of `my_combination_matrix`.  
+
+```{r prep_q14}
+get_geneids <- function(gr_peaks) {
+  overlap <- findOverlaps(query = gr_peaks , subject = promoters_chr19)  # identify the overlap among x and promoters_chr19
+  unique_indexes <- unique(subjectHits(overlap)) # extract the unique indexes of promoters_chr19 with overlap
+  promoter_selection <- promoters_chr19[unique_indexes] # extract the corresponding promoters
+  gene_id_selection <- promoter_selection$gene_id # write the corresponding gene ids to a new object  
+  return(gene_id_selection) # return only the gene ids
+}
+geneids_per_mark <- lapply(X = monocytes_list, FUN = get_geneids)
+my_combination_matrix <- make_comb_mat(geneids_per_mark)
+```
+
+```{r q14_upset, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prep_q14", exercise.lines=3}
+# Generate the UpSet plot of `my_combination_matrix`.  
+
+```
+
+```{r q14_upset-hint-1}
+# Review section 2.6.2 to identify the function you need.  
+```
+
+```{r q14_upset-solution}
+UpSet(my_combination_matrix)
+```
+
+```{r q14_upset-code-check}
+grade_code(correct = "Make sure you also hit 'Run Code' to view the resulting plot.")
+```
+
+```{r q14_mc}
+ quiz(caption = "",
+      question("How many promoters are covered by the combination of marks that is found most often at promoters on chromosome 19? Choose the number that is closest to your approximation.",
+              answer("150"),
+              answer("200"),
+              answer("300"),
+              answer("450", correct = TRUE),
+              allow_retry=TRUE),
+      question("Which histone marks are part of this combination?",
+               answer("H3K4me3 and H3K4me1"),
+               answer("H3K4me3, H3K4me1, H3K27ac and H3K36me3"),
+               answer("H3K4me3, H3K4me1 and H3K27me3"),
+               answer("H3K4me3, H3K4me1 and H3K27ac", correct = TRUE, message = "Observe that your Upset plot contains a lot of combinations that rather very infrequent. In exercise 15 you will therefore filter the combination matrix to only contain combinations of a size of 60 or more."), 
+               allow_retry=TRUE,
+               random_answer_order = TRUE)
+ )
+```
+
+### Exercise 15  
+You can filter a combination matrix for combinations of a particular size using the following code:  
+```{r subset_example, eval=FALSE, echo=TRUE}
+new_combination_matrix <- original_combination_matrix[comb_size(original_combination_matrix) > [threshold]]
+```
+
+* In the example we used `>` for `greater than` but you can also use other [logical operators](https://www.statmethods.net/management/operators.html).  
+* The `comb_size()` functions finds the sizes of all the combinations in the given combination matrix.  
+
+> **Exercise 15**: Repeat the plot of exercise 14 but this time filter `my_combination_matrix` for combinations that have more than 60 genes.  
+
+```{r q15_filtupset, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prep_q14", exercise.lines=6}
+## 1. Filter `my_combination_matrix`
+my_filtered_combination_matrix <- ____
+
+## 2. Generate the UpSet plot of `my_filtered_combination_matrix`.  
+# in `top_annotation=` we changed the height of the top barplot.
+___(___,
+    top_annotation = upset_top_annotation(my_filtered_combination_matrix,
+                                             height = unit(5, "cm"))
+```
+
+```{r q15_filtupset-hint-1}
+# subset my_combination_matrix for combinations of a size above 60
+```
+
+```{r q15_filtupset-hint-2}
+# Thus, subset using:
+comb_size(my_combination_matrix) >60
+```
+
+```{r q15_filtupset-hint-3}
+# Step 1 completely:
+my_filtered_combination_matrix <- my_combination_matrix[comb_size(my_combination_matrix) >60]
+```
+
+```{r q15_filtupset-hint-4}
+# Make the UpSet plot as in exercise 14
+```
+
+```{r q15_filtupset-solution}
+my_filtered_combination_matrix <- my_combination_matrix[comb_size(my_combination_matrix) > 60]
+UpSet(my_filtered_combination_matrix, 
+       top_annotation = upset_top_annotation(my_filtered_combination_matrix,
+                                             height = unit(5, "cm")))
+```
+
+```{r q15_filtupset-code-check}
+grade_code(correct = "Also hit 'Run Code' to view the UpSet plot.")
+```
+
+```{r q15_mc}
+ quiz(caption = "",
+      question("How many promoters are covered by the combination H3K4me1, H3K4me3, H3K27ac and H3K27me3? Choose the number that is closest to you approximation.",
+              answer("50",  correct = TRUE, message = "The number of promoters with these four marks is 66 according to this analysis."),
+              answer("100"),
+              answer("150"),
+              answer("200"),
+              allow_retry=TRUE),
+      question("What do you expect the gene expression level of the corresponding genes to be?",
+               answer("Sky high; among the highest of genes."),
+               answer("Among the lowest of all genes.", correct = TRUE),
+               allow_retry=TRUE)
+ )
+```
+
+### Exercise 16  
+In the plot below we added gene expression of the corresponding genes as 
+
+![](images/wk2_6_upset_with_fpkm.png)  
+
+
+```{r q16_mc}
+ quiz(caption = "",
+      question("Which column (labeled A -F at the bottom) represents polycomb-silenced genes?",
+              answer("A", correct = TRUE),
+              answer("B"),
+              answer("C"),
+              answer("D"),
+              answer("E"),
+              answer("F"),
+              allow_retry=TRUE),
+      question("Which columns represent candiate bivalent promoters with polycomb-mediated silencing?",
+              answer("A"),
+              answer("B"),
+              answer("C", correct = TRUE),
+              answer("D"),
+              answer("E", correct = TRUE, message = "Notice that you also have H3K4me3/H3K9me3 bivalent promoters in column D. Also notice the difference in gene expression among genes of column C and E. Column E may contain promoters that for only a few bps overlap with a H3K27me3 peak and not with the majority promoter. Alternatively, the H3K27me3 signal may be very low and H3K4me3 signals very high. We will look at the relationship between signal intensity and gene expression next week."),
+              answer("F"),
+              allow_retry=TRUE)
+              )
+```
+
+```{r q16_makingplot, echo=FALSE, eval=FALSE}
+# make promoters_chr19 with added FPKM
+promoters_chr19_new <- promoters_chr19[promoters_chr19$gene_id %in% quantification_chr19$entrezgene_id]
+quantification_chr19_new <- quantification_chr19[quantification_chr19$entrezgene_id %in% promoters_chr19_new$gene_id,]
+FPKM_promorder<- as.vector(NA)
+for(i in 1:length(promoters_chr19_new)) {
+  FPKM_promorder[i] <- quantification_chr19_new[which(quantification_chr19_new[, "entrezgene_id"] == promoters_chr19_new$gene_id[i]),]$FPKM
+  }
+promoters_chr19_new$FPKM <- FPKM_promorder
+rm(FPKM_promorder)
+
+## new function
+get_geneids <- function(gr_peaks) {
+  overlap <- findOverlaps(query = gr_peaks , subject = promoters_chr19_new)  # identify the overlap among x and promoters_chr19_new
+  unique_indexes <- unique(subjectHits(overlap)) # extract the unique indexes of promoters_chr19_new with overlap
+  promoter_selection <- promoters_chr19_new[unique_indexes] # extract the corresponding promoters
+  gene_id_selection <- promoter_selection$gene_id # write the corresponding gene ids to a new object  
+  return(gene_id_selection) # return only the gene ids
+}
+## make first combi matrix
+geneids_per_mark <- lapply(X = monocytes_list, FUN = get_geneids)
+m1 <- make_comb_mat(geneids_per_mark)
+
+## filter m1
 m3 <- m1[comb_size(m1) >60]
-UpSet(m3,
-      comb_order = order(comb_size(m3), decreasing =  TRUE),
-      set_order = order(set_size(m3), decreasing = FALSE),
-      )
 
 ## add average gene expression as boxplot below the combinations
-comb_sets <- lapply(comb_name(m3), function(nm) extract_comb(m3, nm))
+m3_comb_sets <- lapply(comb_name(m3), function(nm) extract_comb(m3, nm))
 
-comb_sets = lapply(comb_sets, function(gr) {
-    # we just randomly generate dist_to_tss and mean_meth
-    gr$dist_to_tss = abs(rnorm(length(gr), mean = runif(1, min = 500, max = 2000), sd = 1000))
-    gr$mean_meth = abs(rnorm(length(gr), mean = 0.1, sd = 0.1))
-    gr
-
-
-bottom_annotation = HeatmapAnnotation(
-        dist_to_tss = anno_boxplot(lapply(comb_sets, function(gr) gr$dist_to_tss), outline = FALSE),
-        mean_meth = sapply(comb_sets, function(gr) mean(gr$mean_meth)),
-        annotation_name_side = "left"
-
-
-monocytes_combmatrix_sets <- lapply(monocytes_combmatrix_sets, function(gr) {
-	gr$dist_to_tss <- mcols(distanceToNearest(gr, tss_chr19))[,1]
-	gr$nearby_tss_geneid <- tss_chr19[subjectHits(distanceToNearest(gr, tss_chr19))]$gene_id
-	gr
+# add FPKM to comb sets
+m3_comb_sets <- lapply(m3_comb_sets, function(v) {
+  new <- as.data.frame(v) 
+  colnames(new) <- "gene_id"
+  new$FPKM <- NA
+  for(i in 1:nrow(new)) {
+    new[i, "FPKM"] <- promoters_chr19_new[which(promoters_chr19_new$gene_id == new[i, "gene_id"])]$FPKM
+  }
+	new
 })        
-        
-bottom_annotation = HeatmapAnnotation(
-        dist_to_tss = anno_boxplot(lapply(monocytes_combmatrix_sets, function(gr) gr$dist_to_tss), outline = FALSE),
-        label = anno_text(LETTERS[1:length(monocytes_combmatrix_sets)], rot = 0),
+     
+## plot new UpSet plot
+UpSet(m3,
+      bottom_annotation = HeatmapAnnotation(
+        "log(FPKM+1)" = anno_boxplot(lapply(m3_comb_sets, function(d) log(d$FPKM+1)), outline = FALSE),
         annotation_name_side = "left",
-        height = unit(4, "cm")
+        height = unit(3, "cm"),
+        label = anno_text(LETTERS[1:length(m3_comb_sets)], rot = 0))
+      )
 
+UpSet(m3,
+      bottom_annotation = HeatmapAnnotation(
+        FPKM = anno_boxplot(lapply(m3_comb_sets, function(d) d$FPKM), outline = FALSE),
+        annotation_name_side = "left",
+        height = unit(3, "cm"),
+        label = anno_text(LETTERS[1:length(m3_comb_sets)], rot = 0))
+      )
 
-```
-
-
-
-**So far we have only looked at individual overlaps but chromatin states are actually defined by the combinatorial occupancy of different marks and factors. Let's analyze the chromosome19-wide overlap of the marks in our dataset and identify the occurring combinations.**  
-
-## 2.6 Summarizing overlap among marks   
-### Upset plots  
-Lastly, you will interpret UpSet plots generated using the `ComplexHeatmap` package. The UpSet plot is an elegant alternative to the VennDiagram when working with more than 4 datasets (see this [commentary in Nature Methods 2014 by Alexander Lex & Nils Gehlenborg](https://www.nature.com/articles/nmeth.3033)).   
-<br>
-An UpSet plot visualizes the intersections of multiple sets, sets are the ChIP-seq peaks in our case. The size of the sets are total number of base pairs covered by that mark. The size of the combination sets refers to the sum of base pairs covered by the respective overlapping regions. So, if a peak only partially overlaps, only the base pairs that are part of the overlap will be counted.   
-
-<!-- >#### **Background info**: 3 possible ways for defining combination sets.    -->
-<!-- <details><summary> Click here for more info on the 3 modes defined by the `ComplexHeatmap` package.</summary> -->
-<!-- This **size** of the combined set can be defined in various ways, depending on how you compare your regions. In the `ComplexHeatmap` package they define three 'modes' for it: distinct, intersect and union. . Below is a visual summary of these modes.    -->
-<!-- >  -->
-<!-- > ![](images/wk2_4_complexheatmap_modes.png){width=400}\        -->
-<!-- *Ref: [Zuguang Gu, ComplexHeatmap Complete Reference, last revised on 2020-10-27](https://jokergoo.github.io/ComplexHeatmap-reference/book/upset-plot.html#input-data)*     -->
-<!-- </details>   -->
-
-To detect combinations you use the `make_comb_mat()` function:  
-```{r makecombexample, eval=FALSE, echo=TRUE}
-combination_matrix <- make_comb_mat([list_of_objects_to_be_evaluated]) 
-```
-
-* The "[list_of_objects_to_be_evaluated]" should be a named list. Meaning that each element in the list should have a name attached to it.   
-
-<!-- * The returned object is a "combination matrix" object.   -->
-<!-- * There are special functions to view the content of this object:   -->
-<!--     - `set_name()` prints the names of the objects in the "[list_of_objects_to_be_evaluated]".     -->
-<!--     - `set_size()` prints the total number of bps covered by the intervals in each object   -->
-<!--     - `comb_size()` reports the total number of bps covered by the respective combination of intervals.   -->
-<!--         + The combinations are encoded in a binary fashion with 0s and 1s.   -->
-<!--         + A 1 means the mark in question is present in the combination.   -->
-<!--         + These 0s and 1s follow the order given by `set_name()`.    -->
-* You can visualize the detected overlap with the `UpSet()` function:  
-
-```{r upsetexample, eval=FALSE, echo=TRUE}
-UpSet(m = [combination_matrix], .....)
-```
-
-* `m` = the output of the `make_comb_mat()` function.  
-* `...` means that there are more, optional arguments some of which we will use later on.  
-
-### Exericse 13   
-
-In the following example we run the two functions to make and plot the combination matrix of `monocytes_h3k4me3` and `monocytes_h3k27me3`:    
-<br>
-```{r makecombexample_realdata, eval=FALSE, echo=TRUE}
-## 1. make list of the two objects and name the elements
-my_list <- GRangesList(monocytes_h3k4me3, monocytes_h3k27me3)
-names(my_list) <- c("h3k4me3", "h3k27me3")
-
-## 2. calculate the combination matrix
-comb_matrix <- make_comb_mat(my_list)
-
-## 3. plot the UpSet plot
-# a. order the combinations from least to most frequent
-# b. adjust top and right axis labels to make them better readable.
-UpSet(m = comb_matrix, 
-      comb_order = order(comb_size(comb_matrix)),
-      top_annotation = upset_top_annotation(  
-        comb_matrix,
-        axis_param = list(at = c(0, 2.5e6, 5e6),
-                          labels = c("0Mb", "2.5Mb",  "5Mb")),
-        height = unit(3, "cm")),
-      right_annotation = upset_right_annotation(
-        comb_matrix,
-        axis_param = list(at = c(0,2e6,4e6,6e6),
-                          labels = c("0Mb", "2Mb", "4Mb", "6Mb"),
-                          labels_rot = 0),
-        width = unit(3, "cm")))
-```
-<br>
-![](images/wk2_5_upsetplots_q13.png)\  
-<br>
-In this UpSet plot:  
-
-- The total bps covered by the original objects is plotted in the barplot to the right.  
-- The size of the intersection (=overlap) is plotted by the barplot on top of the plot.   
-- The bars for overlap and no-overlap are annotated by dots and a connector line. When a line connects several dots it means that the bar above it reflects the combination of the connected datasets.  
-
-
-```{r q13_upsetplot_mc}
-quiz(caption ="", 
-     question("Which of the two mark covers most bps?",
-              answer("H3K4me3", message = "Use the barplot plotted to the right of the figure."),
-              answer("H3K27me3", correct=TRUE, message = "We can see this in the barplot to the right (labelled with set size)"),
-              answer("Both cover equal number of bps", message = "Use the barplot plotted to the right of the figure."),
-              allow_retry=TRUE),
-     question("Based on this graph, do you find the combination of H3K4me3 and H3K27me3 more often compared to each mark singularly?",
-              answer("The combination of H3K27me3 & H3K4me3 is found more often than the marks singularly"),
-              answer("H3K27me3 and H3K4me3 are found more often seperate from eachother than together.", correct = TRUE),
-              allow_retry=TRUE)
-     )
-```
-
-
-### Exericse 14      
-We also generated an UpSet plot of all marks, restricted to the combinations of at least 100kb and left out regions that are covered by one mark only:  
-<br>
-```{r makefig14, eval=FALSE, echo=TRUE}
-## 1. Calculate the combination matrix
-monocytes_combinationmatrix <- make_comb_mat(monocytes_list)
-
-## 2. Filter combination matrix for combinations of at least 100kb
-monocytes_combmatrix_filt <- monocytes_combinationmatrix[comb_size(monocytes_combinationmatrix) > 100000]
-
-## 3. Remove the 'combinations' larger than 3kb
-# these are windows covered by one mark
-monocytes_combmatrix_filt <- monocytes_combmatrix_filt[comb_size(monocytes_combmatrix_filt) < 3000000]
-
-## 4. plot the UpSet plot
-# a. order the combinations from least to most frequent
-# b. adjust top and right axis labels to make them better readable.
-UpSet(monocytes_combmatrix_filt,
-      set_order = order(set_size(monocytes_combmatrix_filt), decreasing = F),
-      comb_order = order(comb_size(monocytes_combmatrix_filt), decreasing = T),
-      top_annotation = upset_top_annotation(
-        monocytes_combmatrix_filt,
-        axis_param = list(at = c(0, 0.5e6,1e6,1.5e6, 2e6),
-                          labels = c("0Mb", "0.5Mb", "1Mb", "1.5Mb", " 2Mb")),
-        height = unit(4, "cm")),
-      right_annotation = upset_right_annotation(
-        monocytes_combmatrix_filt,
-        axis_param = list(at = c(0,4e6,8e6,12e6),
-                          labels = c("0Mb", "4Mb", "8Mb", "12Mb"),
-                          labels_rot = 0),
-        width = unit(3, "cm")))
-```
-<br>
-![](images/wk2_5_upsetplots_q14.png)\  
-<br>
-
-```{r q14_upsetplot_mc}
-quiz(caption ="", 
-     question("Which mark covers most bps when taking all marks into consideration?",
-              answer("H3K4me3"),
-              answer("H3K4me1"),
-              answer("H3K36me3"),
-              answer("H3K27ac"),
-              answer("H3K27me3"),
-              answer("H3K9me3", correct=TRUE, message = "Other marks have more peaks, but this marks spans broad domains."),
-              allow_retry=TRUE,
-              random_answer_order = TRUE),
-     question("And which combination of marks apparantly covers most bps?",
-              answer("H3K4me3 and H3K27me3"),
-              answer("H3K9me3 and H3K27me3"),
-              answer("H3K9me3 and H3K4me3"),
-              answer("H3K9me3 and H3K36me3", correct=TRUE, message = "These two marks generally cover large windows in the genome. Their co-occupancy has been associated weakly transcribed genes. A large domain of H3K36me3 + H3K9me3 chromatin is found at the cluster of zinc finger genes on chromosome 19 we saw in week1. (ref: Mauser et al. 2017 Epigentics and Chromatin)"),
-              allow_retry=TRUE,
-              random_answer_order=TRUE),
-     question("")
-     )
+UpSet(m3,
+      bottom_annotation = HeatmapAnnotation(
+        mean(FPKM) = sapply(m3_comb_sets, function(d) mean(d$FPKM)),
+        annotation_name_side = "left",
+        height = unit(3, "cm"),
+        label = anno_text(LETTERS[1:length(m3_comb_sets)], rot = 0))
+      )
 ```
 
 ## Finish  
@@ -2340,14 +2356,13 @@ actionButton("print2pdf", "Print page", style="opacity: .7; color: #000;")
 
 
 ### Well done!  
+You have studied peak locations, their overlap with features, and the association between the absence or presence of a (or a combination of) mark(s) at the promoter and gene expression.   
 <br>
 <center>
 <iframe src="https://giphy.com/embed/JPsFUPp3vLS5q" width="480" height="420" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/friends-thumbs-up-matthew-perry-JPsFUPp3vLS5q">via GIPHY</a></p>
 </center>  
-You have studied examined peak locations, their overlap with features and the association between the absence or presence of a mark and gene expression. This approach is a very simplistic one and we have been ignoring the signal strength altogether: *Are high and lowly expressed genes associated with equal levels of H3K4me3 at their promoter or not? And what about H3K36me3 across the gene body?*.    
 <br>
-The measure of strength is also taken along in the identification of different chromatin states, see for example this paper on the [chromHMM tool](https://doi.org/10.1038/nmeth.1906). Positional and signal information are combined to learn these states. 
-<br>  
-Next week you will examine the relationship between signal strength and gene expression. 
+Next week you will study the relationship between the ChIP-peak signal (the height of the peak in the UCSC genome browser) and gene expression asking for example whether high and lowly expressed genes are associated with equal levels of H3K4me3 at their promoter or not?  
+<br>
 
 
