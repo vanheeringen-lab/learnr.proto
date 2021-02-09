@@ -192,25 +192,23 @@ library(genomation)
 
 ### 3.1.5 About the exercises  
 
-* In this tutorial you will have multiple-choice and check-the-box questions like in fg1 but also **complete-the-code exercises**. The latter are sometimes evaluated on the printed object or summary (e.g a the top part of an object), in other cases, the code itself is checked. When the code is evaluated we added "(code check)" to the question. In these cases, R will give custom feedback that helps you correct your code.      
+* In this tutorial you will have multiple-choice and check-the-box questions like in fg1 but also **complete-the-code exercises**. The latter are sometimes evaluated on the printed object or summary (e.g a the top part of an object). At other times, the code itself is checked. When the code is evaluated we added "(code check)" to the question. In these cases, R will give custom feedback that helps you correct your code.      
 
-* Due to technical reasons, when you hit Submit Answer of **(code check)** exercises, the output (if there is any) will not be printed. Eg a plot won't be shown. To visualize the plot, you must you use `Run Code`.  
+* Due to technical reasons, when you hit Submit Answer of "(code check)" exercises, the output (if there is any) will not be printed. Eg a plot won't be shown. To visualize the plot, you must you use `Run Code`.  
 
 * For short lines of code, you have to decide which function or object to use and how to write this in code. For some longer lines of codes, we left blanks as '\_\_\_' that indicate where in the code you should fill in a function, object or variable. Make sure fill out all the blanks before Answer submission, they will otherwise result in errors.  
 
-* Hit `Hint` (when provided) for clues. Due to technical reasons **you can't go back to previous hints, so make sure you read them well!**        
-
-* Hit `Run Code` to test your code and preview the output.  
+* Hit `Hint` (when provided) for clues. Due to technical reasons **you can't go back to previous hints, so make sure you read them well.**        
 
 * Hit `Run Code` to test your code and preview the output (but make sure no '\_' are left).  
 
-* Hit `Submit Answer` (if present) to submit the code (make sure no '\_' are left) for evaluation.    
+* Hit `Submit Answer` (if present) to submit the code for evaluation (make sure no '\_' are left).      
 
 * Try to keep yourself from hitting `Solution` (when provided). Only use it when you do not understand the automatic feedback given by R.   
 
 * Hit `Start Over` in the header of the exercise to remove any adjustments you made and start again.   
 
-Although we ask for specific answers or completion of specific code, you are encouraged to test your own code and use `Run Code` and `Start Over` extensively. I.e., remove the pre-coded code and write your own code for a different graph or different summary of the data. Use `Run Code` to preview the results. Unfortunately these self-thought of codes can not be evaluated. For the evaluation you need to use our pre-coded code. Hit `Start Over` to get this pre-coded code.  
+Although we ask for specific answers or completion of specific code, you are free to test your own code and use `Run Code` and `Start Over`. I.e., remove the pre-coded code and write your own code for a different graph or different summary of the data. Use `Run Code` to preview the results. Unfortunately these newly created codes can not be evaluated. For the evaluation you need to use our pre-coded code. Hit `Start Over` to get this pre-coded code.  
 <br>
 
 ### 3.1.6 Need help?  
