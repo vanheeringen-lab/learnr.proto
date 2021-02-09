@@ -1187,7 +1187,7 @@ grade_result(
 
 ### 2.4.4 Plot the overlap in a Venn diagram  
 To plot the overlap among promoters and H3K4me3 peaks in a Venn diagram you will use the the `draw.pairwise.venn()` function of the `VennDiagram` package. We installed this package for you with:  
-```{r installrtracklayer, eval=FALSE, echo=TRUE}
+```{r installrtracklayer_, eval=FALSE, echo=TRUE}
 BiocManager::install("VennDiagram")
 library(VennDiagram)
 ```
