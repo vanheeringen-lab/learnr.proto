@@ -119,7 +119,6 @@ if (file.access(log_path, 7)[[1]] == 0 ){
 }
 ```
 
-
 ## Embedding
 
 <!-- ```{r, context="server"} -->

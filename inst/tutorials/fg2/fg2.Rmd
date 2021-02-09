@@ -179,6 +179,23 @@ if (file.access(log_path, 7)[[1]] == 0 ){
 ```
 
 
+## Attendance
+
+Please fill in your name and student number below and hit "Submit Answer" (the button will then disappear). At the end of the tutorial, print your answers and upload the PDF to Brightspace.
+
+```{r who_are_you, echo=FALSE}
+question_text(
+  "Enter your name & student number",
+  placeholder = "name s123456",
+  answer("Little nosey, aren't we?", correct=TRUE),
+  incorrect=NULL,  # hide the red button
+  allow_retry = FALSE  # prevent cheating
+)
+
+# alternative:
+# https://stackoverflow.com/questions/63894794/create-an-open-ended-question-with-learnrtutorial-in-r
+```
+
 ## 2.1 Introduction
 ### 2.1.1 Recap fg1    
 In **fg1** you studied the major steps involved in obtaining epigenomics data, from experiment to raw data and from raw data to normalized signal and peaks. You uploaded and inspected data of DNaseI-seq, RNA-seq and ChIP-seq of histone modifications of monocytes in the UCSC genome browser and you searched for regions with increased signal, so-called *peaks*.   

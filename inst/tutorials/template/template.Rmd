@@ -132,6 +132,24 @@ if (file.access(log_path, 7)[[1]] == 0 ){
 }
 ```
 
+
+## Attendance
+
+Please fill in your name and student number below and hit "Submit Answer" (the button will then disappear). At the end of the tutorial, print your answers and upload the PDF to Brightspace.
+
+```{r who_are_you, echo=FALSE}
+question_text(
+  "Enter your name & student number",
+  placeholder = "name s123456",
+  answer("Little nosey, aren't we?", correct=TRUE),
+  incorrect=NULL,  # hide the red button
+  allow_retry = FALSE  # prevent cheating
+)
+
+# alternative:
+# https://stackoverflow.com/questions/63894794/create-an-open-ended-question-with-learnrtutorial-in-r
+```
+
 ## Chapter name
 
 tutorial goes here
