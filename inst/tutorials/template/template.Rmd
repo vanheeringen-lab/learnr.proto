@@ -110,6 +110,28 @@ $(function() {
 // source: https://yihui.org/en/2018/09/target-blank/
 ```
 
+```{r log_user, context="server"}
+# log the first time a user starts this tutorial.
+
+tutorial = "template"
+log_path = "/scratch/fg_log"  # make this dir and set 777 permissions!
+
+if (file.access(log_path, 7)[[1]] == 0 ){
+  date = Sys.Date()
+  user = basename(path.expand("~"))
+  log_name = paste0(tutorial, "_", user, "_", date)
+  log_file = file.path(log_path, log_name)
+  
+  logs = list.files(log_path)  # all currently existing logs
+  substring = paste0(tutorial, "_", user)  # date is unimportant
+  log_exists = any(lapply(logs, startsWith, substring) == TRUE)
+  if (!log_exists){
+    invisible(file.create(log_file))
+    system(paste0("chmod 777 ", log_file))
+  }
+}
+```
+
 ## Chapter name
 
 tutorial goes here
