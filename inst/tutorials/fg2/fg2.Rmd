@@ -160,17 +160,17 @@ $(function() {
 ### 2.1.1 Recap fg1    
 In **fg1** you studied the major steps involved in obtaining epigenomics data, from experiment to raw data and from raw data to normalized signal and peaks. You uploaded and inspected data of DNaseI-seq, RNA-seq and ChIP-seq of histone modifications of monocytes in the UCSC genome browser and you searched for regions with increased signal, so-called *peaks*.   
 <br>
-By browsing through the data in the UCSC genome browser, you observed that the signal of the various epigenomics datasets have different shapes. E.g. narrow and high signal mainly at the promoter for H3K4me3 versus broad shallow signal covering multiple genes for H3K9me3.   
+By browsing through the data in the UCSC genome browser, you observed that the signal of the various epigenomics datasets have different shapes. E.g. narrow and sharp signal for H3K4me3 versus broad, relatively shallow signal covering a broad window and multiple genes for H3K9me3.   
 <br>
-In addition, you looked at the position of these peaks in the chromosome, with respect to genes as well as the co-occurrences of different marks at these sites. Lastly, you practiced in discriminating active from silenced genes based on their associated histone and DNaseI markings.    
+You also examined the position of these peaks in the chromosome, with respect to genes as well as the co-occurrences of different marks. Lastly, you practiced in discriminating active from silenced genes based on their associated histone mark ChIP-seq and DNase-I-seq signal    
 
 ### 2.1.2 This and next week    
-You will computationally analyze the genome-wide trends in ChIP-seq data of histone modifications using R programming and answer common questions such as:  
+This and also next week you will computationally analyze the genome-wide trends in ChIP-seq data of histone modifications using R programming and answer common questions such as:  
 
 - *"How many peaks do I have?"*;    
 - *"Is this mark statistically enriched at promoters?"*;    
 - *"Which and how often do marks co-occur?"*;   
-- *"What is the association between the occurrence of this mark at the promoter and gene expression?"*;
+- *"What is the relationship between observing a particular mark  at the promoter and gene expression?"*;
 - *"What is the average signal of this mark around the TSS?"*;    
 - *"What are the different chromatin states in my cells, how often do they occur and what functional genomic element do they correspond to?"*;  
 
@@ -186,45 +186,42 @@ A tiny side note: instead of performing the analyses genome-wide, we have restri
 4. Plot this overlap in a Venn diagram.  
 5. Statistically test for enrichment of histone marks in a particular genomic region.  
 6. Compare gene expression of genes with different histone marks at their promoters.  
-7. Identify the different combinations of histone marks that can be found at promoters along with their frequency.  
+7. Group genes based on the combination of histone mark ChIP-seq peaks overlapping their promoter.   
+8. Using the grouping of (7), quantify the frequencty of active, silenced and bivalent promoters.  
 - These refer to global learning objectives #4-#7.  
 
 ### 2.1.4 Tutorial specs  
 
-- **Answers will be saved** each time you close your session and will be loaded if you restart the tutorial. Unless you hit `Start over` at the bottom of the table-of-contents.      
+- **Answers will be saved** each time you close your session and will be loaded if you restart the tutorial. *Unless* you hit `Start over` at the bottom of the table-of-contents.      
 
 - At the end of the tutorial you are instructed to **print a pdf report of the tutorial** (incl. your answers).   
 
 - To reserve server space to *active* running tutorials, and stop those that aren't actively used anymore, **we set a time limit to 25 minutes** meaning that if your tutorial has been idle for over 25 minutes, you will see the warning "Tutorial stopped due to inactivity. Restart to continue where you left off!". When you see this warning, you should close the browser with the tutorial and restart the tutorial. As progress is saved, you can continue where you left once you restart the tutorial.   
 
-- Links to reference material and used resources are formatted with `r colorize("light blue font", col = "dodgerblue")`. It is advised to open these links using the "right-mouse click \-\-\> Open in a new browser tab" strategy. If you click on the links straight away, you are directed away from the tutorial.   
+- Links to reference material and used resources are formatted with `r colorize("light blue font", col = "dodgerblue")`. It is advised to open these links using the "right-mouse click \-\-\> Open in a new browser tab" strategy (if you click on the links straight away, you are directed away from the tutorial).   
 
-- Reading of references and background material **is not required and not taken into account when estimating the time-required** for this tutorial!   
+- Reading of references and background material **is not required and not taken into account when estimating the time-required** for this tutorial.     
 
 ### 2.1.5 About the exercises  
 
-* In this tutorial you will have multiple-choice and check-the-box questions like in fg1 but also **complete-the-code exercises**. The latter are sometimes evaluated on the printed object or summary (e.g a the top part of an object), in other cases, the code itself is checked. When the code is evaluated we added "(code check)" to the question. In these cases, R will give custom feedback that helps you correct your code.      
+* In this tutorial you will have multiple-choice and check-the-box questions as you had in fg1 but also **complete-the-code exercises**. The latter are sometimes evaluated on the printed object or summary (e.g a the top part of an object). At other times, the code itself is checked. When the code is evaluated we added "(code check)" to the question. In these cases, R will give custom feedback that helps you correct your code.      
 
-* Due to technical reasons, when you hit Submit Answer of **(code check)** exercises, the output (if there is any) will not be printed. Eg a plot won't be shown. To visualize the plot, you must you use `Run Code`.  
+* Due to technical reasons, when you hit Submit Answer of "(code check)" exercises, the output (if there is any) will not be printed. Eg a plot won't be shown. To visualize the plot, you must you use `Run Code`.  
 
-* For short lines of code, you have to decide which function or object to use and how to write this in code. For some longer lines of codes, we left blanks as '\_\_\_' that indicate where in the code you should fill in a function, object or variable. Make sure fill out all the blanks before Answer submission, they will otherwise result in errors.  
+* For short lines of code, you have to decide which function or object to use and how to write this in code. For some longer lines of codes, we left blanks as '\_\_\_' that indicate where in the code you should fill in a function, object, variable or parameter. Make sure you fill out all the blanks before Answer submission, they will otherwise result in errors.  
 
-* Hit `Hint` (when provided) for clues. Due to technical reasons **you can't go back to previous hints, so make sure you read them well!**        
-
-* Hit `Run Code` to test your code and preview the output.  
+* Hit `Hint` (when provided) for clues. Due to technical reasons **you can't go back to previous hints, so make sure you read them well.**        
 
 * Hit `Run Code` to test your code and preview the output (but make sure no '\_' are left).  
 
-* Hit `Submit Answer` (if present) to submit the code (make sure no '\_' are left) for evaluation.    
+* Hit `Submit Answer` (if present) to submit the code for evaluation (make sure no '\_' are left).    
 
 * Try to keep yourself from hitting `Solution` (when provided). Only use it when you do not understand the automatic feedback given by R.   
 
 * Hit `Start Over` in the header of the exercise to remove any adjustments you made and start again.   
 
-Although we ask for specific answers or completion of specific code, you are encouraged to test your own code and use `Run Code` and `Start Over` extensively. I.e., remove the pre-coded code and write your own code for a different graph or different summary of the data. Use `Run Code` to preview the results. Unfortunately these self-thought of codes can not be evaluated. For the evaluation you need to use our pre-coded code. Hit `Start Over` to get this pre-coded code.  
+Although we ask for specific answers or completion of specific code, you are free to test your own code and use `Run Code` and `Start Over`. I.e., remove the pre-coded code and write your own code for a different graph or summary of the data. Use `Run Code` to preview the results. Unfortunately these newly created code can not be evaluated. For the evaluation you need to use our pre-coded code. Hit `Start Over` to get this pre-coded code.  
 <br>
-
-**Example coding exercise:**  
 
 > **Example exercise**: Print the head of object `monocytes_h3k4me3` (code check).   
 
@@ -233,9 +230,12 @@ Although we ask for specific answers or completion of specific code, you are enc
 
 ```
 
-```{r examplecode-hint}
-# use the function
-head([object_name])
+```{r examplecode-hint-1}
+# You may want to use the function
+head()
+```
+
+```{r examplecode-hint-2}
 # warning: the next hint is the solution!
 ```
 
@@ -249,25 +249,27 @@ grade_code()
 
 ### 2.1.6 Need help?  
 You are allocated to Breakout rooms in Zoom (or you can select one yourself). Either way, use the Breakout rooms to discuss questions and difficulties with your peers. If you still have question, use the "raise hand" option to notify the host of the session.     
+<br>
+Now, let's get started!    
 
 
 ## 2.2 ChIP-seq peaks in R    
 ### 2.2.1 ChIP-seq peaks can be narrow or broad     
-In epigenomics you often work with **interval** data, also referred to as **windows** or **(genomic) regions**. Think of peaks, genes, exons, ... any genomic region reported with the **genomic coordinates: chr, start, and end**. As we discussed in week 1, these often come in a tabular format with the basic information about the location and some other information.  
+In epigenomic data analyses you often work with peaks, genes, exons, motif locations and other genomic regions reported with the genomic coordinates: chromosome, start, and end. These kind of data are referred to as **genomic interval data**, also called genomic windows or regions.   
 <br>
-Common file formats include BED format for peak files and GFF for gene annotations. In practice, peak files come in two flavors, both cohering to the BED format but with small differences in columns 6-7. These are called **narrowPeak** and **broadPeak** files.    
+As we discussed in fg1, peak files generally come in the tabular BED format (for Browser Extensible Data) with the basic information about the location of the peak and additional columns that contain for example, the name of the peak, a score given by the peak caller and the summit of the peak.   
 <br>
-*"Why should peak files come in two flavors?"*  
+In practice, peak files come in two flavors, both cohering to the BED format but with small differences in columns 4 till 9. These are called **narrowPeak** and **broadPeak** files. *"Why should peak files come in two flavors?"*  
 <br>
 This is because the factors and histone modifications on which ChIPs can be performed, show different enrichment shapes. In other words: some show broad domains of relatively low enrichment, think of H3K9me3; others have more sharp and narrow peaks that clearly have a peak summit, think of transcription factors and H3K4me3.   
 <br>
-Peak calling software can take this into account resulting in slightly different settings for the different data types and two different output formats. If you have a narrowPeak file, this means that during peak calling, settings were used that fit ChIP-seq datasets with sharp, narrow enrichment signals.  For broadPeak files, peak calling settings were used to detect broad domains of (overall lower) enrichment.     
+Peak calling software can take this into account resulting in slightly different peak calling settings and two different output formats with the  major difference in the includes of a peak summit location for narrow-shaped peaks. If you have a narrowPeak file, this means that during peak calling, settings were used that fit ChIP-seq datasets with sharp, narrow enrichment signals. For broadPeak files, peak calling settings were used to detect broad domains of (overall lower) enrichment.     
 <br>
-Discussing the differences between narrowPeak and broadPeak files is one thing, and not very significant. What is important to realize is that ChIP-seq datasets of histone modifications have different shapes. As you also could have see in the UCSC Genome Browser. We will come back to these differences in section 2.3.   
+Discussing the differences between narrowPeak and broadPeak files is one thing, and not very significant. What is important is that you are aware of the different enrichment shapes that ChIP-seq datasets of histone modifications can have. We will come back to these differences in section 2.3.   
  
 
 >#### **Background info**: File formats   
-<details><summary>What do BED and GFF files hold and look like? (click here to expand)</summary>   
+<details><summary>What do BED look like? (click here to expand)</summary>   
 **Browser Extensible Data - BED format**:  
 >
 - Used for peaks, motif locations or other custom intervals.  
@@ -284,7 +286,10 @@ Discussing the differences between narrowPeak and broadPeak files is one thing, 
 > Example:  
 ![](images/wk1_3_file_format_bed.png){width=80%}  
 > Further reading on the file formats on the UCSC Genome Browser FAQ page: [BED](http://genome.ucsc.edu/FAQ/FAQformat.html#format1), and the [narrowPeak BED](http://genome.ucsc.edu/FAQ/FAQformat.html#format12) and [broadPeak BED](http://genome.ucsc.edu/FAQ/FAQformat.html#format13).  
-> <br>
+> </details>
+
+>#### **Extra reading**: Transcript and gene annotations come in GFF format.   
+<details><summary>What do GFF files look like? (click here to expand)</summary>   
 > **General Feature Format - GFF format**:   
 >  
 -	Common file format for storing gene annotations not only including genes but also transcripts/splice variants, cDNA sequences, exons, rRNA, ncRNA, etc.  
@@ -296,7 +301,7 @@ Discussing the differences between narrowPeak and broadPeak files is one thing, 
 > Example:   
 ![](images/wk1_3_file_format_gff.png){width=80%}      
 > Further reading on the gff file formats: [UCSC Genome Browser](http://genome.ucsc.edu/FAQ/FAQformat.html#format3), or [ENSEMBL](https://m.ensembl.org/info/website/upload/gff3.html).  
-> <br>
+> </details>
 
 ### 2.2.2 Peaks as data.frame     
 Peak data can be imported into a data.frame with:  
@@ -307,19 +312,19 @@ object_name <- read.table("location/of/peak_file.bed")
 > #### Refresher:  
 > Follow this link for a recap on data.frames: [What are data.frames? by Data Carpentry](https://datacarpentry.org/R-genomics/02-starting-with-data.html#what_are_data_frames).  
 
-The data.frame data structure is, however, not the most efficient way to work with interval data. E.g. a simple manipulation such as shifting all reported intervals 2 bp to the right, requires you to manipulate the "start" and "end" columns at the same time.  
+The data.frame data structure is, however, not the most efficient way to work with interval data. E.g. a simple manipulation such as shifting all reported intervals 2 bp to the right, requires you to manipulate the "start" and "end" columns at the same time. And do not even start thinking about calcualting overlap among two or more data.rames with interval data.      
 <br>
-Interval data such as genomic peaks can be more efficiently handled with the `IRanges` package which works with a data structure especially developed for **ranges of integers**: IRanges objects.  
+Interval data such as genomic peaks can be more efficiently handled with the `IRanges` package which works with a data structure especially developed for **ranges of integers: IRanges objects**.  
 
 ### 2.2.3 Introducing IRanges and GRanges    
-To construct an IRanges object you need to define at least two of the following three values:  
+To **construct an IRanges object** you need to define at least 2 of the following 3 values:  
 
 1. a starting coordinate  
 2. a finishing coordinate  
 3. the width of the interval.  
 
 <br>
-The GRanges objects of the `GenomicRanges` package are very similar but require a additional **sequence name** (in other words a chromosome) for every interval and an optional **strand** column.  
+The **GRanges objects of the `GenomicRanges` package** are very similar but require a additional **sequence name** (in other words a chromosome) for every interval and an optional **strand** column.  
 <br>
 We installed and loaded the packages `IRanges` and `GenomicsRanges` for you with:
 ```{r install_genomicranges, eval=FALSE, echo=TRUE}
@@ -328,17 +333,22 @@ library(IRanges)
 library(GenomicRanges)
 ```
 <br> 
-Here we create GRanges object called `gr` with 4 intervals on chr1:  
+And here is an example where we create a GRanges object called `gr` with 4 intervals on chr1:  
 ```{r create gr, echo=TRUE, eval=TRUE}
-# create `gr`
+##  create `gr`
+# the custom variable "color" will be used for plotting the ranges.  
 gr_chr1 <-  GRanges(seqnames = c("chr1"), # argument is re-used for each interval
                     ranges = IRanges(start=c(1,3,8,15), width = c(3,10,6,2)),
-                    color = c("black", "red", "green", "yellow"))  # this color will be used for plotting the ranges in the plot below.  
+                    color = c("black", "red", "green", "yellow"))   
+
 # add names to `gr_chr1`
 names(gr_chr1) <- paste("interval", LETTERS[1:4], sep = "_")
+
 # print the object:
 gr_chr1
 ```
+<br>
+Observe the 3 main columns to the left of the "|\"-sign that are always present in a GRanges object: "seqnames", "ranges" and "strand". The start and end coordinates are summarized in the "ranges" column. And these windows are not stranded and therefore have a "*" in the "strand" column.  
 <br>
 When we visualize these intervals we see three 'blocks' along the horizontal axis:
 ```{r plot_gr, echo=FALSE}
@@ -348,8 +358,8 @@ plotRanges(gr_chr1, col = gr_chr1$color, xlim = c(0, 20))
 <br>
 Notice that `gr_chr1` holds 3 slots:  
 
-1. the genomic coordinates in a **GRanges** slot with the variables "seqnames", "ranges" and "strand".   
-2. 1 column as **metadata**  (metadata is data about the data): "color".     
+1. the genomic coordinates in the slot left of the "|\"-signs with the variables "seqnames", "ranges" and "strand".   
+2. 1 column "color" in the area right of the "|\"-signs, this is the **metadata** slot  (metadata is data about the data).     
 3. 1 sequence from an unspecified genome in the **seqinfo** slot: "*1 sequence from an unspecified genome; no seqlengths*"      
 
 We will come back to these slots shortly.  
@@ -375,12 +385,12 @@ To add a column to the metadata you can use:
 granges_object$new_variable <- new_variable_calculation
 ```
 <br>
-A list of the above functions (and more) for GRanges can also be called with `methods(class = "...")`. This also command works for other objects as well. You just need to figure out the class of the object in question using `class([object_name])`.  
+A list of the above functions (and more) for GRanges objects can also be obtained by running `methods(class = "GenomicRanges")`.    
 <br>
-You can print a summary of the GRanges object with `show(object_name)` and `print(object_name)` (this works for many  other R objects as well).  
+You can print the top and bottom 5 lines of the GRanges object with `show(object_name)` and `print(object_name)` (this works for many  other R objects as well).  
 
 ### 2.2.5 Slots in GRanges objects     
-The object `gr` in the image above also holds 3 slots:  
+As we mentioned, the object `my_gr` in the image above has 3 slots:  
 
 1. the genomic coordinates in a **GRanges** slot  
 2. 2 columns as **metadata**  (metadata is data about the data)    
@@ -395,7 +405,9 @@ Extract using `granges(object_name)` |  Extract as DataFrame with `mcols(object_
 Restricted to variables `seqnames`, `ranges` and `strand` | Almost anything can be stored in the metadata
 
 <br>
-Information about the genome is stored in the **seqinfo** part of the object. In the example you see that the peaks are located in human genome 38 which holds 455 sequences in total of which 1 circular (mitochondrial genome). (Sequences that can not be confidently placed on a specific chromosome is stored in chrUn, chr*N*_random and chr*N*_region [explanation on UCSC GB website](http://genome.ucsc.edu/FAQ/FAQdownloads#download10).)   
+Information about the genome is stored in the **seqinfo** part of the object. In the seqinfo slot of `my_gr` you can read that the peaks are located in human genome 38 which holds 455 sequences in total of which 1 circular (mitochondrial genome).   
+<br>
+*Side note*: 455 sequences is more than the number of chromosomes in a human genome. This is because sequences that can not be confidently placed on a specific chromosome is stored in chrUn, chr*N*_random and chr*N*_region [explanation on UCSC GB website](http://genome.ucsc.edu/FAQ/FAQdownloads#download10).   
 
 
 ### 2.2.6 Importing peak files as GRanges     
@@ -413,15 +425,15 @@ monocytes_h3k4me3 <- import("h3k4me3_peaks.chr19.bed", format = "narrowPeak")
 # (you could also use rtracklayer::import("h3k4me3_peaks.chr19.bed", format = "narrowPeak") and skip loading the library)
 ```
 <br>
-As mentioned in [2.2.1 ChIP-seq peaks can be narrow or broad], different histone modifications show different peak shapes in ChIP-seq resulting in "narrowPeak" and "broadPeak" files. H3K4me3 ChIP-seq generally shows sharp(er) enrichment that can reach high enrichment values and is stored as "narrowPeak" file. For `import()` to function properly, we defined this format in the `format = ` parameter.  
+As mentioned in [2.2.1 ChIP-seq peaks can be narrow or broad], different histone modifications show different peak shapes in ChIP-seq resulting in "narrowPeak" and "broadPeak" files. H3K4me3 ChIP-seq generally shows sharp(er) enrichment that can reach high enrichment values and is stored as "narrowPeak" file. For `import()` to function properly, we therefore defined this format in the `format = ` parameter.  
 <br>
-H3K4me1 covers broad(er) domains and peak calling took that into account, resulting in a "broadPeak" peak file. 
+H3K9me3 covers broad(er) domains and peak calling took that into account, resulting in a "broadPeak" peak file. 
 ```{r qimport}
-question("Which function imports the H3K4me1 dataset into a GRanges object?",
-         answer("import(\"h3k4me1_peaks.chr19.bed\", format = \"narrowPeak\")", message = "check the file format."),
-         answer("import(\"h3k4me1_peaks.chr19.bed\", format = \"BED\")", message = "BED is not the right format."),
-         answer("import(\"h3k4me1_peaks.chr19.bed\", format = \"broadPeak\")", correct =T),
-         answer("read.table(\"h3k4me1_peaks.chr19.bed\", format = \"broadPeak\")", message = "read.table parses the data into a data.frame while we asked for a GRanges object."),
+question("Which function imports the H3K9me3 dataset into a GRanges object?",
+         answer("import(\"h3k9me3_peaks.chr19.bed\", format = \"narrowPeak\")", message = "check the file format."),
+         answer("import(\"h3k9me3_peaks.chr19.bed\", format = \"BED\")", message = "BED is not the right format."),
+         answer("import(\"h3k9me3_peaks.chr19.bed\", format = \"broadPeak\")", correct =T),
+         answer("read.table(\"h3k49me3_peaks.chr19.bed\", format = \"broadPeak\")", message = "read.table parses the data into a data.frame while we asked for a GRanges object."),
          allow_retry=TRUE,
          random_answer_order=TRUE
          )
@@ -437,7 +449,7 @@ Let's have a quick look at `monocytes_h3k4me3`.
 
 ```{r q1_head_h3k4me3, exercise=TRUE, exercise.lines=3, exercise.eval=FALSE, error=TRUE}
 # print the head of monocytes_h3k4me3  
-# the object "monocytes_h3k4me3" has already been imported for you
+
 
 
 ```
@@ -489,17 +501,15 @@ Column | Section in GRanges object | Variable | Description
 9. | Metadata | peak  | location of peak summit relative to the peak start.  
 
 ## 2.3 Exploratory data analysis   
-A common first step in genomics data analyses is to look at some basic characteristics of the data by making exploratory summaries and plots. You will look at peak counts and peak widths of the different marks in this section. In a normal analysis, these plots could function as an additional quality control (QC) or  provide new insights, depending on the system that you are working with (think of a newly discovered histone mark or TF).  
+A common first step in genomics data analyses is to look at some basic characteristics of the data by making exploratory summaries and plots. You will look at peak counts, the peak widths and the total number of bps covered by the different marks in this section. In a normal analysis, these plots could function as an additional quality control (QC) or  provide new insights, depending on the system that you are working with (think of a newly discovered histone mark or TF).  
 <br>
-In this case, you will visualize the differences between broad and narrow marks and at the same time get used to working with GRanges objects and refresh your understanding of ggplot2 and dplyr.  
-<br>
-Let's get started!  
+In this case, you will visualize the differences between broad and narrow marks (and at the same time get used to coding in this R environment and working with GRanges objects, *and* refresh your understanding of dplyr and ggplot2).  
 
-### 2.3.1 Peak counts
+### 2.3.1 Peak counts  
 
-> **Exercise 2a**: Determine the number of H3K4me3 and H3K4me1 peaks in monocytes. 
+> **Exercise 2a**: Determine the number of H3K4me3 and H3K9me3 peaks in monocytes. 
 > 
-> * The peak data are stored in the R objects `monocytes_h3k4me3` and `monocytes_h3k4me1`.    
+> * The peak data are stored in the R objects `monocytes_h3k4me3` and `monocytes_h3k9me3`.    
 
 ```{r q2a_exploreh3k4me3, exercise=TRUE, exercise.lines=3, exercise.eval=FALSE, error=TRUE}
 # How many peaks are stored in "monocytes_h3k4me3"?
@@ -522,19 +532,19 @@ grade_result(
  )
 ```
 
-```{r q2a_exploreh3k4me1, exercise=TRUE, exercise.lines=3, exercise.eval=FALSE, error=TRUE}
-# And how many H3K4me1 peaks do you have?
+```{r q2a_exploreh3k9me3, exercise=TRUE, exercise.lines=3, exercise.eval=FALSE, error=TRUE}
+# And how many H3K9me3 peaks do you have?
 
 
 ```
 
-```{r q2a_exploreh3k4me1-hint}
+```{r q2a_exploreh3k9me3-hint}
 # look at the command you used above
 ```
 
-```{r q2a_exploreh3k4me1-check}
+```{r q2a_exploreh3k9me3-check}
 grade_result(
- pass_if(~identical(.result, length(monocytes_h3k4me1)))
+ pass_if(~identical(.result, length(monocytes_h3k9me3)))
  )
 ```
 
@@ -569,19 +579,19 @@ grade_result(
 )
 ```
 
-```{r q2b_widthh3k4me1, exercise=TRUE, exercise.lines=3, exercise.eval=FALSE, error=TRUE}
-# And what is the distribution of H3K4me1 peak sizes?   
-monocytes_h3k4me1
+```{r q2b_widthh3k9me3, exercise=TRUE, exercise.lines=3, exercise.eval=FALSE, error=TRUE}
+# And what is the distribution of H3K9me3 peak sizes?   
+monocytes_h3k9me3
 ```
 
-```{r q2b_widthh3k4me1-check}
+```{r q2b_widthh3k9me3-check}
 grade_result(
-  pass_if(~identical(.result, summary(width(monocytes_h3k4me1))))
+  pass_if(~identical(.result, summary(width(monocytes_h3k9me3))))
 )
 ```
 
 <br>
-Notice the larger median and maximum peak size for H3K4me1 peaks compared to H3K4me3 peaks. This is related to H3K4me3 having having **narrow** peaks of enrichment (enrichment restricted to a relatively small region with high  scores) and H3K4me1 **broad** enrichment profiles (enrichment covering a broad region).   
+Notice the larger median and maximum peak size for H3K9me3 peaks compared to H3K4me3 peaks. This is related to H3K4me3 having having **narrow** peaks of enrichment (enrichment restricted to a relatively small region with high  scores) and H3K9me3 **broad** enrichment profiles (enrichment covering a broad region).   
 
 > #### **In summary**, marks with narrow and with broad peaks 
 ><details><summary>Click here to view the summary...</summary>  
@@ -595,7 +605,16 @@ H2A.Zac | H3K4me1
 </details>  
 
 ### 2.3.2 Plotting summaries with ggplot2  
-You will use ggplot2 and dplyr package to explore the ChIP-seq data further. You have used these packages in the year 1 course Genomics and Big Data. Use the refresher-boxes and package cheatsheets (tip: use google) when you  need a quick reminder of the basics and how-to-use the package-functions.  
+You will use the R packages `ggplot2` and `plyranges` to explore the ChIP-seq data further. You have used ggplot2 in the year 1 course Genomics and Big Data. `plyranges` is a relative of the `dplyr`-package that allows structured manipulation of data. Use the refresher-boxes and package cheatsheets (tip: use google) when you  need a quick reminder of the basics and how-to-use the package-functions.  
+<br>
+We installed and loaded these packages for you by running:  
+```{r install_ggplot_plyranges, eval=FALSE, echo=TRUE}
+BiocManager::install("tidyverse") # tidyverse contains ggplot2 and several other handy packages 
+BiocManager::install("plyranges")
+library(tidyverse)
+library(plyranges)
+```
+
 <br> 
 
 > #### **Refresher**: ggplot2  
@@ -610,15 +629,23 @@ You will use ggplot2 and dplyr package to explore the ChIP-seq data further. You
 ><br>
 > ![](images/wk2_3_ggplottemplate.png){width=50%}     
 ><br>
-> In **ggplot2** you begin with the `ggplot(data = ..)` function and add layers with `geom()` functions. Example geom functions include `geom_point()` for a scatter plot, `geom_histogram()` for a histogram, `geom_density()` for a smoothened version of the histogram, and `geom_bar()` for a barplot.  
+> In **ggplot2** you begin with the `ggplot(data = ..)` function and add layers with `geom()` functions. Example geom functions include:   
+> 
+> - `geom_histogram()` for a histogram,   
+> - `geom_density()` for a smoothened version of the histogram,   
+> - `geom_bar()` for a barplot,   
+> - `geom_boxplot()` for a boxplot,   
+> - `geom_point()` for a scatter plot, and   
+> - `geom_smooth()` for a smoothing or trend line.      
 > <br>
 > The **geom functions** take a `mapping = aes(x = ..., y = ..., ...)` argument that defines how data from variables in the dataset are mapped to visual properties (aes for "aesthetic mapping"). Depending on the geom function, you can map variables to the x- and y-axis, to the shape of symbols, the line type of line graphs, to the fill color of symbols and more.  
 > <br>
 > Each plot has a **coordinate system** that determine the scales and orientation of the x and/or y-axis. The default coordinate system is given by the `coord_cartesian()` funtion. Adding this to a default ggplot won't change your plot. What is helpful is that within `coord_cartesian()` you can set the `xlim=` and `ylim=` arguments. Other coordinate systems can be found on the ggplot2 cheatsheet](https://github.com/rstudio/cheatsheets/raw/master/data-visualization-2.1.pdf).  
-> **Scales** control the mapping from data to aesthetics and can be customized with `scale_[]_[]` functions. These can be used to, for example, change a color palette, set limits to the values included in the mapping, or log transform an axis.  
+> **Scales** control the mapping from data to aesthetics and can be customized with `scale_[]_[]` functions. These can be used to, for example, change a color palette, set limits to the values included in the mapping, or log transform an axis.      
 <br>
-> **Theme** elements include functions to specifify non-data elements of your graph. You can also provide function that contain **complete** themes, eg in `theme_bw()`, `theme_grey()` and many more.   
-> Finally **Faceting** generates small multiples of the graph, each showing a different subset of the data grouped by a categorical variable.   
+> **Theme** elements include functions to specifify non-data elements of your graph. You can also provide function that contain **complete** themes, eg in `theme_bw()`, `theme_grey()` and many more.    
+> <br>
+> Finally, **faceting** generates small multiples of the graph, each showing a different subset of the data grouped by a categorical variable.   
 ><br>
 > **Additional reference**:  
 > *[R for Data Science, chapter 3 Data visualization](https://r4ds.had.co.nz/data-visualisation.html)*  
@@ -628,32 +655,33 @@ You will use ggplot2 and dplyr package to explore the ChIP-seq data further. You
 ### Exercise 3  
 In this exercise you will make a **barplot showing the number of peaks per ChIP experiment**. All ChIP-seq peaks are concatenated in the GRanges object `monocytes_all`. To generate the barplot, you need to:  
 
-a. Identify the variable that you can use to count the number of peaks per chip in the ggplot2 barplot function. 
+a. Identify the variable that you can use to count the number of peaks per ChIP in the ggplot2 barplot function. 
 b. As GRanges objects are not compatible with ggplot, you need to transform the metadata to a data.frame.  
 c. Identify the `geom_` function that will give you a barplot.    
 
 > **Exercise 3a**: Print the top and bottom rows of `mcols(monocytes_all)` using `show()`.  
 > 
-> * This will show the top and bottom rows in the metadata of `monocytes_all`.  
+> * This will show the top rows in the metadata of `monocytes_all`.  
+> * Make sure you match every operning "(" with a closing ")".  
 
 ```{r monocytesall, exercise=TRUE, exercise.lines=3, exercise.eval=FALSE, error=TRUE}
-# print the top and bottom rows of object 'mcols(monocytes_all)'
+# print the head of object 'mcols(monocytes_all)'
 
 
 ```
 
 ```{r monocytesall-hint-1}
-# Use mcols() within show()
+# Use mcols() within head()
 ```
 
 ```{r monocytesall-hint-2}
 # ie:
-show(mcols(___))
+head(mcols(___))
 ```
 
 ```{r monocytesall-check}
 grade_result(
-  pass_if(~identical(.result, show(monocytes_all))),
+  pass_if(~identical(.result, head(monocytes_all))),
   correct = "Identify the variable (column in metadata) that you can use for counting the number of peaks per chip (this will be the statistic used in the barplot)."
   )
 ```
@@ -668,12 +696,11 @@ question("Which variable will you use for counting the number of peaks per ChIP-
 ```
 
 ### Exercise 3b  
-Secondly, you have to extract the metadata and write into a a data.frame as GRanges objects are not compatible with ggplot2.      
+Secondly, you have to extract the metadata and write it into a data.frame as GRanges objects are not compatible with ggplot2.      
 
 > **Exercise 3b**: Complete the code below to extract the metadata from the object `monocytes_all` (code check).  
 > 
 > * The function `as.data.frame()` is used to convert the resulting 'DFrame' object into a 'data.frame'.  
-> * Review the functions mentioned in section 2.2.4 if you do not remember how to extract the metadata.  
 
 ```{r q_extractmetadata, exercise=TRUE, exercise.lines=6, exercise.eval=FALSE, error=TRUE}
 # extract metadata from 'monocytes_all'
@@ -753,11 +780,11 @@ question("Mark has the most peaks on chromosome 19 and which the fewest?",
 ### 2.3.3 Explore total peak area with dplyr & ggplot  
 In this section you will visualize the fraction that each ChIP-seq peak set covers in total on chromosome 19.  
 <br>
-To generate this plot, you have to calculate the total number of bps covered by each peak dataset. This can be achieved by summing up the `peak_size` values.  
+To generate this plot, you have to calculate the total number of bps covered by each peak dataset. This can be achieved by summing up the peaksizes obtained with the `width()` function.   
 <br>
-GRanges objects follow the **tidy data principle**: each row of a Ranges object corresponds to an interval, and each column will represent a variable about that interval, and generally each object will represent a single unit of an observation (like gene annotations). You can use **dplyr**-like functions from the `plyranges` package to manipulate these objects and use the **pipe** operator `%>%` to combine functions in a workflow.  
+GRanges objects follow the **tidy data principle**: each row of a Ranges object corresponds to an interval, and each column will represent a variable about that interval, and generally each row will represent a single unit of an observation. You can use **dplyr**-like functions from the `plyranges` package to manipulate these objects and use the **pipe** operator `%>%` to combine functions in a workflow.  
 
->#### **Refresher**: dplyr     
+>#### **Refresher**: dplyr & plyranges       
 <details><summary>Click here for common dplyr-functions and examples of their plyranges-relatives on GRanges objects</summary>   
 >
 Function | Purpose | Example on GRanges   
@@ -773,9 +800,8 @@ See also the [dplyr cheatsheet](https://rstudio.com/wp-content/uploads/2015/02/d
 
 ### Exercise 4  
 
-> **Exercise 4a**: Add the 'peak_size' variable to `monocytes_metadata`. This new variable holds the peak widths (code check).   
-> 
-> * Remember, to add new columns to GRanges objects you can use: `granges_object$new_variable <- variable_calculation`.    
+> **Exercise 4a**: Add a variable called 'peak_size' to `monocytes_metadata`. This new variable holds the peak widths (code check).   
+
 
 ```{r prepare_q4a, echo=FALSE}
 monocytes_metadata <- as.data.frame(mcols(monocytes_all))
@@ -788,6 +814,12 @@ monocytes_metadata <- as.data.frame(mcols(monocytes_all))
 ```
 
 ```{r addpeaksize-hint-1}
+#Remember, to add new columns to GRanges objects you can use:
+`granges_object$new_variable <- variable_calculation`. 
+```
+
+
+```{r addpeaksize-hint-2}
 # to obtain peak sizes, use the function
 width() 
 # WARNING: the next hint is the solution!
@@ -851,7 +883,7 @@ grade_code()
 
 ### Exercise 5  
 
-> **Exercise 5**: To plot the `fraction_chr19` as bar chart, pipe the output of exercise 5 into ggplot (code check).  
+> **Exercise 5**: To plot the `fraction_chr19` as bar chart, pipe the output of exercise 4b into ggplot (code check).  
 > 
 > * We instruct the barplot function to plot the actual values (in contrast to counting the occurrences of each value as in exercise 3) with: `stat = "identity"`.  
 > * Hit "Run Code" to plot the plot in the console.  
@@ -868,7 +900,8 @@ monocytes_metadata %>%  group_by(chip) %>%
 ```
 
 ```{r plotsummarisewidth-solution}
-monocytes_metadata %>%  group_by(chip) %>% 
+monocytes_metadata %>%  
+  group_by(chip) %>%
   summarise(total_bps = sum(peak_size),  
             fraction_chr19 = sum(peak_size) /58617616) %>% 
   ggplot(.)+ 
@@ -888,15 +921,15 @@ question("Which type of peaks (broad or narrow) covers relativeley more bp in ch
          allow_retry=T)
 ```
 
-**Thus far about the differences between ChIP-seq marks with a a narrow or broad enrichment shapes. Let's look at the overlap between marks and genomics features.**  
+So far for comparing ChIP-seq peaks of histone marks. Let's look at the overlap between marks and genomics features.    
 
 ## 2.4 Overlap analysis   
 ### 2.4.1 Detect overlap with GenomicRanges       
-To understand the function of a ChIPped histone mark or factor often want to know whether it is enriched in a particular genomic element. To find out, you need to calculate a quantitative summary of its genome-wide distribution across the different elements. By comparing this distribution to the genome-wide coverage of these different elements (null hypothesis), we can test for enrichment of the mark or factor.   
+To understand the function of a ChIPped histone mark or factor we often want to know whether it is enriched in a particular genomic element. To find out, you need to calculate a quantitative summary of its genome-wide distribution across the different elements. By comparing this distribution to the genome-wide fraction of these different elements (null hypothesis), we can test for enrichment of the mark or factor.   
 <br>
-The genomic elements are defined in a reference file. You can use various reference files for this exercise: from transcript-oriented objects, to functional elements from a database like ENCODE, to a custom one.   
+The genomic elements are defined in a reference file. You can use various reference files for this exercise: from transcript-oriented objects, to functional elements from a database like ENCODE (lists regulattory elements like enhancers, silencers), to a custom one like TF motif locations.   
 <br>
-In the coming exercise, you will first quantify the overlap between H3K4me3 peaks and promoters and, subsequently, between H3K4me3 peaks and several different genomic elements simultaneously.   
+In the coming exercise, you will quantify the overlap between H3K4me3 peaks and promoters and, subsequently, between H3K4me3 peaks and several different genomic elements simultaneously.   
 <br>
 To identify and count overlap between two sets of GRanges objects (e.g. H3K4me3 peaks and promoters) you can use the `findOverlaps()` function from the GenomicRanges package:  
 ```{r findoverlaps_example, eval=FALSE, echo=TRUE}
@@ -909,7 +942,7 @@ overlap <- findOverlaps(query = [GRanges_object1], subject = [GRanges_object2])
 * If a peak in one of the inputs overlaps with multiple peaks in the other, its index will appear multiple times in the output.  
 
 ### 2.4.2 findOverlaps() example         
-Here we use `findOverlaps()` to find the intervals that overlap between `gr_chr1` and `my_gr` (see [2.2.3 Introducing IRanges and GRanges]):  
+Here we use `findOverlaps()` to identify the intervals that overlap between `gr_chr1` and `my_gr` (see [2.2.3 Introducing IRanges and GRanges]):  
 ```{r making_my_gr_again, eval=TRUE,echo=FALSE}
 # did not save the object in section 2.2.4 :-(
 my_gr <- GRanges(seqnames = c("chr1", "chr2", "chr3", "chr4", "chr5"), 
@@ -922,8 +955,8 @@ names(my_gr) <- paste("peak", LETTERS[1:5], sep = "_")
 
 ```{r overlap_example, eval=TRUE, echo=TRUE}
 # We place () brackets around the code to instruct R to print the output  
-# of the function on the right side of the arrow, and at the same time assign
-# the output to the new object 'my_first_overlap' on the left side of the arrow.
+# of the calculation on the right side of the arrow, and at the same time assign
+# the output to the new object on the left side of the arrow.
 
 (my_first_overlap <- findOverlaps(query = gr_chr1, subject = my_gr)) 
 
@@ -958,7 +991,8 @@ my_gr[indexes_subject]
 - Obviously, `my_gr` had 5 intervals, each on a different chromosome. So only the interval on chromosome 1 showed overlap with the intervals in `gr_chr1`, of which the intervals were restricted to chromosome 1.   
 - From the variable `ranges` we can see that interval_A in `gr_chr1` overlaps with the first bp of peak_A in `my_gr`; and interval_B in `gr_chr1` overlaps with the whole of peak_A in `my_gr`.  
 
-Finally, if you want to know the **number of unique intervals** that overlap you can limit the reported indexes to only the unique ones (do not report indexes more than once), subset the original GRanges object with these unique indexes, and count its length:
+Finally, if you want to know the **number of unique intervals** that overlap you can limit the reported indexes to only the unique ones (do not report indexes more than once) with the function `unique()`, subset the original GRanges object with these unique indexes, and count the length of the subsetted GRanges object.   
+
 ```{r example_subjecthits_uniquecount, echo=TRUE, eval=TRUE}
 # obtain the overlapping intervals from my_gr (subject)
 indexes_subject <- subjectHits(my_first_overlap)
@@ -966,11 +1000,11 @@ indexes_subject <- subjectHits(my_first_overlap)
 # take unique indexes
 indexes_subject_unique <- unique(indexes_subject)
 
-# subset my_gr with uniuqe indexes and count the number of intervals in the resulting object
-length(my_gr[indexes_subject])
+# subset my_gr with unique indexes and count the number of intervals in the resulting object
+length(my_gr[indexes_subject_unique])
 ```
 <br>
-*Side note:* in the code above, instead of running `unique()` on the indexes, you can also run it on the GRanges object with duplicate intervals and then count the length:  
+*Side note:* in the code above, instead of running `unique()` on the indexes, you can also run it on the GRanges object with duplicate intervals and then count the length (or count the number of unique indexes straight away, *all roads lead to Rome*):     
 ```{r example_subjecthits_uniquecount2, echo=TRUE, eval=TRUE}
 # obtain the overlapping intervals from my_gr (subject)
 indexes_subject <- subjectHits(my_first_overlap)
@@ -979,9 +1013,10 @@ indexes_subject <- subjectHits(my_first_overlap)
 length(unique(my_gr[indexes_subject]))
 ```
 
-
 ### 2.4.3 Overlap promoters vs h3k4me3 peaks   
-You will determine the overlap among H3K4me3 peaks and promoters. To do so you first need to obtain promoter regions as a GRanges object. We have done that for you with the following code:  
+You will determine the overlap among H3K4me3 peaks and promoters. We have extracted promoter regions from the `TxDb.Hsapiens.UCSC.hg38.knownGene` database package that holds the coordinates of all transcripts for known genes defined in human genome release 38 by the UCSC genome browser. Besides the transcript coordinates, it also stores the genomic coordinates of TSSs, exons, introns, UTRs and genes. Using the function `promoters()` we can extract promoter regions from this database.   
+<br>
+See the following code for how we obtained these regions exactly:  
 
 ```{r retrieve_genes_txdb, echo=TRUE, eval=FALSE}
 # install the txdb package
@@ -998,7 +1033,7 @@ promoters_chr19 <- unique(promoters(genes(txdb), upstream=2000, downstream=200))
 
 This code:  
   
-1. Loads the `TxDb.Hsapiens.UCSC.hg38.knownGene` database package. Which holds the coordinates of all transcripts for known genes defined in human genome release 38 by the UCSC genome browser. Besides the transcript coordinates, it also stores the genomic coordinates of TSSs, exons, introns, UTRs and genes.   
+1. Loads the `TxDb.Hsapiens.UCSC.hg38.knownGene` database package. 
 2. Extract promoter regions with the `promoters()` function. This function outputs a GRanges object with intervals around the TSS.  
 3. By default, `promoters()` works on transcripts but we are often more interested in promoters of genes therefore we add the `genes()` function.  
 4. **We define promoters as 2kb upstream and 0.2 kb downstream the TSS**.  
@@ -1074,13 +1109,13 @@ overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters_chr19)
 unique_promoters <- unique(___(overlap))
 
 # 2. How many of these unique promoters do you have?
-unique_promoter_count <- ___(unique_promoters)
+unique_promoter_count <- ___(promoters_chr19[___])
 
 # 3. Print the resulting number (leave this code as it is)
 unique_promoter_count
 
 # 4. What fraction of promoters is part of the overlap?  
-unique_promoter_count/__(promoters_chr19)
+___/___(promoters_chr19)
 ```
 
 ```{r q6c_overlap-hint-1}
@@ -1104,7 +1139,7 @@ unique_promoter_count/__(promoters_chr19)
 unique_promoters <- unique(subjectHits(overlap))
 
 # How many of these unique promoters do you have?
-unique_promoters_count <- length(unique_promoters)
+unique_promoters_count <- length(promoters_chr19[unique_promoters])
 
 # Print the resulting number
 unique_promoters_count
@@ -1145,13 +1180,19 @@ round(unique_promoters_count/length(promoters_chr19),3)
 
 ```{r q6c_overlap_enterfraction-check}
 grade_result(
-  pass_if(~identical(.result,round(unique_promoters_count/length(promoters_chr19),3))))
+  pass_if(~identical(.result,round(unique_promoters_count/length(promoters_chr19),3))),
+  correct = "Hmmm, H3K4me3 is found at 1150 of the 1723 promoters (66.7%). That looks like a strong enrichment.")
 ```
 
-This looks like a strong enrichment of this signal in promoters. Let's visualize the overlap.  
 
 ### 2.4.4 Plot the overlap in a Venn diagram  
-To plot the overlap among promoters and H3K4me3 peaks in a Venn diagram you will use the the `draw.pairwise.venn()` function of the `VennDiagram` package. This function has three "areas"-parameters:  
+To plot the overlap among promoters and H3K4me3 peaks in a Venn diagram you will use the the `draw.pairwise.venn()` function of the `VennDiagram` package. We installed this package for you with:  
+```{r installrtracklayer, eval=FALSE, echo=TRUE}
+BiocManager::install("VennDiagram")
+library(VennDiagram)
+```
+<br>
+The `draw.pairwise.venn()` function has 3 "area"-parameters:    
 
 ```{r plotvenn_example, eval=FALSE, echo=TRUE}
 draw.pairwise.venn(area1=[integer_value], area2=[integer_value], cross.area=[integer_value], ....)
@@ -1171,7 +1212,7 @@ How many h3k4me3 peaks are part of the overlap?
 unique_peaks <- unique(___(overlap))
 
 # How many of these unique peaks do you have?
-unique_peaks_count <- ___(unique_peaks)
+unique_peaks_count <- ___(___[unique_peaks])
 
 # Print the resulting number
 unique_peaks_count
@@ -1187,7 +1228,7 @@ queryHits()
 unique_peaks <- unique(queryHits(overlap))
 
 # How many of these unique peaks do you have?
-unique_peaks_count <- length(unique_peaks)
+unique_peaks_count <- length(monocytes_h3k4me3[unique_peaks])
 
 # Print the resulting number
 unique_peaks_count
@@ -1227,9 +1268,9 @@ common_counts <- min(unique_promoters_count, unique_peaks_count)
 grid.newpage()
 
 # Plot the overlap in a venn diagram
-___( area1=___, # total count for area 1
+___(area1=___, # total count for area 1
     area2=___, # total count for area 2
-    cross.area=common_counts, # count for the overlap.
+    cross.area=____, # count for the overlap.
     category=c("H3K4me3", "Promoters"), 
     fill=c("red", "gray"), 
     cat.cex=1.2)
@@ -1262,13 +1303,12 @@ common_counts <- min(unique_promoters_count, unique_peaks_count)
 grid.newpage()
 
 # Plot the overlap in a venn diagram
-draw.pairwise.venn( 
-   area1=length(monocytes_h3k4me3),
-   area2=length(promoters_chr19), 
-   cross.area=common_counts, 
-   category=c("H3K4me3", "Promoters"), 
-   fill=c("red", "gray"), 
-   cat.cex=1.2)
+draw.pairwise.venn(area1=length(monocytes_h3k4me3),
+                   area2=length(promoters_chr19),
+                   cross.area=common_counts,
+                   category=c("H3K4me3", "Promoters"),
+                   fill=c("red", "gray"),
+                   cat.cex=1.2)
 ```
 
 ```{r q6e_plotvenn-code-check}
@@ -1393,16 +1433,16 @@ binom.test(x = [integer_values_for_successes_and_failures], p = [expected_succes
 > - Determine the number of successes and failures (step 2, 3 and 4).  
 > - Set `alternative = "greater"` because we test for *enrichment* and our alternative hypothesis is that the true probability is *larger* than the expected probability.
 
-```{r q7b_binomtest, exercise=TRUE, exercise.eval=FALSE, error=TRUE}
+```{r q7b_binomtest, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.lines=21}
 # 1. We repeat the overlap calculation from exercise 6b so that you don't have to scroll back:
 overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters_chr19)
 
 # 2. Use the indexes from the overlap object to identify promoters with H3K4me3 peak
-promoters_with_h3k4me3 <- promoters_chr19[unique(___(overlap))]
+promoters_with_h3k4me3 <- ____[unique(___(overlap))]
 
 # 3. Perform negative selection using the same indexes to find promoters without H3K4me3 peak
 # the - sign removes the lines with the respective indexes from the original object
-promoters_without_h3k4me3 <- promoters_chr19[ -unique(___(overlap)) ]
+promoters_without_h3k4me3 <- ___[ -unique(___(overlap)) ]
 
 # 4. Define the x for your test
 x_test <- c(___, ___)
@@ -1473,12 +1513,12 @@ grade_code(correct = "Run the code as well and use the output to answer the ques
 
 ```{r q7c_enrichmenttest}
 question("Is H3K4me3 enriched promoters?",
-         answer("*Yes*", correct=T, message = "The binomial test shows a p-value < 2.2e-16 and a confidence interval that excludes the expected 0.062 We therefore reject the H0 of no enrichment. Realize that with the current test, we compared the number of overlaps and ignored the size of the overlap. There is still ongoing discussion of what is the best method to test for enrichment of genomic interals. This was a relative simple approach that gives a good indication. An alternative would have been to cut chromosome 19 in 200bp windows and determine whether you have more windows than expected covering promoters AND H3K4me3 peaks."),
+         answer("*Yes*", correct=T, message = "The binomial test shows a p-value < 2.2e-16 and a confidence interval that excludes the expected 0.062 We therefore reject the H0 of no enrichment. Realize that with the current test, we compared the number of overlaps and ignored the size of the overlap. Sidenote: There is still ongoing discussion of what is the best method to test for enrichment of genomic interals. This was a relative simple approach that gives a good indication. An alternative would have been to cut chromosome 19 in 200bp windows and determine whether you have more windows than expected covering promoters AND H3K4me3 peaks with a chi-square test."),
          answer("*No*", message = "Incorrect. Look at the p-value of the previous test.")
 )
 ```
 
-### 2.4.6 Overlap promoters, exons, introns and intergenic regions vs h3k4me3 peaks   
+### 2.4.6 Overlap between H3K4me3 peaks and promoters, exons, introns and intergenic regions       
 Instead of looking only at the overlap with promoters, we can also calculate the distribution of H3K4me3 peaks over various genomic features. To achieve this with functions like `findOverlaps` would require several, successive overlap analyses that would clutter up the code. Luckily, special packages have been developed for ChIP-seq analyses that perform this task. One of these packages is `genomation`. We have installed and loaded that package by:  
 ```{r genomation, eval=FALSE, echo=TRUE}
 BiocManager::install("genomation")
@@ -1507,6 +1547,16 @@ gencode_chr19 <- readTranscriptFeatures("data/encode/gencodev32.chr19.bed", uniq
 ```{r q8a_genomationoverlap, exercise=TRUE, exercise.eval=FALSE, error=TRUE}
 # overlap of h3k4me3 with promoters, exons, introns and intergenic regions
 annotation_h3k4me3 <- ___(target = __, feature = __)
+```
+
+```{r q8a_genomationoverlap-hint-1}
+# Use
+target = monocytes_h3k4me3
+```
+
+```{r q8a_genomationoverlap-hint-2}
+# and 
+feature = gencode_chr19
 ```
 
 ```{r q8a_genomationoverlap-solution}
@@ -1545,13 +1595,13 @@ plotTargetAnnotation(x = annotation_h3k4me3, main = "H3K4me3 over gene parts")
 grade_code(correct = "Hit `Run Code` to view your plot.")
 ```
 
-Realize that this transcript-oriented analyses gives you slightly different results compared to the gene-centered one in exercise 6 and 7. For now, we will stick to the gene-centered values and look at how the presence of histone marks at the TSS is related to the expression of the downstream gene.  
+Realize that this transcript-oriented analyses gives you slightly different results compared to the gene-centered one in exercise 6 and 7: In Exercise 6 and 7 we observed that H3K4me3 is found to overlap with 66.7% of promoters but here we detect overlap with 60% of promoters. For now, we will stick to the gene-centered values and look at how the presence of histone marks at the TSS is related to the expression of the downstream gene.  
 
 ## 2.5 Association with gene expression   
 ### 2.5.1 Genes with H3K4me3 at their promoter  
-Can we observe a difference in gene expression between genes with and without H3K4me3 in their promoters?
+Can we observe a difference in gene expression between genes with and without H3K4me3 in their promoters?   
 <br>
-To answer this question, we first need to obtain the genes associated with the promoters that have a H3K4me3 peak. To do so, we can use the indexes from the overlap object (exercise 6) to subset the original `promoters_chr19` object and extract the corresponding gene IDs.
+To answer this question, we first need to obtain the genes associated with the promoters that have a H3K4me3 peak. To do so, we can use the indexes from the overlap object (exercise 6) to subset the original `promoters_chr19` object and extract the corresponding gene IDs from the metadata of that object.
 
 ### Exercise 9  
 
@@ -1610,13 +1660,15 @@ grade_result(
 ```
 
 ### Exericse 10  
-Plot the expression of genes with and without H3K4me3 in their promoters. We obtained the gene expression levels from the [BLUEPRINT data portal](http://dcc.blueprint-epigenome.eu/#/experiments/ERX157053) and filtered it for genes present on chromosome 19. These data are loaded in object `quantification_chr19` for you.  
+Plot the expression of genes with and without H3K4me3 in their promoters. We obtained the gene expression levels from the [BLUEPRINT data portal](http://dcc.blueprint-epigenome.eu/#/experiments/ERX157053) and filtered it for genes present on chromosome 19. These data are loaded in object `quantification_chr19`.  
 <br>
 
-> **Exercise 10a**: Define a new variable `h3k4me3_promoter` in `quantification_chr19` which groups genes based on their overlap (TRUE/FALSE) with H3K4me3 peaks.   
+> **Exercise 10a**: Define a new variable `h3k4me3_promoter` in `quantification_chr19` which groups genes based on their overlap (TRUE/FALSE) with H3K4me3 peaks (code check).   
 >
-> * 1. First view the head of 'quantification_chr19' to identify the variable with the gene id
-> * 2. Use the dplyr-function mutate(h3k4me3_promoter = ....) to define the new variable (code check).
+> + First view the head of 'quantification_chr19' to identify the variable with the gene ID.  
+> + Use a dplyr-function to define the new variable `h3k4me3_promoter`.   
+> + The GRanges object `promoters_with_h3k4me3` of exercise 9 is available to you, it holds the corresponding gene IDs in the column "gene_id" in the metadata.  
+> + The operator `%in%` returns a vector of TRUE / FALSE that indicates if a value in the object printed to the left of the `%in%` is present in the object to the right of the `%in%`.  
 
 ```{r prepare_exercise10a, echo=FALSE}
 overlap <- findOverlaps(query = monocytes_h3k4me3, subject = promoters_chr19)
@@ -1675,13 +1727,13 @@ quantification_chr19_new <- quantification_chr19 %>%
 
 ```{r q10b_plot_genequant, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_exercise10b"}
 # Use ggplot() and geom_boxplot() to visualize the FPKM per gene group in the dataset `quantification_chr19_new`   
-ggplot(___)+
+ggplot(data = ___)+
   geom_boxplot(mapping = aes(x = __, y = __))+
   theme_calc()
 ```
 
 ```{r q10b_plot_genequant-solution}
-ggplot(quantification_chr19_new)+
+ggplot(data = quantification_chr19_new)+
   geom_boxplot(mapping = aes(x = h3k4me3_promoter, y = FPKM))+
   theme_calc()
 ```
@@ -1697,12 +1749,12 @@ This doesn't look very informative, we mainly see the outliers! RNA-seq quantifi
 > **Exercise 10c**: Repeat the plot of 10b but log10-transform the FPKM values on the y-axis (code check).  
 >
 > - Add 1 to all FPKM values to prevent taking a log10() of 0.  
-> - Also add another 'layer', visualizing the same data but as jitter (points).  
+> - Also add another 'layer', visualizing the same data but as jitter (points with a small amount of random variation that is usefull if you want to prevent plotting points on top of other points).   
 > - Hit "Run Code" to view the resulting plot.  
 
 ```{r q10c_plot_genequant, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_exercise10b"}
 # Repeat the plot of 9b but lgo10-transform the y-axis    
-ggplot(quantification_chr19_new)+
+___(data = ___)+
   geom_boxplot(mapping = aes(x = h3k4me3_promoter, y = ____)+
   geom_jitter(mapping = aes(x = h3k4me3_promoter, y = ____), size = 0.75, alpha = 0.6)+ # size makes the dots smaller, alpha makes the points transparent, ensuring that you still see the boxplot. 
   theme_calc()
@@ -1721,7 +1773,7 @@ log(FPKM+1)
 
 ```{r q10c_plot_genequant-solution}
 # Repeat the plot of 9b but log10-transform the y-axis    
-ggplot(quantification_chr19_new)+
+ggplot(data = quantification_chr19_new)+
   geom_boxplot(mapping = aes(x = h3k4me3_promoter, y = log(FPKM+1)))+
   geom_jitter(mapping = aes(x = h3k4me3_promoter, y = log(FPKM+1)), size = 0.75, alpha = 0.6)+ 
   theme_calc()
@@ -1731,7 +1783,7 @@ ggplot(quantification_chr19_new)+
 grade_code(correct = "Make sure you also hit `Run Code` to view your plot.")
 ```
 
-There is a clear difference in gene expression between the two gene sets with presence of H3K4me3 being associated with higher expression although we also see genes that deviate from this trend. This can be due to the presence of other histone marks, the presence of transcription factors or even downsream, transcriptional mechanisms that control gene expression.   
+There is a clear difference in gene expression between the two gene sets with presence of H3K4me3 being associated with higher expression although we also see genes that deviate from this trend. This can be due to the presence of other histone marks, the presence of transcription factors or even downstream, transcriptional mechanisms that control gene expression.   
 
 ### 2.5.2 Genes with H3K27me3 at their promoter   
 H3K27me3 can also be deposited at promoters. What trend do you observe there?  
@@ -1879,14 +1931,14 @@ grade_result(pass_if(~identical(.result, table(quantification_chr19_new$promoter
 
 ```{r q12b_bivalent_prom, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_exercise12"}
 # Print the boxplot of the log(FPKM+1) distribution per gene group 
-___(___) +
+___(data = ___) +
     ___(mapping = aes(x = ___, y = log(FPKM+1)))+
     geom_jitter(mapping = aes(x = ___, y = log(FPKM+1)), size = 0.75, alpha = 0.6)+
     theme_calc()
 ```
 
 ```{r q12b_bivalent_prom-solution}
-ggplot(quantification_chr19_new) +
+ggplot(data = quantification_chr19_new) +
     geom_boxplot(mapping = aes(x = promoter_mark, y = log(FPKM+1)))+
     geom_jitter(mapping = aes(x = promoter_mark, y = log(FPKM+1)), size = 0.75, alpha = 0.6)+
     theme_calc()
@@ -1895,26 +1947,29 @@ ggplot(quantification_chr19_new) +
 
 
 ```{r q12_bivalent_mc}
-question("Which of the following statments are supported by the table and the boxplot?",
+question("Which of the following statments are supported by the table of exercise 12a and the boxplot of exercise 12b?",
          answer("Gene expression is associated with different histone mark (combinations).", correct=TRUE),
          answer("H3K4me3 defines promoters.", message = "H3K4me3 does not define promoters. Promoters are defined as the regions near the TSS."),
          answer("There are more promoters with chromatin markings than without, in chromosome 19 of monocytes.", correct=TRUE),
          answer("Bivalent promoters show equally low expression levels as promoters with H3K27me3 only"),
-         answer("H3K4me3 is more often found at promoters than H3K27me3, in chromosome 19 of monocytes.", correct=TRUE),
+         answer("H3K4me3 is more often found at promoters than H3K27me3, in chromosome 19 of monocytes.", correct=TRUE, message = "As you can see, the specific combination of histone marks at the promoter is functionally associated with a different output in gene expression levels. Let's not restrict our analysis to 2 marks but examine the occurrence of all the different marks in our dataset at the promoter."),
          allow_retry=TRUE,
          random_answer_order=TRUE
          )
 
 ```
 
-`r colorize("As you can see, the specific combination of histone marks at the promoter can be functionally associated with a different output in gene expression levels. Let's not restrict our analysis to 2 marks but examine the occurrence at the promoter of all the different marks in our dataset.", "red")`   
+", "red")`   
 
 ## 2.6 Promoters with combinations of histone marks  
 ### 2.6.1 Taking the old road: the Venn diagram strategy    
-What if we want to quantify and plot **all the different combinations** of histone marks that are present at the promoters in our dataset? As we have ChIP-seq data of 6 different histone marks, we could theoretically detect 0, 1 or any combination of 2 to 6 marks resulting in 64 different outcomes! How could we ever visualize those results clearly? A Venn diagram based on 6 datasets is extremely difficult to read. See this example of the genes found in the genome of 6 different crop species:    
+What if we want to quantify and plot **all the different combinations** of histone marks that are present at the promoters in our dataset? As we have ChIP-seq data of 6 different histone marks, we could theoretically detect 0, 1 or any combination of 2 to 6 marks resulting in 64 different outcomes! How could we ever visualize those results clearly? A Venn diagram based on 6 datasets is extremely difficult to read. See this example of common and unique genes found in the genome of 6 different crop species.    
 <br>
 ![](images/wk2_6_venn_6set_banana.png){width=50%}\    
 *Ref: [D’Hont, A., Denoeud, F., Aury, JM. et al. The banana (Musa acuminata) genome and the evolution of monocotyledonous plants. Nature 488, 213–217 (2012)](https://doi.org/10.1038/nature11241)*  
+<br>
+To experience how it is to read this graph, try to identify the largest gene group and the associated genomes in which this group of genes is found.   
+
 
 ### 2.6.2 The new kid on the block: Upset plot  
 [UpSet plots](https://jku-vds-lab.at/tools/upset/) are an elegant alternative to the Venn diagram. Especially for cases when you want to visualize the intersection among more than 3 "sets" (also see this [commentary in Nature Methods 2014 by Alexander Lex & Nils Gehlenborg](https://www.nature.com/articles/nmeth.3033)).   
@@ -1938,7 +1993,7 @@ UpSet(m = [combination_matrix], set_order = ... , comb_order = ... ,...)
 
 * The object `[the_input_sets_as_list]` should be a list of sets. Each set in this list should have a name attached to it.    
 * In `m =` you provide the matrix generated by `make_comb_matrix()`.  
-* With `set_order =` you can set a custom order to the sets, these are by default depicted in rows and with a barplot to the right of the matrix.  
+* With `set_order =` you can set a custom order to the sets ( = rows with barplot to the right of the plot).     
 * With `comb_order =` you can do the same for the combinations (depicted in the columns with a barplot at the top of the plot).  
 
 Let's look at an example to clarify this further.  
@@ -1967,6 +2022,7 @@ First, we plot the overlap among the sets using a Venn diagram:
 grid.newpage()
 
 # Plot the overlap in a Venn diagram
+# use the draw.triple.venn() similar to the draw.pairwise.venn() of ex 6e.  
 draw.triple.venn( 
    area1=length(set_a),
    area2=length(set_b), 
@@ -1979,7 +2035,7 @@ draw.triple.venn(
    fill=c("red", "green", "blue"), 
    cat.cex=1.2)
 ```
-![](images/wk2_6_set_example_venn.png){width=50%}\   
+![](images/wk2_6_set_example_venn.png){width=35%}\   
 <br>  
 Next, we plot the same data in an UpSet plot:  
 ```{r set_example_upset, eval=FALSE, echo=TRUE, fig.height=4, fig.width=6}
@@ -2000,7 +2056,8 @@ UpSet(my_combination_matrix,
     + The sets (=rows) where the connector line contains a dot are included in the combination.   
 - The barplot on top of the matrix shows how many letters are common among the respective combination.   
     + Example 1: the first column tells you that 1 letter is found in all sets.  
-    + Example 2: the second column tells you that 1 letter is common among set A and B. And so forth.  
+    + Example 2: the second column tells you that 1 letter is common among set A and B.    
+    + And so forth.    
 - The barplot to the right of the matrix shows the sizes of the original sets.  
 
 In contrast to the Venn diagram you can easily identify the biggest combination and which sets it involves using the Upset plot.   
@@ -2186,7 +2243,7 @@ new_combination_matrix <- original_combination_matrix[comb_size(original_combina
 
 > **Exercise 15**: Repeat the plot of exercise 14 but this time filter `my_combination_matrix` for combinations that have more than 60 genes.  
 
-```{r q15_filtupset, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prep_q14", exercise.lines=6}
+```{r q15_filtupset, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prep_q14", exercise.lines=9}
 ## 1. Filter `my_combination_matrix`
 my_filtered_combination_matrix <- ____
 
@@ -2194,7 +2251,7 @@ my_filtered_combination_matrix <- ____
 # in `top_annotation=` we changed the height of the top barplot.
 ___(___,
     top_annotation = upset_top_annotation(my_filtered_combination_matrix,
-                                             height = unit(5, "cm"))
+                                             height = unit(5, "cm")))
 ```
 
 ```{r q15_filtupset-hint-1}
@@ -2242,7 +2299,7 @@ grade_code(correct = "Also hit 'Run Code' to view the UpSet plot.")
 ```
 
 ### Exercise 16  
-In the plot below we added gene expression of the corresponding genes as 
+In the plot below we added gene expression as FPKM of the corresponding genes as boxplots.  
 
 ![](images/wk2_6_upset_with_fpkm.png)  
 
