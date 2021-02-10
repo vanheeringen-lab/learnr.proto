@@ -132,6 +132,23 @@ if (file.access(log_path, 7)[[1]] == 0 ){
 ```
 
 
+## Attendance
+
+Please fill in your name and student number below and hit "Submit Answer" (the button will then disappear). At the end of the tutorial, print your answers and upload the PDF to Brightspace.
+
+```{r who_are_you, echo=FALSE}
+question_text(
+  "Enter your name & student number",
+  placeholder = "name s123456",
+  answer("Little nosey, aren't we?", correct=TRUE),
+  incorrect=NULL,  # hide the red button
+  allow_retry = FALSE  # prevent cheating
+)
+
+# alternative:
+# https://stackoverflow.com/questions/63894794/create-an-open-ended-question-with-learnrtutorial-in-r
+```
+
 ## Introduction to this computer practical  
 This is the computer practical for the [Functional Genomics 1](https://www.ru.nl/courseguides/science/vm/osirislinks/bb/nwi-bb064b/) course. The purpose of this practical is to teach you common bio-informatics analyses performed to analyze epigenomics data. You may already be familiar with the output of these analyses from scientific publications and your Epigenomics lectures. Here, we will focus on **how to detect, quantify, annotate and visualize the genome-wide (co-)occurrence of histone tail modifications**. The majority of the tutorial therefore focuses on the analysis of ChIP-seq data but you will also use RNA- and DNaseI-seq incidentally.   
 
