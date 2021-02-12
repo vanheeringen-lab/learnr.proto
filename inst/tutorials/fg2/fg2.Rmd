@@ -721,7 +721,7 @@ head(mcols(___))
 
 ```{r monocytesall-check}
 grade_result(
-  pass_if(~identical(.result, head(monocytes_all))),
+  pass_if(~identical(.result, head(mcols(monocytes_all)))),
   correct = "Identify the variable (column in metadata) that you can use for counting the number of peaks per chip (this will be the statistic used in the barplot)."
   )
 ```
