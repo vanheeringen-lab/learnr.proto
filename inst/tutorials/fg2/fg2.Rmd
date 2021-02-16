@@ -40,6 +40,8 @@ suppressPackageStartupMessages({
   library(TxDb.Hsapiens.UCSC.hg38.knownGene)
   txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene 
   seqlevels(txdb) <- "chr19"
+  promoters_chr19 <- unique(promoters(genes(txdb), upstream=2000, downstream=200)) 
+  rm(txdb)
   
   ## installing additional packages by:
   # BiocManager::install('genomation')
@@ -55,24 +57,12 @@ suppressPackageStartupMessages({
   # data accessible to all exercises
   rdata = system.file("extdata", "week2.Rdata", package = "learnr.proto")
   load(rdata)
-  monocytes_list <- GRangesList(monocytes_list, compress=F) # go from compressed to simpleGRangesList
-  # make one large granges object
-  monocytes_all <- unlist(monocytes_list)
-  monocytes_all$chip <- names(monocytes_all)
-  
-  # chr19_windows_1bp <- tileGenome(seqinfo(txdb), tilewidth = 10, cut.last.tile.in.chrom =T)
-  tss_chr19 <- unique(promoters(genes(txdb), upstream=100, downstream=0)) 
-  tss_chr19  <- resize(tss_chr19, width = 1, fix = "end")
-  promoters_chr19 <- unique(promoters(genes(txdb), upstream=2000, downstream=200)) 
-  
+  #monocytes_list <- GRangesList(monocytes_list, compress=F) # go from compressed to simpleGRangesList
+
   # gene quantification chromosome 19  
   rdsfile <- system.file("extdata", "week2", "prepared_rds", "blueprint_c000s5_gene_quantification_chr19.rds", package = "learnr.proto")
   quantification_chr19 <- readRDS(rdsfile)
-  
-  # import the gencode features for annotation with genomation (exercise 8)
-  gencode_chr19 <- system.file("extdata", "week2", "encode", "gencodev32.chr19.bed", package = "learnr.proto")
-  gencode_chr19 <- readTranscriptFeatures(gencode_chr19, up.flank = 2000, down.flank = 200) 
-})
+  })
 ```
 
 ```{r stop_when_browser_closes, context="server"}
@@ -704,7 +694,14 @@ c. Identify the `geom_` function that will give you a barplot.
 > * This will show the top rows in the metadata of `monocytes_all`.  
 > * Make sure you match every operning "(" with a closing ")".  
 
-```{r monocytesall, exercise=TRUE, exercise.lines=3, exercise.eval=FALSE, error=TRUE}
+```{r prep_q3a}
+# make one large granges object
+monocytes_all <- unlist(monocytes_list)
+monocytes_all$chip <- names(monocytes_all)
+```
+
+
+```{r monocytesall, exercise=TRUE, exercise.lines=3, exercise.eval=FALSE, error=TRUE, exercise.setup="prep_q3a"}
 # print the head of object 'mcols(monocytes_all)'
 
 
@@ -742,7 +739,7 @@ Secondly, you have to extract the metadata and write it into a data.frame as GRa
 > 
 > * The function `as.data.frame()` is used to convert the resulting 'DFrame' object into a 'data.frame'.  
 
-```{r q_extractmetadata, exercise=TRUE, exercise.lines=6, exercise.eval=FALSE, error=TRUE}
+```{r q_extractmetadata, exercise=TRUE, exercise.lines=6, exercise.eval=FALSE, error=TRUE, exercise.setup="prep_q3a"}
 # extract metadata from 'monocytes_all'
 monocytes_metadata <- __(__)
 
@@ -766,11 +763,14 @@ grade_code()
 
 > **Exercise 3c**: Complete the code below to plot the number of peaks per ChIP in a bar chart using ggplot2 plotting (code check).  
 
-```{r prepare_q3c} 
+```{r prep_q3c} 
+monocytes_all <- unlist(monocytes_list)
+monocytes_all$chip <- names(monocytes_all)
 monocytes_metadata <- as.data.frame(mcols(monocytes_all))
+rm(monocytes_all)
 ```
 
-```{r q3c_barplotpeakcount, exercise=TRUE, exercise.lines=8, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q3c"}
+```{r q3c_barplotpeakcount, exercise=TRUE, exercise.lines=8, exercise.eval=FALSE, error=TRUE, exercise.setup="prep_q3c"}
 # plot the number of peaks per chip
 ggplot(data = __)+
   __(mapping=aes(y=__) )+
@@ -843,11 +843,13 @@ See also the [dplyr cheatsheet](https://rstudio.com/wp-content/uploads/2015/02/d
 > **Exercise 4a**: Add a variable called 'peak_size' to `monocytes_metadata`. This new variable holds the peak widths (code check).   
 
 
-```{r prepare_q4a, echo=FALSE}
+```{r prep_q4a, echo=FALSE}
+monocytes_all <- unlist(monocytes_list)
+monocytes_all$chip <- names(monocytes_all)
 monocytes_metadata <- as.data.frame(mcols(monocytes_all))
 ```
 
-```{r addpeaksize, exercise=TRUE, exercise.lines=3, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q4a"}
+```{r addpeaksize, exercise=TRUE, exercise.lines=3, exercise.eval=FALSE, error=TRUE, exercise.setup="prep_q4a"}
 # add variable 'peak_size' to monocytes_metadata with the width of the peaks from monocytes_all 
 
 
@@ -855,7 +857,7 @@ monocytes_metadata <- as.data.frame(mcols(monocytes_all))
 
 ```{r addpeaksize-hint-1}
 #Remember, to add new columns to GRanges objects you can use:
-`granges_object$new_variable <- variable_calculation`. 
+`granges_object$new_variable <- variable_calculation`
 ```
 
 
@@ -882,12 +884,15 @@ grade_code()
 > 2. Then, calculate the total number of bps covered by each peak dataset as 'total_bps'. Use the 'peak_size' variable you defined in exercise 4a.        
 > 3. Laslty, calculate what fraction this is of chromosome 19 (=total 58617616 bp).   
 
-```{r prepare_q4b}
+```{r prep_q4b}
+monocytes_all <- unlist(monocytes_list)
+monocytes_all$chip <- names(monocytes_all)
 monocytes_metadata <- as.data.frame(mcols(monocytes_all))
 monocytes_metadata$peak_size <- width(monocytes_all)
+rm(monocytes_all)
 ```
 
-```{r summarisewidth, exercise=TRUE, exercise.lines=6, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q4b"}
+```{r summarisewidth, exercise=TRUE, exercise.lines=6, exercise.eval=FALSE, error=TRUE, exercise.setup="prep_q4b"}
 # calculate the total number of bps covered by each chipseq dataset
 # and as a fraction of total bps in chromosome 19
 monocytes_metadata %>% 
@@ -928,7 +933,7 @@ grade_code()
 > * We instruct the barplot function to plot the actual values (in contrast to counting the occurrences of each value as in exercise 3) with: `stat = "identity"`.  
 > * Hit "Run Code" to plot the plot in the console.  
 
-```{r plotsummarisewidth, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prepare_q4b"}
+```{r plotsummarisewidth, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prep_q4b"}
 # plot the fraction covered in a bar chart
 monocytes_metadata %>%  group_by(chip) %>% 
   summarise(total_bps = sum(peak_size),  
@@ -1583,8 +1588,13 @@ gencode_chr19 <- readTranscriptFeatures("data/encode/gencodev32.chr19.bed", uniq
 
 > **Exercise 8a**: Use annotateWithGeneParts() to determine the overlap between H3K4me3 peaks and promoters, exons, introns and intergenic regions (code check).  
 
+```{r prep_q8a}
+# import the gencode features for annotation with genomation (exercise 8)
+gencode_chr19 <- system.file("extdata", "week2", "encode", "gencodev32.chr19.bed", package = "learnr.proto")
+gencode_chr19 <- readTranscriptFeatures(gencode_chr19, up.flank = 2000, down.flank = 200) 
+```
 
-```{r q8a_genomationoverlap, exercise=TRUE, exercise.eval=FALSE, error=TRUE}
+```{r q8a_genomationoverlap, exercise=TRUE, exercise.eval=FALSE, error=TRUE, exercise.setup="prep_q8a"}
 # overlap of h3k4me3 with promoters, exons, introns and intergenic regions
 annotation_h3k4me3 <- ___(target = __, feature = __)
 ```
@@ -1618,6 +1628,9 @@ plotTargetAnnotation(x = [annotateWithGeneParts_output], main = "....")
 > **Exercise 8b**: Plot the output of exercise 8a using plotTargetAnnotation().     
 
 ```{r prepare_q8b, echo=FALSE}
+gencode_chr19 <- system.file("extdata", "week2", "encode", "gencodev32.chr19.bed", package = "learnr.proto")
+gencode_chr19 <- readTranscriptFeatures(gencode_chr19, up.flank = 2000, down.flank = 200) 
+
 annotation_h3k4me3 <- annotateWithGeneParts(target = monocytes_h3k4me3, feature = gencode_chr19)
 ```
 
