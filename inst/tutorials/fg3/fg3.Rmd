@@ -180,12 +180,12 @@ question_text(
 
 ## 3.1 Introduction   
 ### 3.1.1 Recap fg2  
-In week 2 we quantified and visualized the overlap between histone peaks and promoters and examined the association with gene expression. Although informative, we have been ignoring the actual ChIP-seq signal strengths altogether.  
+In week 2 we quantified and visualized the overlap between histone peaks and promoters and examined the association between the presence/absence of a histone mark and gene expression.   
 
 ### 3.1.2 This week's topic  
-This week you will investigate the relationship between histone PTMs and gene expression further by including ChIP-seq signals in your analyses. You will generate plots displaying the distribution of ChIP-seq signal around certain genomic positions, here a set of promoter regions to answer common questions like: "*What is the signal of the mark around the TSS?*", "*What is the relationship between histone ChIP-seq signal intensity and gene expression?*".  
+This week you will investigate the ChIP-seq data further by including the actual signal from the bigwig files in your analysis. You will generate plots displaying the distribution of the ChIP-seq signal around certain genomic positions, here a set of transcription start sites to answer common questions like: "*What is the signal of the mark around the TSS?*", "*What is the relationship between histone ChIP-seq signal intensity and gene expression?*", and "*What are the chromatin states in my dataset?*".  
 <br>
-These plots include an average signal profile and a heatmap representation. You could use dplyr-related functions and ggplot-ting to achieve this but it is much more convenient to use dedicated tools for these tasks.   
+The plots that display the ChIP-seq signal around the TSS include an average signal profile and a heatmap. You could use dplyr-related functions and ggplot-ting to achieve this but it is much more convenient to use functions from dedicated packages for these tasks.   
 <br>
 We have chosen for the [genomation](https://github.com/BIMSBbioinfo/genomation) package for this purpose because it is compatible with the file types that we have available. (Side note: there are a number of other packages to analyze ChIP-seq data we well. Incl. ChIPpeakAnno and ChIPseeker.)   
 <br>
@@ -232,6 +232,8 @@ library(genomation)
 
 ### 3.1.5 About the exercises  
 
+(These are the same as last week.)    
+
 * In this tutorial you will have multiple-choice and check-the-box questions like in fg1 but also **complete-the-code exercises**. The latter are sometimes evaluated on the printed object or summary (e.g a the top part of an object). At other times, the code itself is checked. When the code is evaluated we added "(code check)" to the question. In these cases, R will give custom feedback that helps you correct your code.      
 
 * Due to technical reasons, when you hit Submit Answer of "(code check)" exercises, the output (if there is any) will not be printed. Eg a plot won't be shown. To visualize the plot, you must you use `Run Code`.  
@@ -258,8 +260,7 @@ You are allocated to Breakout rooms in Zoom (or you can select one yourself). Ei
 ### 3.2.1 Identify the nearest TSS   
 First, let's identify the nearest TSS and plot the distance between a histone mark and its nearest TSS (in contrast to identifying strict overlap as in **fg2**). In an attempt to speed up the tutorial, we have reduced the size of the dataset by randomly selecting 100 H3K4me3 peaks (on chromosome 19).      
 
-### Exercise 1    
-Identify the nearest TSS for each H3K4me3 peak in monocytes.   
+### Exercise 1a    
 
 > **Exercise 1a**: Recap, which of the commands below imports the peaks table into a GRanges object?  
 
@@ -281,7 +282,7 @@ distance2NearestFeature(g.idh = [chip_peaks_in_GRanges],
                         tss = [TSSs_in_GRanges])  
 ```
 
-> **Exercise 1b**: Identify the nearest TSS for each H3K4me3 ChIP-seq peak.  
+> **Exercise 1b**: Identify the nearest TSS for each H3K4me3 ChIP-seq peak in your dataset.  
 > 
 - H3K4me3 peaks in monocytes are stored in `monocytes_h3k4me3_sample`.   
 - TSS locations are stored in object `tss_chr19_ex1`.  
@@ -317,15 +318,15 @@ tss = tss_chr19_ex1
 ```{r q1_distancetss-check}
 grade_result(
   pass_if(~identical(.result, head(distance2NearestFeature(monocytes_h3k4me3_sample, tss_chr19_ex1)))),
-  correct = "This object, 'dist_h3k4me3_to_tss' is a data.frame reporting for each H3K4me3 peak its nearest TSS, the name (Entrez geneid) of the corresponding gene, and the distance between them. Which variable reports the distance?"
+  correct = "This object, 'dist_h3k4me3_to_tss' is a data.frame reporting for each H3K4me3 peak its nearest TSS, the name (Entrez gene ID) of the corresponding gene, and the distance between them. Which variable reports the distance?"
 )
 ```
 
 * **Important to note**: there are negative and positive distances reported in `dist_h3k4me3_to_tss$dist.to.feature`. Negative values indicate that the H3K4me3 peak is located **upstream** the TSS, positive values refer to H3K4me3 peaks located **downstream** the TSS.   
 
 
-### 3.2.2 Plot distances between ChIP peaks and features  
-Let's plot the reported distances between H3K4me3 peaks and their nearest TSS.    
+### 3.2.2 Summarize distances between ChIP peaks and features  
+Let's summarize the reported distances between H3K4me3 peaks and their nearest TSS.    
 
 ### Exercise 2a   
 
@@ -429,10 +430,10 @@ Let's look at these relationships in real data.
 ### 3.3.2 Importing ChIP-seq signal in r   
 ChIP-seq signal can be obtained from BAM files or bigWig files. Remember from week 1, BAM files contain records of read alignments with 1 line per read. The bigWig files do not store individual reads but the coverage across the genome, often normalized per million mapped reads.   
 <br>
-Not all packages and functions are compatible with both file types and the resulting plots may look slightly different in part because BAM files - as they store read information -  give you more freedom to define how coverage is calculated. You will use the data from bigWig files today as those are provided by BLUEPRINT in contrast to BAM files.     
+Not all packages and functions are compatible with both file types and the resulting plots may look slightly different in part because BAM files - as they store read information -  give you more freedom to define how coverage is calculated. You will use the data from bigWig files today as those are provided by the BLUEPRINT project.     
 <!-- REF: https://www.bioconductor.org/packages/release/bioc/vignettes/genomation/inst/doc/GenomationManual.html#4_Extraction_and_visualization_of_genomic_data   -->
 <br>
-We limited the data stored in the bigWig files to a **10kb window around the TSSs of 60 genes on chromosome 19 (genes were randomly selected)**. This was done to reduce the size of these files (bigWig and BAM files are huge!) and speed up the tutorial a bit. By taking a *random* selection, the relationships present in the genome-wide dataset should till hold in the sampled dataset. However, because of this decision you can't make plots of windows wider than 10kb. Also, even with this downsampling, the calculations can take 10-20sec, so- more time for coffee ;-)!  
+We limited the data stored in the bigWig files to a **10kb window around the TSSs of 60 genes on chromosome 19 (genes were randomly selected)**. This was done to reduce the size of these files (bigWig and BAM files are huge!) and speed up the tutorial a bit. By taking a *random* selection, the relationships present in the genome-wide dataset should till hold in the sampled dataset. However, because of this decision you can't make plots of windows wider than 10kb and the plots may have low resolution. For certain exercises we therefore prepared similar plots in advance using *all TSSs* on chromosome 19 (having more regions increases the resolution and helps you identify the trends and relationships in the data).  
 
 
 ### Exercise 3  
@@ -470,7 +471,7 @@ resize(x = [GRanges_object], width = [desired_width], fix = ["start", "end" or "
 
 > **Exercise 3a**: Complete and then run the code below to obtain the H3K4me3 signal in a **10kb** window around the TSSs.  
 >
-> * The object `bw_h3k4me3_60genes` directs to the H3K4me3 ChIP-seq bigWig file.  
+> * The object `bw_h3k4me3_60genes` points to the H3K4me3 ChIP-seq bigWig file.  
 
 ```{r q3a_h3k4me3_scores, exercise=TRUE, exercise.eval=FALSE, error=TRUE}
 # 1. Define the window size 
@@ -579,7 +580,7 @@ ___(mat = scores_h3k4me3_tss, ___)
 ```{r q3b_h3k4me3plot-check}
 grade_result(
   pass_if(~identical(.result, plotMeta(mat = scores_h3k4me3_tss, xcoords = c(-5000, 5000)))),
-  correct = "The signal you get with only  60 genes in the dataset is a somewhat noisy. Open the dropdown box of exercise 3c to view the same plot but generated using all TSSs on chromosome 19. Use that example plot to answer the multiple choice questions.")
+  correct = "The signal you get with only  60 genes in the dataset is a bit noisy. Open the dropdown box of exercise 3c to view the same plot generated using all TSSs on chromosome 19. Use that example plot to answer the multiple choice questions.")
 ```
 
 ```{r q3b_h3k4me3plot_meake_exampleplot, eval=FALSE, echo=FALSE}
@@ -613,7 +614,7 @@ plotMeta(mat = scores_h3k4me3_tss_chr19, xcoords = c(-5000, 5000))
 
 ```{r q3c_mc_densityplot}
 quiz(caption="",
-  question("Which function would you change and how, to make sure that the signal in the plot of Exercise 3b is limited to +/-3kb around the TSSs?",
+  question("Which function would you change and how, to make sure that the signal in the plot is limited to +/-3kb around the TSSs?",
          answer("Change the xcoords parameter in 'plotMeta', set it to c(-3000, 3000).", message = "Changing the xcoords parameter only changes the thickmarks on the x-axis but does not change the actual window size of the interval."),
          answer("Filter the ScoreMatrix 'scores_h3k4me3_tss' for columns c(-3000, 3000).", message = "We could filter the matrix indeed but these are not the correct columns as there are no 'negative' columns."),
          answer("Change the width parameter in 'resize', set it to 6001.", correct = TRUE),
@@ -711,7 +712,7 @@ ScoreMatrix(target = bw_h3k27ac_60genes, windows = tss_window_60genes, ....)
 grade_result(pass_if(~identical(.result,plotMeta(mat = ScoreMatrix(target = bw_h3k27ac_60genes,
                                                                    windows = resize(x = tss_chr19_60genes, width = 10001, fix = "center"), 
                                                                    type = 'bigWig', strand.aware =TRUE) , xcoords = c(-5000, 5000)))),
-             correct = "Looks a bit bumpy doesn't it? For exercise 4b we therefore prepared the plot in advance.")
+             correct = "Looks a bit bumpy doesn't it? For exercise 4b we also prepared a plot using all TSSs on chromosome 19 in advance.")
 ```
 
 ### Exercise 4b  
@@ -904,7 +905,7 @@ plotMeta(scores_h3k4me3_h3k27ac_h3k27me3, xcoords = c(-5000, 5000), overlay = TR
 
 <!-- ```{r q6a_addh3k37me3-solution} -->
 <!-- # Create H3K27me3 ScoreMatrix for the 10kb windows around the TSS. -->
-<!-- scores_h3k27me3_tss <- ScoreMatrix(target = bw_h3k27me3_60genes, windows = tss_window, type = 'bigWig', strand.aware =TRUE)   -->
+<!-- scores_h3k27me3_tss <- ScoreMatrix(target = bw_h3k27me3_60genes, windows = tss_window_60genes, type = 'bigWig', strand.aware =TRUE)   -->
 
 <!-- # Create a new ScoreMatrixList object   -->
 <!-- scores_h3k4me3_h3k27ac_h3k27me3 <- new("ScoreMatrixList", list(h3k4me3=scores_h3k4me3_tss, h3k27ac=scores_h3k27ac_tss, h3k27me3=scores_h3k27me3_tss)) -->
@@ -918,7 +919,7 @@ plotMeta(scores_h3k4me3_h3k27ac_h3k27me3, xcoords = c(-5000, 5000), overlay = TR
 grade_result(pass_if(~identical(.result,
                                 plotMeta(mat = new("ScoreMatrixList", list(h3k4me3=scores_h3k4me3_tss, 
                                                                            h3k27ac=scores_h3k27ac_tss, 
-                                                                           h3k27me3=ScoreMatrix(target = bw_h3k27me3_60genes, windows = tss_window, type = 'bigWig', strand.aware =TRUE))), 
+                                                                           h3k27me3=ScoreMatrix(target = bw_h3k27me3_60genes, windows = tss_window_60genes, type = 'bigWig', strand.aware =TRUE))), 
                                          xcoords = c(-5000, 5000), 
                                          overlay = TRUE, 
                                          profile.names = c("H3K4me3", "H3K27ac", "H3K27me3"))
@@ -963,12 +964,12 @@ Use this example plot to answer the multiple choice questions below.
 
 ```{r q6b_addh3k37me3_mc}
 question("What can you conclude from the above plot?",
-         answer("H3K4me3 scores are always higher than the H3K27ac scores.", message = "These plots display the *average* scores, there might still be TSS whith only H3K27ac or with a H3K27ac signal that is higher than H3K4me3, you can't say that from this plot."),
-         answer("There are more TSSs overlapping a H3K4me3 peak than TSSs overlapping a H3K27ac peak.", message = "This plot does not display how many TSS overlap with a ChIP peak."),
-         answer("There are no H3K27me3 peaks overlapping TSSs used to make this plot.", message = "The H3K27me3 signal is generally broad, spanning 10s of kbs and does not reach such high scores as H3k4me3. In this plot we see a slight enrichment of H3K27me3 over the TSS, these could well represent a few TSSs with H3K27me3 signal."),
-         answer("There are no TSSs with both H3K4me3 and H3K27me3", message = "Although the average H3K27me3 signal is low due to that hsitone mark not showing high enrichments and that likely only a few TSSs in this dataset have this mark, that does not mean that H3K27me3 is not found at promoters that have H3K4me3."),
-         answer("None of the statements listed above", correct = TRUE, message = "This plot shows the 'average' ChIP-seq signal around the TSS but not the extend of overlap among the different marks. Nor does it show the variation in signal strenght that can be found for a particular mark, only the average signal. You will ook at the variation in signal strength next, using H3K4me3 as a test case. And regarding the H3K27me3, the H3K27me3 signal is generally broad, spanning 10s of kbs and does not reach such high scores as H3k4me3. In this plot we see a slight enrichment of H3K27me3 over the TSS, these could well represent a few TSSs with H3K27me3 signal."),
-         answer("All of the statements listed above are correct"),
+         answer("1: H3K4me3 scores are always higher than the H3K27ac scores.", message = "These plots display the *average* scores, there might still be TSS whith only H3K27ac or with a H3K27ac signal that is higher than H3K4me3, you can't say that from this plot."),
+         answer("2: There are more TSSs overlapping a H3K4me3 peak than TSSs overlapping a H3K27ac peak.", message = "This plot does not display how many TSS overlap with a ChIP peak."),
+         answer("3: There are no H3K27me3 peaks overlapping TSSs used to make this plot.", message = "The H3K27me3 signal is generally broad, spanning 10s of kbs and does not reach such high scores as H3k4me3. In this plot we see a slight enrichment of H3K27me3 over the TSS, these could well represent a few TSSs with H3K27me3 signal."),
+         answer("4: There are no TSSs with both H3K4me3 and H3K27me3", message = "Although the average H3K27me3 signal is low due to that hsitone mark not showing high enrichments and that likely only a few TSSs in this dataset have this mark, that does not mean that H3K27me3 is not found at promoters that have H3K4me3."),
+         answer("None of the statements 1, 2, 3 or 4 are correct", correct = TRUE, message = "This plot shows the 'average' ChIP-seq signal around the TSS but not the extend of overlap among the different marks. Nor does it show the variation in signal strenght that can be found for a particular mark, only the average signal. You will ook at the variation in signal strength next, using H3K4me3 as a test case. And regarding the H3K27me3, the H3K27me3 signal is generally broad, spanning 10s of kbs and does not reach such high scores as H3k4me3. In this plot we see a slight enrichment of H3K27me3 over the TSS, these could well represent a few TSSs with H3K27me3 signal."),
+         answer("Statements 1, 2,3 and 4 are all correct"),
          allow_retry=TRUE)
 ```
 
@@ -1150,7 +1151,7 @@ ggsave(filename= "images/q7b_boxplot_average_h3k4me3_tss_5kbwindow.png")
 
 ![](images/q7b_boxplot_average_h3k4me3_tss_5kbwindow.png){width=30%}\    
 
-In this boxplot we can already see that there are some outliers that have a very high H3K4me3 signal in this 5kb window around the TSS, even higher than the maximum of the average signal plotted in exercises 3b, 5 and 6 (which reached appr. 50 reads per million).  
+This boxplot nicely shows the variation in H3K4me3 signal at the TSS.  
 <br>
 Let's look at the association between these different H3K4me3 levels and gene expression.  
 
@@ -1164,7 +1165,7 @@ To generate this boxplot for groups of genes grouped by gene expression into 4 e
 #### Step 1. Adding gene expression values to `average_h3k4me3_tss_df`.  
 The gene expression data are stored in the metadata of `tss_chr19_60genes`:  
 ```{r show_tss_chr19_60genes, eval=TRUE, echo=TRUE}
-show(tss_chr19_60genes)
+head(tss_chr19_60genes)
 ```
 
 ```{r geneexpressionmeasure_mc}
@@ -1184,8 +1185,8 @@ You can group rows of a data.frame into groups of equal size using `ntile()` fro
 ntile(x = [variable_to_use_for_grouping] , n = [number_of_groups])
 ```
 <br>
-By running `ntile()` within `mutate()` you can define the new variable. For example, below we categorize TSS into quartiles based on the corresponding gene expression stored in the metadata of `tss_chr19_60genes`:   
-```{r ntile_example2, echo=TRUE, eval=FALSE}
+By running `ntile()` within `mutate()` you can define the new variable. For example, below we group TSSs into quartiles based on the corresponding gene expression stored in the metadata of `tss_chr19_60genes`:   
+```{r ntile_example2, echo=TRUE, eval=TRUE}
 # group genes in quartiles by FPKM
 # count genes per group with group_by() and tally
 as.data.frame(mcols(tss_chr19_60genes)) %>% 
@@ -1401,7 +1402,7 @@ ggplot(data = average_h3k4me3_tss_df, mapping=aes(y = h3k4me3_rpm, x = log(FPKM+
        subtitle = "5kb window around the TSS, with smooth trend line.")  
 ```
 <br>
-![](images/q7e_scatterplot_average_h3k4me3_tss_5kbwindow_vs_fpkm_incl_default_smoothline.png){width=75%}\   
+![](images/q7e_scatterplot_average_h3k4me3_tss_5kbwindow_vs_fpkm_incl_default_smoothline.png){width=65%}\   
 <br>  
 You can use different methods to draw the trend line. For example, `methods = "lm"` fits a linear model and plots the line of best fit:    
 <br>
@@ -1414,9 +1415,11 @@ ggplot(data = average_h3k4me3_tss_df, mapping=aes(y = h3k4me3_rpm, x = log(FPKM+
        subtitle = "5kb window around the TSS, with best fit line from linear regression.")
 ```
 <br>
-![](images/q7e_scatterplot_average_h3k4me3_tss_5kbwindow_vs_fpkm_incl_lm_fitline.png){width=75%}\   
+![](images/q7e_scatterplot_average_h3k4me3_tss_5kbwindow_vs_fpkm_incl_lm_fitline.png){width=65%}\   
 <br>
-> **Background info**: For further reading on smooth-lines: [Section 2.6.1 in ggplot2: elegant graphics for data analysis](https://ggplot2-book.org/getting-started.html?q=smooth#smooth) and a [short tutorial on smoothing with ggplot2 by Adam J Sullivan](http://statseducation.com/Introduction-to-R/modules/graphics/smoothing/).  
+
+> **Background info**: For further reading on smooth-lines: [Section 2.6.1 in ggplot2: elegant graphics for data analysis](https://ggplot2-book.org/getting-started.html?q=smooth#smooth) and a [short tutorial on smoothing with ggplot2 by Adam J Sullivan](http://statseducation.com/Introduction-to-R/modules/graphics/smoothing/).   
+
 
 ```{r make_plots_q7e, eval=FALSE, echo=FALSE, fig.height=4, fig.width=6}
 # I used this code to make the plots used above.
@@ -1439,7 +1442,7 @@ ggsave(filename= "images/q7e_scatterplot_average_h3k4me3_tss_5kbwindow_vs_fpkm_i
 
 ```{r q7e_signalfpkm_mc}
 question("Use the trend lines in the two plots above, what can you say about the strength of the relationship between H3K4me3 and gene expression?",
-         answer("This is a strong 1-to-1 relationship: The H3k4me3 signal at the TSS is a good predictor for gene expressino levels."),
+         answer("This is a strong 1-to-1 relationship: The H3k4me3 signal at the TSS is a good predictor for gene expression levels."),
          answer("This is a strong 1-to-1 relationship with gene expression levels being negatively associated with H3K4me3 signal at the TSS."),
          answer("The scatterplot shows that there is no relationship between H3K4me3 signal and gene expression levels."),
          answer("None of the above.", correct = TRUE, message = "Observe that the positive association between H3K4me3 signal at the TSS and gene expression is a **trend and not a 1-to-1 relationship!** Additional factors influence gene expression levels including the presence of other marks, the presence of TFs and post-transcriptional mechanisms."),
@@ -1561,7 +1564,7 @@ grade_code()
 
 ```{r prepare_q8e}
 tss_window_60genes <- resize(x= tss_chr19_60genes, width = 5001, fix = "center")
-average_h3k27me3_tss <- ScoreMatrixBin(target = bw_h3k27me3,windows = tss_window_60genes,bin.num = 1,type = 'bigWig',strand.aware =TRUE)
+average_h3k27me3_tss <- ScoreMatrixBin(target = bw_h3k27me3_60genes, windows = tss_window_60genes, bin.num = 1,type = 'bigWig',strand.aware =TRUE)
 average_h3k27me3_tss_matrix <- as(average_h3k27me3_tss, "matrix")
 average_h3k27me3_tss_df <- as.data.frame(average_h3k27me3_tss_matrix)
 average_h3k27me3_tss_df$gene_id <- tss_chr19_60genes$gene_id
@@ -1632,7 +1635,7 @@ Hmmm, this does not look at all like the boxplot with H3K4me3 signal per gene gr
 
 ```{r prepare_q8f}
 tss_window_60genes <- resize(x= tss_chr19_60genes, width = 5001, fix = "center")
-average_h3k27me3_tss <- ScoreMatrixBin(target = bw_h3k27me3,windows = tss_window_60genes,bin.num = 1,type = 'bigWig',strand.aware =TRUE)
+average_h3k27me3_tss <- ScoreMatrixBin(target = bw_h3k27me3_60genes, windows = tss_window_60genes,bin.num = 1,type = 'bigWig',strand.aware =TRUE)
 average_h3k27me3_tss_matrix <- as(average_h3k27me3_tss, "matrix")
 average_h3k27me3_tss_df <- as.data.frame(average_h3k27me3_tss_matrix)
 average_h3k27me3_tss_df$gene_id <- tss_chr19_60genes$gene_id
@@ -1682,7 +1685,7 @@ grade_code(
 question("What statement best describes the relationship between H3K27me3 and gene expression? (With gene expression defined as log(FPKM+1))",
          answer("The data show a linear relationship."),
          answer("The data show an inverse linear relationship."),
-         answer("The data show a non-linear relationship.", correct=TRUE, message = "Indeed. What you can clearly see in this graph is that the mere presence of H3K27me3 at the TSS translates to gene silencing for the majority of TSSs. This appears irrespecitve of the H3K27me3 level. We observe a couple of outliers. These may be due to the expression different transcript isoforms, expressed from a different TSS. Or due to TSSs marked by H3K27me3 in a fraction of the cell population."),
+         answer("The data show a non-linear relationship.", correct=TRUE, message = "Indeed. What you can clearly see in this graph is that the mere presence of H3K27me3 at the TSS translates to gene silencing for the majority of TSSs. This appears irrespecitve of the H3K27me3 level. We observe a few outliers of TSSs that are marked by H3K27me3 but still show some extend of gene expression. These may be due to the expression different transcript isoforms, expressed from a different TSS. Or due to TSSs marked by H3K27me3 in a fraction of the cell population."),
          answer("I need a smoothing line to answer this question"),
          allow_retry=TRUE)
 ```
@@ -1922,7 +1925,7 @@ dev.off()
 ```
 
 > #### **Exercise 9b example result**     
-<details><summary>Click here for the heatmap of H3K4me3 around all TSSs of chromosome 19.</summary>  
+<details><summary>Click here for the heatmap of H3K4me3 singal in a 10kb window around all TSSs of chromosome 19.</summary>  
 <br>
 ![](images/q9b_heatmap_h3k4me3signal.png)\  
 <br>
@@ -2164,7 +2167,7 @@ grade_result(pass_if(~identical(.result,
 
 > **Exercise 12**: Make a heatmap of the **H3K27me3** signal in a 10kb window around the TSS using the same (top-to-bottom) ordering of the regions as used for the heatmap of section [3.5.4 Heatmap of 1 mark ordered by gene expression] (code check). 
 
-> * `tss_window_60genes` from Exercise 11 is available to you.  
+> * `tss_window_60genes_sorted` from Exercise 11 is available to you.  
 > * `bw_h3k27me3_60genes` points to the locations of the bigWig file of the H3K27me3 ChIP.  
 > * `colors_h3k27me3` is the color palette you can use in this heatmap (white-to-blue).  
 > * Hit "Run Code" to view the plot (plotting heatmaps may take 5-10 sec).  
@@ -2225,7 +2228,7 @@ heatMatrix(mat = scores_h3k27me3_tss,
 ```
 
 ```{r q12b_h3k27me3_heatmapfpkmorder-code-check}
-grade_code(correct = "Also hit 'Run Code' to view the heatmap. You will see that only a couple (±8) regions have H3K27me3 signal in this sampled set of TSSs. In the following sections, we will generate similar plots using all TSSs on chromosome 19. In those plots it is easier to identify clusters of TSSs with H3K27me3 signal." )
+grade_code(correct = "Also hit 'Run Code' to view the heatmap. You will see that only a couple (±8) regions have H3K27me3 signal in this sampled set of TSSs. In the following sections, we have generated similar plots for you using all TSSs on chromosome 19. In those plots it is easier to identify clusters of TSSs with H3K27me3 signal." )
 ```
 
 ### 3.5.6 Heatmaps of multiple histone marks, ordered by gene expression.  
@@ -2377,7 +2380,7 @@ kmeans_function <- function(x) kmeans(x, centers = ["your desired number of clus
 ```
 
 ```{r q14_multiheatmap-hint-4}
-kmeans_function <- function(x) kmeans(x, centers = 3)$cluster
+kmeans_function <- function(x) kmeans(x, centers = 4)$cluster
 # Warning, the next hint is the solution!
 ```
 
@@ -2756,8 +2759,30 @@ question("The likely annotation is ... ",
 ```
 
 ## Finish  
-> #### Congratulations!  
-You have performed a quantitative analysis of the ChIP-seq signal at the TSS, analzyed its association with gene expression and the combinatorial patterns that occur among different histone marks at the TSS. You have completed this tutorial. Well done!   
+### Almost there...        
+> **You have one last challenge to go**: Hit the `Print page` button to save a progress report of the tutorial (incl. your answers) as pdf to your local drive.   
+> 
+> * It is important that you have visited each topic within the tutorial for all of the content to be populated.   
+> * Thus, if you see empty sections in your pdf file, revisit each section and print the report again.  
+> * Hit `Continue` after you saved your pdf file.     
+  
+```{js print2pdf1, context="server"}
+// the following 2 chunks print the completed sections of the tutorial to PDF
+// uses "css/print2pdf.css"
+$(document).on('shiny:inputchanged', function(event) {
+  if (event.name === 'print2pdf') {
+    window.print();
+  }
+});
+```
+```{r print2pdf2}
+# button can be placed anywhere in the tutorial
+# suggested at the end of the tutorial as the tutorial should be completed first
+actionButton("print2pdf", "Print page", style="opacity: .7; color: #000;")
+```
+
+### Well done!  
+Congratulations! You have performed a quantitative analysis of the ChIP-seq signal at the TSS, analyzed its association with gene expression and the combinatorial patterns that occur among different histone marks at the TSS. You have completed this tutorial. Well done!   
 
 <br>
 
