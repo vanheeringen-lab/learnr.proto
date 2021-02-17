@@ -39,22 +39,16 @@ suppressPackageStartupMessages({
   # data accessible to all exercises
   # see extdata/prepdata.Rmd --> section "week 3"
   # tss_chr19_60genes and quantification_chr19_sample correspond to the windows of which we have data in the bigWig files
-  # rdata = system.file("extdata", "week3.Rdata", package = "learnr.proto")
-  rdata ="/home/ctoenhake/learnr.proto/inst/extdata/week3_v2.Rdata" 
+  rdata = system.file("extdata", "week3.Rdata", package = "learnr.proto")
   load(rdata)
   rm(rdata)  
   
   ## bw file locations, see extdata/prepdata.Rmd for how these were generated. 
-  # bw_h3k4me3 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_10kb.bw", package = "learnr.proto")
-  # bw_h3k4me1 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547981.H3K4me1.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_10kb.bw", package = "learnr.proto")
-  # bw_h3k27me3 <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_10kb.bw", package = "learnr.proto")
-  # bw_h3k27ac <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547980.H3K27ac.bwa.GRCh38.20150528.chr19_chr19tss_0.4ofGenes_10kb.bw", package = "learnr.proto")
+   bw_h3k4me3_60genes <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19_chr19tss_60Genes_10kb.bw", package = "learnr.proto")
+   bw_h3k4me1_60genes <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547981.H3K4me1.bwa.GRCh38.20150528.chr19_chr19tss_60Genes_10kb.bw", package = "learnr.proto")
+   bw_h3k27me3_60genes <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.20150528.chr19_chr19tss_60Genes_10kb.bw", package = "learnr.proto")
+   bw_h3k27ac_60genes <- system.file("extdata", "week3", "bw_chr19_tss_sample", "C000S5H2.ERX547980.H3K27ac.bwa.GRCh38.20150528.chr19_chr19tss_60Genes_10kb.bw", package = "learnr.proto")
 
-  bw_h3k4me3_60genes <- "/home/ctoenhake/learnr.proto/inst/extdata/week3/bw_chr19_tss_sample/C000S5H2.ERX547984.H3K4me3.bwa.GRCh38.20150528.chr19_chr19tss_60Genes_10kb.bw"
-  bw_h3k4me1_60genes <- "/home/ctoenhake/learnr.proto/inst/extdata/week3/bw_chr19_tss_sample/C000S5H2.ERX547981.H3K4me1.bwa.GRCh38.20150528.chr19_chr19tss_60Genes_10kb.bw"
-  bw_h3k27me3_60genes <- "/home/ctoenhake/learnr.proto/inst/extdata/week3/bw_chr19_tss_sample/C000S5H2.ERX547983.H3K27me3.bwa.GRCh38.20150528.chr19_chr19tss_60Genes_10kb.bw"
-  bw_h3k27ac_60genes <- "/home/ctoenhake/learnr.proto/inst/extdata/week3/bw_chr19_tss_sample/C000S5H2.ERX547980.H3K27ac.bwa.GRCh38.20150528.chr19_chr19tss_60Genes_10kb.bw"
-  
   ## color palettes for heatmaps
   # color palette for h3k4me3
   colors_h3k4me3 <- colorRampPalette(c ("white", "red"))(100)
