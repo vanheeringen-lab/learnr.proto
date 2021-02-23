@@ -292,7 +292,7 @@ distance2NearestFeature(g.idh = [chip_peaks_in_GRanges],
 # 1. Identify the nearest TSS for each H3K4me3 peak  
 dist_h3k4me3_to_tss <- __(g.idh = __, tss = __)
 
-# 2. Print the first five lines of 'dist_h3k4me3_to_tss' with head()
+# 2. Print the first few lines of 'dist_h3k4me3_to_tss' with head()
 ___
 ```
 
@@ -578,6 +578,10 @@ ___(mat = scores_h3k4me3_tss, ___)
 ```
 
 ```{r q3b_h3k4me3plot-check}
+# gradethis tries to save the plots.
+# since users have no write permission, this goes wrong without this.
+pdf(NULL)  
+
 grade_result(
   pass_if(~identical(.result, plotMeta(mat = scores_h3k4me3_tss, xcoords = c(-5000, 5000)))),
   correct = "The signal you get with only  60 genes in the dataset is a bit noisy. Open the dropdown box of exercise 3c to view the same plot generated using all TSSs on chromosome 19. Use that example plot to answer the multiple choice questions.")
@@ -709,6 +713,10 @@ ScoreMatrix(target = bw_h3k27ac_60genes, windows = tss_window_60genes, ....)
 
 
 ```{r q4_h3k27ac_density-check}
+# gradethis tries to save the plots.
+# since users have no write permission, this goes wrong without this.
+pdf(NULL)
+
 grade_result(pass_if(~identical(.result,plotMeta(mat = ScoreMatrix(target = bw_h3k27ac_60genes,
                                                                    windows = resize(x = tss_chr19_60genes, width = 10001, fix = "center"), 
                                                                    type = 'bigWig', strand.aware =TRUE) , xcoords = c(-5000, 5000)))),
@@ -822,6 +830,10 @@ ___(___ = scores_h3k4me3_h3k27ac,
 <!-- ``` -->
 
 ```{r q5_overlay-check}
+# gradethis tries to save the plots.
+# since users have no write permission, this goes wrong without this.
+pdf(NULL)
+
 grade_result(pass_if(~identical(.result, 
                                 plotMeta(mat = new("ScoreMatrixList", list(h3k4me3=scores_h3k4me3_tss, h3k27ac=scores_h3k27ac_tss)), 
                                                   xcoords = c(-5000, 5000), 
@@ -916,6 +928,10 @@ plotMeta(scores_h3k4me3_h3k27ac_h3k27me3, xcoords = c(-5000, 5000), overlay = TR
 
 
 ```{r q6a_addh3k37me3-check}
+# gradethis tries to save the plots.
+# since users have no write permission, this goes wrong without this.
+pdf(NULL)
+
 grade_result(pass_if(~identical(.result,
                                 plotMeta(mat = new("ScoreMatrixList", list(h3k4me3=scores_h3k4me3_tss, 
                                                                            h3k27ac=scores_h3k27ac_tss, 
@@ -1878,6 +1894,10 @@ heatMatrix(mat = scores_h3k4me3_tss,
 ```
 
 ```{r q9_heatmap1mark-check}
+# gradethis tries to save the plots.
+# since users have no write permission, this goes wrong without this.
+pdf(NULL)
+
 grade_result(
  pass_if(~identical(.result, heatMatrix(mat = ScoreMatrix(target = bw_h3k4me3_60genes,
                                                           windows = resize(x=tss_chr19_60genes, width = 10001, fix = "center"),
@@ -2149,6 +2169,10 @@ tss_window_60genes_sorted  <- sort(x = tss_window_60genes, by = ~FPKM, decreasin
 <!-- ``` -->
 
 ```{r q11_heatmapfpkmorder-check}
+# gradethis tries to save the plots.
+# since users have no write permission, this goes wrong without this.
+pdf(NULL)
+
 grade_result(pass_if(~identical(.result,
                                 heatMatrix(mat = ScoreMatrix(target = bw_h3k4me3_60genes, 
                                                              windows = sort(x = tss_window_60genes_sorted, by = ~FPKM, decreasing =TRUE),
