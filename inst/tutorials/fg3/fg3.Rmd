@@ -8,7 +8,7 @@ output:
     fig_caption: no
     progressive: true
     allow_skip: true
-    css: css/custom.css
+    css: ["css/custom.css", "css/print2pdf.css"]
 runtime: shiny_prerendered
 description: >
   Multi line text can be put here
@@ -2765,7 +2765,7 @@ question("The likely annotation is ... ",
 > * It is important that you have visited each topic within the tutorial for all of the content to be populated.   
 > * Thus, if you see empty sections in your pdf file, revisit each section and print the report again.  
 > * Hit `Continue` after you saved your pdf file.     
-  
+
 ```{js print2pdf1, context="server"}
 // the following 2 chunks print the completed sections of the tutorial to PDF
 // uses "css/print2pdf.css"
@@ -2775,11 +2775,13 @@ $(document).on('shiny:inputchanged', function(event) {
   }
 });
 ```
+
 ```{r print2pdf2}
 # button can be placed anywhere in the tutorial
 # suggested at the end of the tutorial as the tutorial should be completed first
 actionButton("print2pdf", "Print page", style="opacity: .7; color: #000;")
 ```
+
 
 ### Well done!  
 Congratulations! You have performed a quantitative analysis of the ChIP-seq signal at the TSS, analyzed its association with gene expression and the combinatorial patterns that occur among different histone marks at the TSS. You have completed this tutorial. Well done!   
